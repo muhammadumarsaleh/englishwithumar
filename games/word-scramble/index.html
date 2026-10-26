@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Word Scramble — Spelling Bee EduSpark</title>
+<meta name="description" content="Game menyusun huruf acak menjadi kata Bahasa Inggris yang benar untuk anak TK & SD." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        },
+        colors: {
+          spark: {
+            50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',
+            500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81'
+          },
+          ink: { 900:'#0b1020', 800:'#151b33', 700:'#26304f', 600:'#3b4664' }
+        },
+        boxShadow: {
+          glass: '0 10px 40px -14px rgba(15,23,42,.28)',
+          soft: '0 18px 45px -18px rgba(79,70,229,.55)',
+          card: '0 24px 60px -30px rgba(15,23,42,.35)'
+        },
+        keyframes: {
+          drift: {
+            '0%':   { transform: 'translate3d(0,0,0) scale(1)' },
+            '100%': { transform: 'translate3d(30px,-40px,0) scale(1.12)' }
+          },
+          pop: {
+            '0%':   { transform: 'scale(.85)', opacity: '0' },
+            '60%':  { transform: 'scale(1.04)' },
+            '100%': { transform: 'scale(1)', opacity: '1' }
+          },
+          shake: {
+            '0%,100%': { transform: 'translateX(0)' },
+            '20%,60%': { transform: 'translateX(-7px)' },
+            '40%,80%': { transform: 'translateX(7px)' }
+          },
+          bounceIn: {
+            '0%':   { transform: 'translateY(-8px) scale(.9)', opacity: '0' },
+            '100%': { transform: 'translateY(0) scale(1)', opacity: '1' }
+          },
+          glow: {
+            '0%,100%': { boxShadow: '0 0 0 0 rgba(16,185,129,.5)' },
+            '50%':     { boxShadow: '0 0 0 14px rgba(16,185,129,0)' }
+          }
+        },
+        animation: {
+          drift: 'drift 16s ease-in-out infinite alternate',
+          pop: 'pop .45s cubic-bezier(.2,.8,.2,1) both',
+          shake: 'shake .45s ease-in-out',
+          bounceIn: 'bounceIn .35s cubic-bezier(.2,.8,.2,1) both',
+          glow: 'glow 1.2s ease-out'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<style>
+  :root { color-scheme: light; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background:#f7f8fc; color:#151b33; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4,.font-display { font-family: 'Outfit', system-ui, sans-serif; }
+
+  .mesh-bg {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(1100px 560px at 50% -12%, #eef2ff 0%, rgba(238,242,255,0) 62%),
+      radial-gradient(900px 520px at 100% 0%, #ecfeff 0%, rgba(236,254,255,0) 60%),
+      #f7f8fc;
+  }
+  .blob { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: .5; }
+
+  .glass {
+    background: rgba(255,255,255,.62);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    border: 1px solid rgba(255,255,255,.75);
+  }
+  .glass-strong {
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.9);
+  }
+  .gradient-text {
+    background: linear-gradient(100deg,#4f46e5 0%,#0ea5e9 45%,#8b5cf6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ====== TILE ====== */
+  .tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.1rem;
+    height: 3.1rem;
+    border-radius: .85rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -.02em;
+    color: #1e293b;
+    background: linear-gradient(155deg, #ffffff, #eef2ff);
+    box-shadow:
+      inset 0 0 0 1px rgba(226,232,240,.9),
+      0 8px 18px -10px rgba(15,23,42,.35);
+    cursor: pointer;
+    user-select: none;
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s, background .18s, color .18s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tile:hover:not(.used) {
+    transform: translateY(-3px) scale(1.03);
+    background: linear-gradient(155deg, #ffffff, #e0e7ff);
+    box-shadow:
+      inset 0 0 0 1px rgba(199,210,254,.9),
+      0 14px 26px -12px rgba(79,70,229,.6);
+  }
+  .tile:active:not(.used) { transform: translateY(-1px) scale(.98); }
+
+  .tile.used {
+    opacity: .32;
+    cursor: not-allowed;
+    background: #f1f5f9;
+    box-shadow: inset 0 0 0 1px rgba(226,232,240,.7);
+    color: #94a3b8;
+  }
+
+  /* ====== SLOT ====== */
+  .slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.1rem;
+    height: 3.1rem;
+    border-radius: .85rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: #fff;
+    background: linear-gradient(155deg, #4f46e5, #6366f1);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.25),
+      0 10px 22px -12px rgba(79,70,229,.85);
+    cursor: pointer;
+    user-select: none;
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s;
+    animation: bounceIn .3s cubic-bezier(.2,.8,.2,1) both;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .slot:hover { transform: translateY(-2px); }
+  .slot:active { transform: scale(.95); }
+  .slot.empty {
+    background: rgba(241,245,249,.7);
+    box-shadow: inset 0 0 0 2px rgba(203,213,225,.7);
+    color: transparent;
+    cursor: default;
+    animation: none;
+  }
+  .slot.empty:hover { transform: none; }
+
+  /* Highlight letter saat hint */
+  .tile.hint, .slot.hint {
+    background: linear-gradient(155deg, #f59e0b, #f97316);
+    color: #fff;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.3),
+      0 14px 28px -12px rgba(245,158,11,.8);
+    animation: glow 1.2s ease-out;
+  }
+
+  /* Wrong feedback */
+  .shake-board { animation: shake .45s ease-in-out; }
+
+  /* Success tile */
+  .tile.correct, .slot.correct {
+    background: linear-gradient(155deg, #10b981, #059669);
+    color: #fff;
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.3),
+      0 14px 28px -12px rgba(16,185,129,.9);
+  }
+
+  /* Progress ring */
+  .progress-ring { transform: rotate(-90deg); }
+  .progress-ring circle { transition: stroke-dashoffset .35s linear; }
+
+  /* Confetti */
+  .confetti {
+    position: fixed;
+    top: -12px;
+    width: 10px; height: 14px;
+    opacity: .95;
+    pointer-events: none;
+    z-index: 200;
+    animation: fall linear forwards;
+    border-radius: 2px;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Picture */
+  .picture-wrap {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -30px rgba(15,23,42,.55);
+    background: #e2e8f0;
+  }
+  .picture-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform .7s cubic-bezier(.2,.8,.2,1);
+  }
+  .picture-wrap:hover img { transform: scale(1.05); }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(#a5b4fc,#67e8f9); border-radius: 999px; border: 3px solid #f7f8fc; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(#6366f1,#06b6d4); }
+</style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- ====== AMBIENT BG ====== -->
+<div class="mesh-bg" aria-hidden="true">
+  <span class="blob bg-indigo-400 animate-drift" style="width:520px;height:520px;top:-180px;left:-140px;"></span>
+  <span class="blob bg-cyan-300 animate-drift" style="width:460px;height:460px;top:14%;right:-160px;animation-delay:-4s;"></span>
+  <span class="blob bg-fuchsia-300 animate-drift" style="width:420px;height:420px;bottom:-160px;left:22%;animation-delay:-8s;"></span>
+</div>
+
+<!-- ====== NAVBAR ====== -->
+<header class="sticky top-0 z-50">
+  <div class="mx-auto max-w-6xl px-4 pt-4 sm:px-6">
+    <nav class="glass flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 shadow-glass sm:px-4">
+      <a href="../../games.html" class="group flex items-center gap-3">
+        <span class="grid h-10 w-10 place-items-center rounded-xl bg-white text-cyan-600 shadow-soft ring-1 ring-slate-200 transition-transform duration-300 group-hover:-translate-x-0.5">
+          <i data-lucide="arrow-left" class="h-5 w-5"></i>
+        </span>
+        <span class="leading-tight">
+          <span class="block font-display text-[15px] font-extrabold tracking-tight text-ink-900">Word Scramble</span>
+          <span class="hidden text-[10px] font-semibold uppercase tracking-[.2em] text-slate-400 sm:block">EduSpark Arcade</span>
+        </span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <div class="hidden items-center gap-3 rounded-xl bg-white/70 px-3 py-1.5 ring-1 ring-slate-200/80 backdrop-blur sm:flex">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="trophy" class="h-3.5 w-3.5 text-amber-500"></i>
+            <span class="font-display text-sm font-extrabold text-ink-900" id="scoreDisplay">0</span>
+          </div>
+          <span class="h-4 w-px bg-slate-200"></span>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="flame" class="h-3.5 w-3.5 text-rose-500"></i>
+            <span class="font-display text-sm font-extrabold text-ink-900" id="streakDisplay">0</span>
+          </div>
+        </div>
+
+        <button type="button" id="restartBtn" class="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 px-3.5 py-2.5 text-xs font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+          <i data-lucide="rotate-ccw" class="h-3.5 w-3.5"></i>
+          <span class="hidden sm:inline">Ulangi</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6">
+
+  <!-- ====== SOFT SESSION BANNER ====== -->
+  <div id="sessionBanner" class="mb-6 hidden animate-pop rounded-2xl border border-amber-200 bg-amber-50/80 p-4 shadow-glass backdrop-blur">
+    <div class="flex items-start gap-3">
+      <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-600">
+        <i data-lucide="shield-alert" class="h-4 w-4"></i>
+      </span>
+      <div class="flex-1">
+        <p class="text-[13px] font-bold text-amber-900">Kamu membuka game ini langsung tanpa unlock</p>
+        <p class="mt-0.5 text-[12.5px] leading-relaxed text-amber-800/85">
+          Game tetap bisa dimainkan. Untuk pengalaman lengkap, buka lewat
+          <a href="../../games.html" class="font-bold underline decoration-dotted underline-offset-2">Game Hub</a>.
+        </p>
+      </div>
+      <button type="button" id="dismissBanner" class="grid h-7 w-7 place-items-center rounded-lg text-amber-500 transition hover:bg-amber-100">
+        <i data-lucide="x" class="h-3.5 w-3.5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ====== GAME HEADER ====== -->
+  <section class="mb-6">
+    <div class="glass rounded-3xl p-5 shadow-glass sm:p-6">
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-cyan-700 ring-1 ring-cyan-100">
+            <i data-lucide="spell-check-2" class="h-3 w-3"></i> Spelling Bee
+          </span>
+          <h1 class="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">
+            Susun Huruf Jadi <span class="gradient-text">Kata Inggris</span>
+          </h1>
+          <p class="mt-1.5 max-w-lg text-[13px] leading-relaxed text-slate-500">
+            Lihat gambarnya, lalu susun huruf acak menjadi kata Bahasa Inggris yang benar.
+          </p>
+        </div>
+
+        <!-- Progress info -->
+        <div class="flex items-center gap-4">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Soal</p>
+            <p class="font-display text-xl font-extrabold text-ink-900">
+              <span id="questionNum">1</span><span class="text-slate-300">/</span><span id="questionTotal">10</span>
+            </p>
+          </div>
+          <div class="h-10 w-px bg-slate-200"></div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Skor</p>
+            <p class="font-display text-xl font-extrabold text-amber-600" id="scoreDisplaySm">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-200/70 pt-5 sm:grid-cols-4">
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="check-circle-2" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Benar</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-emerald-600" id="statCorrect">0</p>
+        </div>
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="x-circle" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Lewat</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-rose-500" id="statSkipped">0</p>
+        </div>
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="flame" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Streak</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-rose-500" id="statStreak">0</p>
+        </div>
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="award" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">High Score</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-amber-600" id="statHighScore">0</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== GAME AREA ====== -->
+  <section class="glass-strong rounded-3xl p-4 shadow-card sm:p-8">
+
+    <!-- Timer ring + category -->
+    <div class="mb-6 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 ring-1 ring-slate-200">
+          <i data-lucide="tag" class="h-3 w-3"></i>
+          <span id="categoryLabel">Animals</span>
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 ring-1 ring-slate-200">
+          <i data-lucide="bar-chart-3" class="h-3 w-3"></i>
+          <span id="difficultyLabel">Mudah</span>
+        </span>
+      </div>
+
+      <!-- Timer -->
+      <div class="relative h-14 w-14 shrink-0">
+        <svg class="progress-ring h-14 w-14" viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="#e2e8f0" stroke-width="4"></circle>
+          <circle id="timerRing" cx="22" cy="22" r="18" fill="none" stroke="#0ea5e9" stroke-width="4"
+                  stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="0"></circle>
+        </svg>
+        <span id="timerText" class="absolute inset-0 grid place-items-center font-display text-sm font-extrabold text-ink-900">60</span>
+      </div>
+    </div>
+
+    <!-- Picture -->
+    <div class="picture-wrap mb-6 mx-auto max-w-lg">
+      <img
+        id="pictureImg"
+        src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=80"
+        alt="Gambar soal"
+        onerror="this.onerror=null;this.src='https://picsum.photos/seed/word-scramble/1200/750';" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-900/35 via-transparent to-transparent"></div>
+      <div class="absolute left-4 top-4 rounded-full bg-white/85 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 backdrop-blur">
+        <i data-lucide="image" class="mr-1 inline h-3 w-3"></i> Gambar Soal
+      </div>
+    </div>
+
+    <!-- Answer slots -->
+    <div class="mb-6">
+      <p class="mb-3 text-center text-[11px] font-bold uppercase tracking-[.2em] text-slate-400">Jawabanmu</p>
+      <div id="answerSlots" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+        <!-- slots injected -->
+      </div>
+    </div>
+
+    <!-- Available letters -->
+    <div class="mb-8">
+      <p class="mb-3 text-center text-[11px] font-bold uppercase tracking-[.2em] text-slate-400">Huruf Tersedia</p>
+      <div id="letterTiles" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+        <!-- tiles injected -->
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+      <button type="button" id="btnClear"
+        class="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-600 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-rose-500 hover:ring-rose-200">
+        <i data-lucide="delete" class="h-4 w-4"></i> Hapus
+      </button>
+      <button type="button" id="btnHint"
+        class="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-600 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-amber-600 hover:ring-amber-200">
+        <i data-lucide="lightbulb" class="h-4 w-4"></i> Petunjuk
+        <span class="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-extrabold text-amber-700" id="hintCounter">3</span>
+      </button>
+      <button type="button" id="btnSkip"
+        class="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-600 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-spark-600 hover:ring-spark-200">
+        <i data-lucide="skip-forward" class="h-4 w-4"></i> Lewati
+      </button>
+      <button type="button" id="btnSubmit"
+        class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-sky-500 px-6 py-3 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
+        <i data-lucide="check" class="h-4 w-4"></i> Periksa
+      </button>
+    </div>
+
+    <p class="mt-5 text-center text-[12px] text-slate-400">
+      <i data-lucide="keyboard" class="mr-1 inline h-3.5 w-3.5"></i>
+      Tips: kamu juga bisa mengetik langsung dengan keyboard.
+    </p>
+  </section>
+
+  <!-- ====== HOW TO PLAY ====== -->
+  <section class="mt-8 grid gap-4 sm:grid-cols-3">
+    <div class="glass rounded-2xl p-4 shadow-glass">
+      <div class="flex items-center gap-2 text-cyan-600">
+        <i data-lucide="eye" class="h-4 w-4"></i>
+        <h3 class="font-display text-[13px] font-bold">1. Lihat Gambar</h3>
+      </div>
+      <p class="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">Amati gambar dan pikirkan kata Inggris yang cocok.</p>
+    </div>
+    <div class="glass rounded-2xl p-4 shadow-glass">
+      <div class="flex items-center gap-2 text-spark-600">
+        <i data-lucide="mouse-pointer-click" class="h-4 w-4"></i>
+        <h3 class="font-display text-[13px] font-bold">2. Susun Huruf</h3>
+      </div>
+      <p class="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">Klik huruf untuk menyusun, klik slot untuk membatalkan.</p>
+    </div>
+    <div class="glass rounded-2xl p-4 shadow-glass">
+      <div class="flex items-center gap-2 text-emerald-600">
+        <i data-lucide="zap" class="h-4 w-4"></i>
+        <h3 class="font-display text-[13px] font-bold">3. Kejar Skor</h3>
+      </div>
+      <p class="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">Semakin cepat &amp; tanpa hint, semakin besar skornya.</p>
+    </div>
+  </section>
+</main>
+
+<!-- ====== FOOTER ====== -->
+<footer class="border-t border-white/60 bg-white/50 backdrop-blur-xl">
+  <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
+      <p class="text-[12px] text-slate-400">© <span data-year>2025</span> EduSpark Studio Pro — Word Scramble</p>
+      <a href="../../games.html" class="inline-flex items-center gap-1.5 text-[12px] font-bold text-cyan-600 transition hover:gap-2.5">
+        <i data-lucide="gamepad-2" class="h-3.5 w-3.5"></i> Kembali ke Game Hub
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== RESULT MODAL ====== -->
+<div id="resultOverlay" class="fixed inset-0 z-[120] hidden items-center justify-center bg-ink-900/55 p-4 backdrop-blur-md">
+  <div id="resultCard" class="glass-strong w-full max-w-md animate-pop rounded-[2rem] p-7 shadow-2xl ring-1 ring-white/70 sm:p-9">
+    <div class="text-center">
+      <span id="resultIcon" class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-cyan-500 via-sky-500 to-indigo-500 text-white shadow-soft">
+        <i data-lucide="party-popper" class="h-7 w-7"></i>
+      </span>
+      <h2 class="mt-5 font-display text-3xl font-extrabold tracking-tight text-ink-900" id="resultTitle">
+        Selesai! 🎉
+      </h2>
+      <p class="mt-1.5 text-[14px] text-slate-500" id="resultSubtitle">
+        Kamu menyelesaikan sesi ini
+      </p>
+    </div>
+
+    <div class="mt-6 grid grid-cols-3 gap-3">
+      <div class="rounded-2xl bg-white/70 px-3 py-3.5 text-center ring-1 ring-slate-100">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Benar</p>
+        <p class="mt-1 font-display text-lg font-extrabold text-emerald-600" id="resCorrect">0</p>
+      </div>
+      <div class="rounded-2xl bg-white/70 px-3 py-3.5 text-center ring-1 ring-slate-100">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Skor</p>
+        <p class="mt-1 font-display text-lg font-extrabold text-amber-600" id="resScore">0</p>
+      </div>
+      <div class="rounded-2xl bg-white/70 px-3 py-3.5 text-center ring-1 ring-slate-100">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Streak Maks</p>
+        <p class="mt-1 font-display text-lg font-extrabold text-rose-500" id="resStreak">0</p>
+      </div>
+    </div>
+
+    <p id="resNewRecord" class="mt-4 hidden text-center text-[12.5px] font-bold text-emerald-600">
+      <i data-lucide="award" class="mr-1 inline h-3.5 w-3.5"></i> Rekor baru!
+    </p>
+
+    <div class="mt-7 flex flex-col gap-2.5 sm:flex-row">
+      <button type="button" id="resPlayAgain" class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 to-sky-500 px-5 py-3.5 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+        <i data-lucide="rotate-ccw" class="h-4 w-4"></i> Main Lagi
+      </button>
+      <a href="../../games.html" class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-ink-800 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-cyan-600">
+        <i data-lucide="layout-grid" class="h-4 w-4"></i> Game Lain
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SCRIPTS ====== -->
+<script src="../../js/app.js"></script>
+<script>
+/* =========================================================
+   WORD SCRAMBLE GAME — Vanilla JS
+   ========================================================= */
+(function () {
+  'use strict';
+
+  /* ============ DATA ============ */
+  const WORDS = [
+    // Animals
+    { word: 'CAT',      category: 'Animals',  difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-cat' },
+    { word: 'DOG',      category: 'Animals',  difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-dog' },
+    { word: 'BIRD',     category: 'Animals',  difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-bird' },
+    { word: 'FISH',     category: 'Animals',  difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-fish' },
+    { word: 'LION',     category: 'Animals',  difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-lion' },
+    { word: 'TIGER',    category: 'Animals',  difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-tiger' },
+    { word: 'ELEPHANT', category: 'Animals',  difficulty: 'Sulit',  img: 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-elephant' },
+    { word: 'GIRAFFE',  category: 'Animals',  difficulty: 'Sulit',  img: 'https://images.unsplash.com/photo-1547721064-da6cfb341d50?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-giraffe' },
+
+    // Fruits
+    { word: 'APPLE',    category: 'Fruits',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-apple' },
+    { word: 'BANANA',   category: 'Fruits',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-banana' },
+    { word: 'ORANGE',   category: 'Fruits',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1547514701-42782101795e?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-orange' },
+    { word: 'GRAPE',    category: 'Fruits',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-grape' },
+    { word: 'MANGO',    category: 'Fruits',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-mango' },
+    { word: 'PINEAPPLE',category: 'Fruits',   difficulty: 'Sulit',  img: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-pineapple' },
+    { word: 'STRAWBERRY',category:'Fruits',   difficulty: 'Sulit',  img: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-strawberry' },
+
+    // Colors
+    { word: 'RED',      category: 'Colors',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-red' },
+    { word: 'BLUE',     category: 'Colors',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-blue' },
+    { word: 'GREEN',    category: 'Colors',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-green' },
+    { word: 'YELLOW',   category: 'Colors',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-yellow' },
+    { word: 'PURPLE',   category: 'Colors',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-purple' },
+    { word: 'ORANGE',   category: 'Colors',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-orange-c' },
+
+    // Things
+    { word: 'BOOK',     category: 'Things',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-book' },
+    { word: 'CHAIR',    category: 'Things',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-chair' },
+    { word: 'TABLE',    category: 'Things',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1449247709967-d4461a6a6103?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-table' },
+    { word: 'HOUSE',    category: 'Things',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-house' },
+    { word: 'CAR',      category: 'Things',   difficulty: 'Mudah', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-car' },
+    { word: 'BICYCLE',  category: 'Things',   difficulty: 'Sulit',  img: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-bicycle' },
+    { word: 'UMBRELLA', category: 'Things',   difficulty: 'Sulit',  img: 'https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-umbrella' },
+    { word: 'PENCIL',   category: 'Things',   difficulty: 'Sedang', img: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?auto=format&fit=crop&w=1200&q=80', fallback: 'ws-pencil' }
+  ];
+
+  const ROUND_SIZE = 10;
+  const TIMER_SECONDS = 60;
+  const HINTS_PER_ROUND = 3;
+  const SCORE_BASE = 100;
+  const SCORE_TIME_BONUS = 2; // per detik sisa
+  const SCORE_STREAK_BONUS = 25;
+  const HIGHSCORE_KEY = 'eduspark_word_scramble_highscore_v1';
+
+  /* ============ DOM ============ */
+  const answerSlots = document.getElementById('answerSlots');
+  const letterTiles = document.getElementById('letterTiles');
+  const pictureImg = document.getElementById('pictureImg');
+  const categoryLabel = document.getElementById('categoryLabel');
+  const difficultyLabel = document.getElementById('difficultyLabel');
+  const questionNum = document.getElementById('questionNum');
+  const questionTotal = document.getElementById('questionTotal');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const scoreDisplaySm = document.getElementById('scoreDisplaySm');
+  const streakDisplay = document.getElementById('streakDisplay');
+  const statCorrect = document.getElementById('statCorrect');
+  const statSkipped = document.getElementById('statSkipped');
+  const statStreak = document.getElementById('statStreak');
+  const statHighScore = document.getElementById('statHighScore');
+  const hintCounter = document.getElementById('hintCounter');
+
+  const btnClear = document.getElementById('btnClear');
+  const btnHint = document.getElementById('btnHint');
+  const btnSkip = document.getElementById('btnSkip');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const restartBtn = document.getElementById('restartBtn');
+
+  const timerRing = document.getElementById('timerRing');
+  const timerText = document.getElementById('timerText');
+
+  const sessionBanner = document.getElementById('sessionBanner');
+  const dismissBanner = document.getElementById('dismissBanner');
+
+  const resultOverlay = document.getElementById('resultOverlay');
+  const resCorrect = document.getElementById('resCorrect');
+  const resScore = document.getElementById('resScore');
+  const resStreak = document.getElementById('resStreak');
+  const resNewRecord = document.getElementById('resNewRecord');
+  const resPlayAgain = document.getElementById('resPlayAgain');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultSubtitle = document.getElementById('resultSubtitle');
+
+  /* ============ STATE ============ */
+  let queue = [];
+  let currentIndex = 0;
+  let currentWord = '';
+  let currentLetters = []; // array of { char, used, index }
+  let answer = [];         // array of tile index yang dipilih
+  let score = 0;
+  let correctCount = 0;
+  let skippedCount = 0;
+  let streak = 0;
+  let maxStreak = 0;
+  let hintsLeft = HINTS_PER_ROUND;
+  let timerId = null;
+  let timeLeft = TIMER_SECONDS;
+  let isChecking = false;
+  let roundActive = false;
+
+  const RING_CIRC = 2 * Math.PI * 18; // r=18
+
+  /* ============ UTIL ============ */
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const escapeHtml = (s) =>
+    String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  const getHighScore = () => {
+    try {
+      const raw = localStorage.getItem(HIGHSCORE_KEY);
+      return raw ? (parseInt(raw, 10) || 0) : 0;
+    } catch (e) { return 0; }
+  };
+
+  const setHighScore = (val) => {
+    try { localStorage.setItem(HIGHSCORE_KEY, String(val)); } catch (e) {}
+  };
+
+  /* ============ SETUP ROUND ============ */
+  function setupRound() {
+    queue = shuffle(WORDS).slice(0, ROUND_SIZE);
+    currentIndex = 0;
+    score = 0;
+    correctCount = 0;
+    skippedCount = 0;
+    streak = 0;
+    maxStreak = 0;
+    roundActive = true;
+
+    questionTotal.textContent = String(ROUND_SIZE);
+    updateStats();
+    statHighScore.textContent = String(getHighScore());
+
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    if (currentIndex >= queue.length) {
+      endRound();
+      return;
+    }
+
+    const q = queue[currentIndex];
+    currentWord = q.word;
+    hintsLeft = HINTS_PER_ROUND;
+    hintCounter.textContent = String(hintsLeft);
+
+    // Picture
+    pictureImg.src = q.img;
+    pictureImg.setAttribute('data-fallback', q.fallback);
+
+    // Labels
+    categoryLabel.textContent = q.category;
+    difficultyLabel.textContent = q.difficulty;
+    questionNum.textContent = String(currentIndex + 1);
+
+    // Build letters
+    currentLetters = currentWord.split('').map((char, i) => ({
+      char, used: false, idx: i
+    }));
+    currentLetters = shuffle(currentLetters);
+    answer = [];
+
+    renderSlots();
+    renderTiles();
+    updateButtons();
+
+    // Reset timer
+    resetTimer();
+    startTimer();
+
+    // Focus board
+    isChecking = false;
+    document.body.focus();
+  }
+
+  /* ============ RENDER ============ */
+  function renderSlots() {
+    const len = currentWord.length;
+    let html = '';
+    for (let i = 0; i < len; i++) {
+      const tileIdx = answer[i];
+      if (tileIdx == null) {
+        html += `<button type="button" class="slot empty" data-slot="${i}" aria-label="Slot kosong"></button>`;
+      } else {
+        const tile = currentLetters[tileIdx];
+        html += `<button type="button" class="slot" data-slot="${i}" data-tile="${tileIdx}">${escapeHtml(tile.char)}</button>`;
+      }
+    }
+    answerSlots.innerHTML = html;
+  }
+
+  function renderTiles() {
+    let html = '';
+    currentLetters.forEach((tile, i) => {
+      const used = tile.used;
+      html += `<button type="button" class="tile ${used ? 'used' : ''}" data-tile="${i}" ${used ? 'disabled' : ''}>${escapeHtml(tile.char)}</button>`;
+    });
+    letterTiles.innerHTML = html;
+  }
+
+  function updateButtons() {
+    const filled = answer.length >= currentWord.length && answer.filter(x => x != null).length === currentWord.length;
+    btnSubmit.disabled = !filled || isChecking;
+  }
+
+  function updateStats() {
+    scoreDisplay.textContent = String(score);
+    scoreDisplaySm.textContent = String(score);
+    streakDisplay.textContent = String(streak);
+    statCorrect.textContent = String(correctCount);
+    statSkipped.textContent = String(skippedCount);
+    statStreak.textContent = String(streak);
+  }
+
+  /* ============ TIMER ============ */
+  function resetTimer() {
+    stopTimer();
+    timeLeft = TIMER_SECONDS;
+    renderTimer();
+  }
+
+  function renderTimer() {
+    timerText.textContent = String(timeLeft);
+    const pct = Math.max(0, Math.min(1, timeLeft / TIMER_SECONDS));
+    timerRing.style.strokeDasharray = String(RING_CIRC);
+    timerRing.style.strokeDashoffset = String(RING_CIRC * (1 - pct));
+
+    // warna adaptif
+    let color = '#0ea5e9';
+    if (pct <= 0.25) color = '#ef4444';
+    else if (pct <= 0.5) color = '#f59e0b';
+    timerRing.setAttribute('stroke', color);
+
+    // pulse saat <10s
+    timerText.classList.toggle('text-rose-500', pct <= 0.25);
+  }
+
+  function startTimer() {
+    stopTimer();
+    timerId = setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) {
+        timeLeft = 0;
+        renderTimer();
+        stopTimer();
+        onTimeUp();
+        return;
+      }
+      renderTimer();
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  }
+
+  function onTimeUp() {
+    if (isChecking || !roundActive) return;
+    isChecking = true;
+    streak = 0;
+    updateStats();
+    window.EduSpark.toast.warning('Waktu habis! Jawaban: ' + currentWord, { duration: 2400, title: '⏰ Time Up' });
+    revealAnswer();
+    setTimeout(() => {
+      currentIndex++;
+      loadQuestion();
+    }, 1800);
+  }
+
+  /* ============ INTERAKSI HURUF ============ */
+  function pickTile(idx) {
+    if (isChecking || !roundActive) return;
+    if (idx < 0 || idx >= currentLetters.length) return;
+    if (currentLetters[idx].used) return;
+    if (answer.length >= currentWord.length) return;
+
+    currentLetters[idx].used = true;
+    answer.push(idx);
+
+    renderSlots();
+    renderTiles();
+    updateButtons();
+  }
+
+  function unpickSlot(slotIdx) {
+    if (isChecking || !roundActive) return;
+    if (slotIdx < 0 || slotIdx >= answer.length) return;
+    if (answer[slotIdx] == null) return;
+
+    const tileIdx = answer[slotIdx];
+    currentLetters[tileIdx].used = false;
+    answer.splice(slotIdx, 1);
+
+    renderSlots();
+    renderTiles();
+    updateButtons();
+  }
+
+  function clearAnswer() {
+    if (isChecking || !roundActive) return;
+    answer.forEach((tileIdx) => {
+      if (tileIdx != null) currentLetters[tileIdx].used = false;
+    });
+    answer = [];
+    renderSlots();
+    renderTiles();
+    updateButtons();
+  }
+
+  /* ============ HINT ============ */
+  function useHint() {
+    if (isChecking || !roundActive) return;
+    if (hintsLeft <= 0) {
+      window.EduSpark.toast.warning('Petunjuk sudah habis untuk soal ini.');
+      return;
+    }
+
+    // Cari posisi yang belum benar
+    const correctLetters = currentWord.split('');
+    let targetSlot = -1;
+    for (let i = 0; i < correctLetters.length; i++) {
+      const tileIdx = answer[i];
+      const placedChar = tileIdx != null ? currentLetters[tileIdx].char : null;
+      if (placedChar !== correctLetters[i]) {
+        targetSlot = i;
+        break;
+      }
+    }
+    if (targetSlot === -1) return; // sudah benar semua
+
+    const neededChar = correctLetters[targetSlot];
+
+    // Jika slot target sudah ada isinya, buang dulu
+    if (answer[targetSlot] != null) {
+      const oldTileIdx = answer[targetSlot];
+      currentLetters[oldTileIdx].used = false;
+      answer.splice(targetSlot, 1);
+    }
+
+    // Cari tile dengan karakter yang tepat dan belum dipakai
+    let tileIdx = -1;
+    for (let i = 0; i < currentLetters.length; i++) {
+      if (!currentLetters[i].used && currentLetters[i].char === neededChar) {
+        tileIdx = i;
+        break;
+      }
+    }
+    if (tileIdx === -1) {
+      // cari yang masih dipakai di slot lain
+      for (let i = 0; i < currentLetters.length; i++) {
+        if (currentLetters[i].char === neededChar) {
+          // hapus dari slot manapun
+          const pos = answer.indexOf(i);
+          if (pos > -1) answer.splice(pos, 1);
+          tileIdx = i;
+          break;
+        }
+      }
+    }
+    if (tileIdx === -1) return;
+
+    currentLetters[tileIdx].used = true;
+    // sisipkan di targetSlot
+    answer.splice(targetSlot, 0, tileIdx);
+
+    hintsLeft--;
+    hintCounter.textContent = String(hintsLeft);
+    if (hintsLeft === 0) {
+      btnHint.classList.add('opacity-50');
+    }
+
+    renderSlots();
+    renderTiles();
+    updateButtons();
+
+    // Beri highlight hint
+    const slots = answerSlots.querySelectorAll('.slot');
+    if (slots[targetSlot]) {
+      slots[targetSlot].classList.add('hint');
+      setTimeout(() => slots[targetSlot].classList.remove('hint'), 1400);
+    }
+    const tiles = letterTiles.querySelectorAll('.tile');
+    if (tiles[tileIdx]) {
+      tiles[tileIdx].classList.add('hint');
+      setTimeout(() => tiles[tileIdx].classList.remove('hint'), 1400);
+    }
+  }
+
+  /* ============ SUBMIT / SKIP ============ */
+  function submitAnswer() {
+    if (isChecking || !roundActive) return;
+    if (answer.length !== currentWord.length) return;
+
+    const attempt = answer.map((i) => currentLetters[i].char).join('');
+    isChecking = true;
+    stopTimer();
+
+    if (attempt === currentWord) {
+      // BENAR
+      const timeBonus = timeLeft * SCORE_TIME_BONUS;
+      const streakBonus = streak * SCORE_STREAK_BONUS;
+      const gained = SCORE_BASE + timeBonus + streakBonus;
+      score += gained;
+      correctCount++;
+      streak++;
+      maxStreak = Math.max(maxStreak, streak);
+      updateStats();
+
+      markCorrect();
+      fireConfetti(18);
+      window.EduSpark.toast.success('+' + gained + ' poin! ' + currentWord, { duration: 2000, title: '✓ Benar!' });
+
+      setTimeout(() => {
+        currentIndex++;
+        loadQuestion();
+      }, 1300);
+    } else {
+      // SALAH
+      streak = 0;
+      updateStats();
+      shakeBoard();
+      window.EduSpark.toast.error('Belum tepat. Coba lagi!', { duration: 1800, title: '✗ Salah' });
+
+      setTimeout(() => {
+        // Buang jawaban yang salah
+        clearAnswer();
+        isChecking = false;
+        updateButtons();
+        // Reset timer jika belum habis
+        if (timeLeft > 0) startTimer();
+      }, 600);
+    }
+  }
+
+  function markCorrect() {
+    answerSlots.querySelectorAll('.slot').forEach((el) => el.classList.add('correct'));
+    letterTiles.querySelectorAll('.tile').forEach((el) => el.classList.add('correct'));
+  }
+
+  function shakeBoard() {
+    answerSlots.classList.add('shake-board');
+    letterTiles.classList.add('shake-board');
+    setTimeout(() => {
+      answerSlots.classList.remove('shake-board');
+      letterTiles.classList.remove('shake-board');
+    }, 500);
+  }
+
+  function skipQuestion() {
+    if (isChecking || !roundActive) return;
+    isChecking = true;
+    stopTimer();
+    streak = 0;
+    skippedCount++;
+    updateStats();
+
+    window.EduSpark.toast.info('Jawaban: ' + currentWord, { duration: 2200, title: '⏭ Dilewati' });
+    revealAnswer();
+
+    setTimeout(() => {
+      currentIndex++;
+      loadQuestion();
+    }, 1600);
+  }
+
+  function revealAnswer() {
+    // Susun huruf sesuai kata benar dan tandai
+    const correctLetters = currentWord.split('');
+    // Reset
+    currentLetters.forEach((t) => t.used = false);
+    answer = [];
+    const slots = [];
+    for (let i = 0; i < correctLetters.length; i++) {
+      const ch = correctLetters[i];
+      let tileIdx = -1;
+      for (let j = 0; j < currentLetters.length; j++) {
+        if (!currentLetters[j].used && currentLetters[j].char === ch) {
+          tileIdx = j; break;
+        }
+      }
+      if (tileIdx > -1) {
+        currentLetters[tileIdx].used = true;
+        slots.push(tileIdx);
+      }
+    }
+    answer = slots;
+    renderSlots();
+    renderTiles();
+    // tandai warna merah (reveal)
+    answerSlots.querySelectorAll('.slot').forEach((el) => {
+      el.classList.remove('correct');
+      el.style.background = 'linear-gradient(155deg, #f43f5e, #e11d48)';
+    });
+  }
+
+  /* ============ END ROUND ============ */
+  function endRound() {
+    roundActive = false;
+    stopTimer();
+
+    const prevHigh = getHighScore();
+    const isNewRecord = score > prevHigh;
+    if (isNewRecord) setHighScore(score);
+    statHighScore.textContent = String(getHighScore());
+
+    resCorrect.textContent = correctCount + '/' + ROUND_SIZE;
+    resScore.textContent = String(score);
+    resStreak.textContent = String(maxStreak);
+    resNewRecord.classList.toggle('hidden', !isNewRecord);
+
+    // Judul adaptif
+    if (correctCount >= 9) {
+      resultTitle.textContent = 'Luar Biasa! 🏆';
+      resultSubtitle.textContent = 'Kamu hampir sempurna!';
+    } else if (correctCount >= 6) {
+      resultTitle.textContent = 'Bagus Sekali! 🎉';
+      resultSubtitle.textContent = 'Terus tingkatkan kosakatamu!';
+    } else {
+      resultTitle.textContent = 'Selesai! 💪';
+      resultSubtitle.textContent = 'Coba lagi untuk skor lebih tinggi!';
+    }
+
+    resultOverlay.classList.remove('hidden');
+    resultOverlay.classList.add('flex');
+    window.EduSpark.UI.refreshIcons();
+
+    if (correctCount >= 6) fireConfetti(50);
+  }
+
+  /* ============ CONFETTI ============ */
+  function fireConfetti(count = 40) {
+    const colors = ['#4f46e5', '#0ea5e9', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'];
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.animationDuration = (2 + Math.random() * 1.6) + 's';
+      el.style.animationDelay = (Math.random() * 0.4) + 's';
+      el.style.width = (6 + Math.random() * 8) + 'px';
+      el.style.height = (8 + Math.random() * 10) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4200);
+    }
+  }
+
+  /* ============ EVENTS ============ */
+  answerSlots.addEventListener('click', (e) => {
+    const slot = e.target.closest('.slot');
+    if (!slot) return;
+    if (slot.classList.contains('empty')) return;
+    const idx = Number(slot.dataset.slot);
+    unpickSlot(idx);
+  });
+
+  letterTiles.addEventListener('click', (e) => {
+    const tile = e.target.closest('.tile');
+    if (!tile) return;
+    if (tile.classList.contains('used')) return;
+    const idx = Number(tile.dataset.tile);
+    pickTile(idx);
+  });
+
+  btnClear.addEventListener('click', clearAnswer);
+  btnHint.addEventListener('click', useHint);
+  btnSkip.addEventListener('click', skipQuestion);
+  btnSubmit.addEventListener('click', submitAnswer);
+
+  restartBtn.addEventListener('click', () => {
+    window.EduSpark.toast.info('Memulai sesi baru', { duration: 1600 });
+    setupRound();
+  });
+
+  // Keyboard support
+  document.addEventListener('keydown', (e) => {
+    if (!roundActive) return;
+    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (answer.length > 0) unpickSlot(answer.length - 1);
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!btnSubmit.disabled) submitAnswer();
+      return;
+    }
+    if (e.key === 'Escape') {
+      clearAnswer();
+      return;
+    }
+
+    if (/^[a-zA-Z]$/.test(e.key)) {
+      const ch = e.key.toUpperCase();
+      // cari tile yang cocok & belum dipakai
+      const idx = currentLetters.findIndex((t) => !t.used && t.char === ch);
+      if (idx > -1) pickTile(idx);
+    }
+  });
+
+  resPlayAgain.addEventListener('click', () => {
+    resultOverlay.classList.add('hidden');
+    resultOverlay.classList.remove('flex');
+    setupRound();
+  });
+
+  resultOverlay.addEventListener('click', (e) => {
+    if (e.target === resultOverlay) {
+      resultOverlay.classList.add('hidden');
+      resultOverlay.classList.remove('flex');
+    }
+  });
+
+  // Banner
+  if (dismissBanner) {
+    dismissBanner.addEventListener('click', () => sessionBanner.classList.add('hidden'));
+  }
+
+  // Picture fallback
+  pictureImg.addEventListener('error', function () {
+    const fb = this.getAttribute('data-fallback') || 'ws-fallback';
+    if (this.src.indexOf('picsum.photos') === -1) {
+      this.src = 'https://picsum.photos/seed/' + fb + '/1200/750';
+    }
+  });
+
+  /* ============ SESSION SOFT CHECK ============ */
+  function checkSession() {
+    try {
+      const hasAccess = window.EduSpark.Session.has(window.EduSpark.storage.GAME_ACCESS);
+      if (!hasAccess && sessionBanner) sessionBanner.classList.remove('hidden');
+    } catch (e) {
+      if (sessionBanner) sessionBanner.classList.remove('hidden');
+    }
+  }
+
+  /* ============ BOOT ============ */
+  function boot() {
+    checkSession();
+    setupRound();
+    window.EduSpark.UI.refreshIcons();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portal Admin — EduSpark Studio Pro</title>
+<meta name="description" content="Dashboard pengajar & admin EduSpark Studio Pro — analitik, transaksi, manajemen modul." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        },
+        colors: {
+          spark: {
+            50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',
+            500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81'
+          },
+          ink: { 900:'#0b1020', 800:'#151b33', 700:'#26304f', 600:'#3b4664' }
+        },
+        boxShadow: {
+          glass: '0 10px 40px -14px rgba(15,23,42,.28)',
+          soft: '0 18px 45px -18px rgba(79,70,229,.55)',
+          card: '0 24px 60px -30px rgba(15,23,42,.35)'
+        },
+        keyframes: {
+          drift: {
+            '0%':   { transform: 'translate3d(0,0,0) scale(1)' },
+            '100%': { transform: 'translate3d(30px,-40px,0) scale(1.12)' }
+          },
+          pop: {
+            '0%':   { transform: 'scale(.9)', opacity: '0' },
+            '60%':  { transform: 'scale(1.03)' },
+            '100%': { transform: 'scale(1)', opacity: '1' }
+          },
+          shake: {
+            '0%,100%': { transform: 'translateX(0)' },
+            '25%':     { transform: 'translateX(-6px)' },
+            '75%':     { transform: 'translateX(6px)' }
+          },
+          slideUp: {
+            '0%':   { transform: 'translateY(14px)', opacity: '0' },
+            '100%': { transform: 'translateY(0)', opacity: '1' }
+          }
+        },
+        animation: {
+          drift: 'drift 16s ease-in-out infinite alternate',
+          pop: 'pop .5s cubic-bezier(.2,.8,.2,1) both',
+          shake: 'shake .4s ease-in-out',
+          slideUp: 'slideUp .5s cubic-bezier(.2,.8,.2,1) both'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<style>
+  :root { color-scheme: light; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background:#f7f8fc; color:#151b33; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4,.font-display { font-family: 'Outfit', system-ui, sans-serif; }
+
+  .mesh-bg {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(1100px 560px at 50% -12%, #eef2ff 0%, rgba(238,242,255,0) 62%),
+      radial-gradient(900px 520px at 100% 0%, #ecfeff 0%, rgba(236,254,255,0) 60%),
+      #f7f8fc;
+  }
+  .blob { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: .5; }
+
+  .glass {
+    background: rgba(255,255,255,.62);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    border: 1px solid rgba(255,255,255,.75);
+  }
+  .glass-strong {
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.9);
+  }
+  .glass-dark {
+    background: rgba(11,16,32,.55);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .gradient-text {
+    background: linear-gradient(100deg,#4f46e5 0%,#0ea5e9 45%,#8b5cf6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ====== LOGIN ====== */
+  .lock-wrap {
+    background: linear-gradient(135deg, rgba(11,16,32,.94), rgba(49,46,129,.94));
+    backdrop-filter: blur(20px);
+  }
+  .pin-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    outline: none;
+    transition: all .25s ease;
+  }
+  .pin-input::placeholder {
+    color: rgba(255,255,255,.35);
+    letter-spacing: .04em;
+    font-weight: 600;
+    font-size: .95rem;
+  }
+  .pin-input:focus {
+    border-color: rgba(165,180,252,.7);
+    background: rgba(255,255,255,.14);
+    box-shadow: 0 0 0 4px rgba(99,102,241,.25);
+  }
+  .pin-input.is-error {
+    border-color: rgba(248,113,113,.75);
+    background: rgba(239,68,68,.15);
+  }
+
+  /* ====== SIDEBAR ====== */
+  .side-link {
+    display:flex; align-items:center; gap:.75rem;
+    padding:.7rem 1rem; border-radius:.85rem;
+    font-size:.875rem; font-weight:600; color:#3b4664;
+    transition: all .22s cubic-bezier(.2,.8,.2,1);
+    cursor:pointer;
+  }
+  .side-link:hover { background: rgba(99,102,241,.08); color:#4f46e5; transform: translateX(3px); }
+  .side-link.is-active {
+    background: linear-gradient(135deg,#4f46e5,#0ea5e9);
+    color:#fff;
+    box-shadow: 0 14px 30px -16px rgba(79,70,229,.9);
+  }
+
+  /* ====== BARS ====== */
+  .bar-track {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(226,232,240,.9);
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg,#4f46e5,#0ea5e9);
+    transition: width 1.2s cubic-bezier(.2,.8,.2,1);
+  }
+
+  /* ====== CHART ====== */
+  .chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+  }
+  .chart-bar {
+    width: 100%;
+    border-radius: .6rem .6rem .2rem .2rem;
+    background: linear-gradient(180deg,#4f46e5,#0ea5e9);
+    transition: height 1s cubic-bezier(.2,.8,.2,1), transform .25s;
+    cursor: pointer;
+    position: relative;
+    min-height: 6px;
+  }
+  .chart-bar:hover { transform: scaleY(1.04); }
+  .chart-bar::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -1.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 700;
+    color: #4f46e5;
+    opacity: 0;
+    transition: opacity .2s;
+    white-space: nowrap;
+  }
+  .chart-bar:hover::after { opacity: 1; }
+
+  /* ====== TABLE ====== */
+  .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .data-table th {
+    text-align: left;
+    font-size: .68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #94a3b8;
+    padding: .85rem 1rem;
+    border-bottom: 1px solid rgba(226,232,240,.8);
+  }
+  .data-table td {
+    padding: .95rem 1rem;
+    font-size: .82rem;
+    color: #3b4664;
+    border-bottom: 1px solid rgba(241,245,249,.9);
+    vertical-align: middle;
+  }
+  .data-table tbody tr { transition: background .2s; }
+  .data-table tbody tr:hover { background: rgba(238,242,255,.5); }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .25rem .6rem;
+    border-radius: 999px;
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  /* ====== TOGGLE ====== */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px; height: 22px;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider {
+    position: absolute; inset: 0;
+    background: #cbd5e1;
+    border-radius: 999px;
+    transition: background .25s;
+    cursor: pointer;
+  }
+  .switch .slider::before {
+    content: '';
+    position: absolute;
+    height: 16px; width: 16px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .25s;
+    box-shadow: 0 2px 4px rgba(15,23,42,.2);
+  }
+  .switch input:checked + .slider { background: linear-gradient(135deg,#4f46e5,#0ea5e9); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(#a5b4fc,#67e8f9); border-radius: 999px; border: 3px solid #f7f8fc; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(#6366f1,#06b6d4); }
+</style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- ====== AMBIENT BG ====== -->
+<div class="mesh-bg" aria-hidden="true">
+  <span class="blob bg-indigo-400 animate-drift" style="width:520px;height:520px;top:-180px;left:-140px;"></span>
+  <span class="blob bg-cyan-300 animate-drift" style="width:460px;height:460px;top:14%;right:-160px;animation-delay:-4s;"></span>
+  <span class="blob bg-fuchsia-300 animate-drift" style="width:420px;height:420px;bottom:-160px;left:22%;animation-delay:-8s;"></span>
+</div>
+
+<!-- ============================================================
+     LOGIN SCREEN
+     ============================================================ -->
+<section id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="lock-wrap w-full max-w-md overflow-hidden rounded-[2rem] p-8 shadow-2xl ring-1 ring-white/10 sm:p-10">
+    <div class="text-center">
+      <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-spark-500 to-cyan-500 text-white shadow-soft">
+        <i data-lucide="shield-check" class="h-7 w-7"></i>
+      </span>
+      <h2 class="mt-5 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+        Portal Admin
+      </h2>
+      <p class="mx-auto mt-3 max-w-sm text-[14px] leading-relaxed text-white/70">
+        Masuk dengan kode akses pengajar untuk membuka dashboard analitik, transaksi, dan manajemen modul.
+      </p>
+    </div>
+
+    <form id="loginForm" class="mt-8 space-y-4" autocomplete="off" novalidate>
+      <div>
+        <label for="adminPin" class="mb-2 block text-[11px] font-bold uppercase tracking-[.2em] text-white/60">
+          Kode Akses Admin
+        </label>
+        <input
+          type="password"
+          id="adminPin"
+          name="pin"
+          class="pin-input"
+          placeholder="Masukkan kode akses…"
+          autocomplete="off"
+          spellcheck="false"
+          maxlength="32" />
+      </div>
+
+      <p id="adminHint" class="hidden text-center text-[12.5px] font-semibold text-rose-300">
+        <i data-lucide="alert-circle" class="mr-1 inline h-3.5 w-3.5"></i>
+        <span data-error-text>Kode akses salah. Coba lagi.</span>
+      </p>
+
+      <button type="submit"
+        class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-spark-500 to-cyan-500 px-6 py-4 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl">
+        <i data-lucide="log-in" class="h-4 w-4"></i>
+        Masuk Dashboard
+        <i data-lucide="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1"></i>
+      </button>
+    </form>
+
+    <div class="mt-6 flex items-start gap-3 rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
+      <i data-lucide="info" class="mt-0.5 h-4 w-4 shrink-0 text-cyan-300"></i>
+      <p class="text-[12.5px] leading-relaxed text-white/65">
+        Kode akses diberikan kepada pengajar &amp; staf resmi. Belum punya akses?
+        Hubungi <a href="mailto:admin@edusparkstudio.id" class="font-bold text-cyan-300 underline decoration-dotted underline-offset-2 hover:text-cyan-200">admin@edusparkstudio.id</a>.
+      </p>
+    </div>
+
+    <details class="mt-4 group">
+      <summary class="cursor-pointer list-none text-center text-[11px] font-bold uppercase tracking-wider text-white/30 transition hover:text-white/60">
+        Demo / Testing
+      </summary>
+      <p class="mt-2 text-center text-[12px] text-white/50">
+        Kode akses: <code class="rounded bg-white/10 px-2 py-0.5 font-mono text-cyan-300">eduspark2025</code>
+      </p>
+    </details>
+
+    <a href="index.html" class="mt-5 flex items-center justify-center gap-2 text-[12px] font-semibold text-white/40 transition hover:text-white/80">
+      <i data-lucide="arrow-left" class="h-3.5 w-3.5"></i> Kembali ke Beranda
+    </a>
+  </div>
+</section>
+
+<!-- ============================================================
+     DASHBOARD (hidden sampai login)
+     ============================================================ -->
+<div id="dashboard" class="hidden min-h-screen">
+
+  <!-- ====== NAVBAR ====== -->
+  <header class="sticky top-0 z-50">
+    <div class="mx-auto max-w-[1600px] px-4 pt-4 sm:px-6">
+      <nav class="glass flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 shadow-glass sm:px-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-spark-600 to-cyan-500 text-white shadow-soft">
+            <i data-lucide="sparkles" class="h-5 w-5"></i>
+          </span>
+          <span class="leading-tight">
+            <span class="block font-display text-[15px] font-extrabold tracking-tight text-ink-900">EduSpark Admin</span>
+            <span class="hidden text-[10px] font-semibold uppercase tracking-[.2em] text-slate-400 sm:block">Dashboard Pengajar</span>
+          </span>
+        </a>
+
+        <div class="flex items-center gap-2">
+          <span class="hidden items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 sm:inline-flex">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            Live
+          </span>
+
+          <!-- User menu -->
+          <div class="relative">
+            <button type="button" id="userMenuBtn" class="flex items-center gap-2 rounded-xl bg-white/70 px-2.5 py-2 ring-1 ring-slate-200/80 backdrop-blur transition hover:-translate-y-0.5">
+              <span class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-spark-500 to-cyan-500 text-[11px] font-extrabold text-white">AD</span>
+              <span class="hidden text-xs font-bold text-ink-900 sm:block">Admin</span>
+              <i data-lucide="chevron-down" class="h-3.5 w-3.5 text-slate-400"></i>
+            </button>
+
+            <div id="userMenu" class="glass-strong absolute right-0 mt-2 hidden w-56 rounded-2xl p-2 shadow-card">
+              <div class="border-b border-slate-100 px-3 py-2.5">
+                <p class="text-[13px] font-bold text-ink-900">Admin EduSpark</p>
+                <p class="text-[11px] text-slate-400">admin@edusparkstudio.id</p>
+              </div>
+              <a href="index.html" class="mobile-link mt-1 flex items-center gap-2">
+                <i data-lucide="globe" class="h-3.5 w-3.5"></i> Lihat Situs
+              </a>
+              <button type="button" id="logoutBtn" class="mobile-link flex w-full items-center gap-2 text-rose-500 hover:!bg-rose-50 hover:!text-rose-600">
+                <i data-lucide="log-out" class="h-3.5 w-3.5"></i> Keluar
+              </button>
+            </div>
+          </div>
+
+          <button data-nav-toggle class="grid h-10 w-10 place-items-center rounded-xl text-slate-600 ring-1 ring-slate-200/80 transition hover:bg-white lg:hidden" aria-label="Buka menu">
+            <i data-lucide="menu" class="h-5 w-5"></i>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="mx-auto max-w-[1600px] px-4 py-6 sm:px-6">
+    <div class="grid gap-6 lg:grid-cols-[260px_1fr]">
+
+      <!-- ====== SIDEBAR ====== -->
+      <aside class="glass h-fit rounded-3xl p-3 shadow-glass lg:sticky lg:top-24">
+        <p class="px-3 pt-2 pb-2 text-[10px] font-bold uppercase tracking-[.2em] text-slate-400">Menu</p>
+        <nav class="space-y-1" id="sideNav">
+          <button type="button" class="side-link is-active w-full" data-page="overview">
+            <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Ringkasan
+          </button>
+          <button type="button" class="side-link w-full" data-page="transactions">
+            <i data-lucide="receipt" class="h-4 w-4"></i> Transaksi
+          </button>
+          <button type="button" class="side-link w-full" data-page="products">
+            <i data-lucide="package" class="h-4 w-4"></i> Modul &amp; Produk
+          </button>
+          <button type="button" class="side-link w-full" data-page="students">
+            <i data-lucide="users" class="h-4 w-4"></i> Siswa
+          </button>
+          <button type="button" class="side-link w-full" data-page="games">
+            <i data-lucide="gamepad-2" class="h-4 w-4"></i> Game Access
+          </button>
+
+          <div class="my-3 border-t border-slate-200/70"></div>
+
+          <p class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.2em] text-slate-400">Sistem</p>
+          <a href="index.html" class="side-link">
+            <i data-lucide="globe" class="h-4 w-4"></i> Lihat Situs
+          </a>
+          <a href="ebooks.html" class="side-link">
+            <i data-lucide="book-open" class="h-4 w-4"></i> Katalog Publik
+          </a>
+          <button type="button" class="side-link w-full" data-page="settings">
+            <i data-lucide="settings" class="h-4 w-4"></i> Pengaturan
+          </button>
+        </nav>
+
+        <div class="mt-4 rounded-2xl bg-gradient-to-br from-spark-600 to-cyan-600 p-4 text-white">
+          <div class="flex items-center gap-2">
+            <i data-lucide="crown" class="h-4 w-4"></i>
+            <p class="font-display text-[13px] font-extrabold">Paket Pro</p>
+          </div>
+          <p class="mt-1 text-[11.5px] leading-relaxed text-white/80">Dashboard analitik lengkap + ekspor data.</p>
+          <button type="button" class="mt-3 w-full rounded-xl bg-white/15 px-3 py-2 text-[11.5px] font-bold ring-1 ring-white/25 backdrop-blur transition hover:bg-white/25">
+            Kelola Langganan
+          </button>
+        </div>
+      </aside>
+
+      <!-- ====== MAIN CONTENT ====== -->
+      <main class="min-w-0 space-y-6">
+
+        <!-- ====== PAGE: OVERVIEW ====== -->
+        <section data-content="overview" class="space-y-6">
+
+          <!-- Page header -->
+          <div class="animate-slideUp">
+            <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">
+              Selamat datang, <span class="gradient-text">Admin</span> 👋
+            </h1>
+            <p class="mt-1.5 text-[13.5px] text-slate-500">
+              Berikut ringkasan performa EduSpark Studio Pro dalam 30 hari terakhir.
+            </p>
+          </div>
+
+          <!-- KPI cards -->
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="glass animate-slideUp rounded-3xl p-5 shadow-glass transition hover:-translate-y-1 hover:shadow-card" style="animation-delay:.05s">
+              <div class="flex items-start justify-between">
+                <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-soft">
+                  <i data-lucide="wallet" class="h-5 w-5"></i>
+                </span>
+                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                  <i data-lucide="trending-up" class="h-3 w-3"></i> 18.2%
+                </span>
+              </div>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Pendapatan</p>
+              <p class="mt-1 font-display text-2xl font-extrabold text-ink-900" data-counter="48250000" data-format="rupiah">Rp 0</p>
+              <p class="mt-1 text-[11.5px] text-slate-400">vs bulan lalu</p>
+            </div>
+
+            <div class="glass animate-slideUp rounded-3xl p-5 shadow-glass transition hover:-translate-y-1 hover:shadow-card" style="animation-delay:.1s">
+              <div class="flex items-start justify-between">
+                <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-spark-500 to-indigo-500 text-white shadow-soft">
+                  <i data-lucide="receipt" class="h-5 w-5"></i>
+                </span>
+                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                  <i data-lucide="trending-up" class="h-3 w-3"></i> 12.4%
+                </span>
+              </div>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">Transaksi</p>
+              <p class="mt-1 font-display text-2xl font-extrabold text-ink-900" data-counter="1284" data-format="number">0</p>
+              <p class="mt-1 text-[11.5px] text-slate-400">pembelian sukses</p>
+            </div>
+
+            <div class="glass animate-slideUp rounded-3xl p-5 shadow-glass transition hover:-translate-y-1 hover:shadow-card" style="animation-delay:.15s">
+              <div class="flex items-start justify-between">
+                <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-500 to-sky-500 text-white shadow-soft">
+                  <i data-lucide="users" class="h-5 w-5"></i>
+                </span>
+                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                  <i data-lucide="trending-up" class="h-3 w-3"></i> 8.9%
+                </span>
+              </div>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">Siswa Aktif</p>
+              <p class="mt-1 font-display text-2xl font-extrabold text-ink-900" data-counter="8420" data-format="number">0</p>
+              <p class="mt-1 text-[11.5px] text-slate-400">belajar bulan ini</p>
+            </div>
+
+            <div class="glass animate-slideUp rounded-3xl p-5 shadow-glass transition hover:-translate-y-1 hover:shadow-card" style="animation-delay:.2s">
+              <div class="flex items-start justify-between">
+                <span class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-soft">
+                  <i data-lucide="star" class="h-5 w-5"></i>
+                </span>
+                <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                  stabil
+                </span>
+              </div>
+              <p class="mt-4 text-[11px] font-bold uppercase tracking-wider text-slate-400">Rating Produk</p>
+              <p class="mt-1 font-display text-2xl font-extrabold text-ink-900">4.9<span class="text-sm text-amber-500">★</span></p>
+              <p class="mt-1 text-[11.5px] text-slate-400">dari 1.240 ulasan</p>
+            </div>
+          </div>
+
+          <!-- Chart + Top Products -->
+          <div class="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+
+            <!-- Revenue chart -->
+            <div class="glass animate-slideUp rounded-3xl p-6 shadow-glass" style="animation-delay:.25s">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 class="font-display text-lg font-extrabold tracking-tight text-ink-900">Pendapatan 7 Hari</h2>
+                  <p class="mt-0.5 text-[12.5px] text-slate-500">Total mingguan: <strong class="font-bold text-emerald-600" id="weekTotal">Rp 0</strong></p>
+                </div>
+                <div class="inline-flex rounded-xl bg-white/70 p-1 ring-1 ring-slate-200/80">
+                  <button type="button" class="rounded-lg bg-gradient-to-r from-spark-600 to-cyan-500 px-3 py-1.5 text-[11px] font-bold text-white">7H</button>
+                  <button type="button" class="rounded-lg px-3 py-1.5 text-[11px] font-bold text-slate-500 transition hover:text-spark-600">30H</button>
+                  <button type="button" class="rounded-lg px-3 py-1.5 text-[11px] font-bold text-slate-500 transition hover:text-spark-600">90H</button>
+                </div>
+              </div>
+
+              <div class="mt-6 flex h-56 items-end gap-2 sm:gap-3" id="barChart">
+                <!-- bars injected -->
+              </div>
+
+              <div class="mt-6 grid grid-cols-3 gap-3 border-t border-slate-200/70 pt-4">
+                <div>
+                  <p class="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">Rata-rata Harian</p>
+                  <p class="mt-1 font-display text-base font-extrabold text-ink-900" id="avgDaily">Rp 0</p>
+                </div>
+                <div>
+                  <p class="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">Hari Terbaik</p>
+                  <p class="mt-1 font-display text-base font-extrabold text-ink-900" id="bestDay">—</p>
+                </div>
+                <div>
+                  <p class="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">Total Transaksi</p>
+                  <p class="mt-1 font-display text-base font-extrabold text-ink-900" id="weekTx">0</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top products -->
+            <div class="glass animate-slideUp rounded-3xl p-6 shadow-glass" style="animation-delay:.3s">
+              <h2 class="font-display text-lg font-extrabold tracking-tight text-ink-900">Produk Terlaris</h2>
+              <p class="mt-0.5 text-[12.5px] text-slate-500">Top 5 dalam 30 hari terakhir</p>
+
+              <div class="mt-5 space-y-4">
+                <div>
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-[11px] font-extrabold text-white">1</span>
+                      <p class="truncate text-[13px] font-bold text-ink-900">Worksheet Tracing</p>
+                    </div>
+                    <p class="shrink-0 font-display text-[13px] font-extrabold text-emerald-600">412</p>
+                  </div>
+                  <div class="bar-track mt-2"><div class="bar-fill" data-width="92%"></div></div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-[11px] font-extrabold text-slate-500">2</span>
+                      <p class="truncate text-[13px] font-bold text-ink-900">Flashcard Alfabet</p>
+                    </div>
+                    <p class="shrink-0 font-display text-[13px] font-extrabold text-emerald-600">368</p>
+                  </div>
+                  <div class="bar-track mt-2"><div class="bar-fill" data-width="82%"></div></div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-[11px] font-extrabold text-slate-500">3</span>
+                      <p class="truncate text-[13px] font-bold text-ink-900">Master Bundle SD</p>
+                    </div>
+                    <p class="shrink-0 font-display text-[13px] font-extrabold text-emerald-600">215</p>
+                  </div>
+                  <div class="bar-track mt-2"><div class="bar-fill" data-width="48%"></div></div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-[11px] font-extrabold text-slate-500">4</span>
+                      <p class="truncate text-[13px] font-bold text-ink-900">Buku Cerita: Brave Cat</p>
+                    </div>
+                    <p class="shrink-0 font-display text-[13px] font-extrabold text-emerald-600">187</p>
+                  </div>
+                  <div class="bar-track mt-2"><div class="bar-fill" data-width="42%"></div></div>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-[11px] font-extrabold text-slate-500">5</span>
+                      <p class="truncate text-[13px] font-bold text-ink-900">Modul Lesson Plan</p>
+                    </div>
+                    <p class="shrink-0 font-display text-[13px] font-extrabold text-emerald-600">142</p>
+                  </div>
+                  <div class="bar-track mt-2"><div class="bar-fill" data-width="32%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent transactions -->
+          <div class="glass animate-slideUp rounded-3xl p-6 shadow-glass" style="animation-delay:.35s">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="font-display text-lg font-extrabold tracking-tight text-ink-900">Transaksi Terbaru</h2>
+                <p class="mt-0.5 text-[12.5px] text-slate-500">6 transaksi terakhir dari semua kanal</p>
+              </div>
+              <button type="button" class="inline-flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-[12px] font-bold text-slate-600 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-spark-600" data-goto="transactions">
+                Lihat Semua <i data-lucide="arrow-right" class="h-3.5 w-3.5"></i>
+              </button>
+            </div>
+
+            <div class="mt-4 -mx-3 overflow-x-auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Pelanggan</th>
+                    <th>Produk</th>
+                    <th>Tanggal</th>
+                    <th>Jumlah</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTxBody">
+                  <!-- rows injected -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== PAGE: TRANSACTIONS ====== -->
+        <section data-content="transactions" class="hidden space-y-6">
+          <div class="animate-slideUp">
+            <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Transaksi</h1>
+            <p class="mt-1.5 text-[13.5px] text-slate-500">Semua pembelian melalui Lynk.id &amp; kanal lain.</p>
+          </div>
+
+          <div class="glass animate-slideUp rounded-3xl p-5 shadow-glass" style="animation-delay:.05s">
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="relative flex-1 min-w-[220px]">
+                <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="txSearch" placeholder="Cari ID atau nama pelanggan…"
+                  class="w-full rounded-xl border border-slate-200 bg-white/90 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-spark-400 focus:ring-4 focus:ring-spark-100" />
+              </label>
+
+              <select id="txFilter" class="rounded-xl border border-slate-200 bg-white/90 px-3.5 py-2.5 text-sm font-semibold text-slate-600 outline-none transition focus:border-spark-400 focus:ring-4 focus:ring-spark-100">
+                <option value="all">Semua Status</option>
+                <option value="success">Berhasil</option>
+                <option value="pending">Menunggu</option>
+                <option value="refund">Refund</option>
+              </select>
+
+              <button type="button" class="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-spark-600 to-cyan-500 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+                <i data-lucide="download" class="h-3.5 w-3.5"></i> Ekspor CSV
+              </button>
+            </div>
+
+            <div class="mt-5 -mx-3 overflow-x-auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Pelanggan</th>
+                    <th>Produk</th>
+                    <th>Tanggal</th>
+                    <th>Jumlah</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="allTxBody"></tbody>
+              </table>
+            </div>
+
+            <p class="mt-4 text-center text-[12px] text-slate-400" id="txCount">Menampilkan 0 transaksi</p>
+          </div>
+        </section>
+
+        <!-- ====== PAGE: PRODUCTS ====== -->
+        <section data-content="products" class="hidden space-y-6">
+          <div class="flex flex-wrap items-end justify-between gap-4 animate-slideUp">
+            <div>
+              <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Modul &amp; Produk</h1>
+              <p class="mt-1.5 text-[13.5px] text-slate-500">Kelola katalog e-book, worksheet, dan modul ajar.</p>
+            </div>
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-2xl bg-gradient-to-r from-spark-600 to-cyan-500 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+              <i data-lucide="plus" class="h-3.5 w-3.5"></i> Tambah Produk
+            </button>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="productGrid">
+            <!-- injected -->
+          </div>
+        </section>
+
+        <!-- ====== PAGE: STUDENTS ====== -->
+        <section data-content="students" class="hidden space-y-6">
+          <div class="animate-slideUp">
+            <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Manajemen Siswa</h1>
+            <p class="mt-1.5 text-[13.5px] text-slate-500">Data siswa terdaftar &amp; progres belajar mereka.</p>
+          </div>
+
+          <div class="glass animate-slideUp rounded-3xl p-6 shadow-glass" style="animation-delay:.05s">
+            <div class="mt-1 -mx-3 overflow-x-auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Siswa</th>
+                    <th>Kelas</th>
+                    <th>Progress</th>
+                    <th>Game Favorit</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== PAGE: GAMES ====== -->
+        <section data-content="games" class="hidden space-y-6">
+          <div class="animate-slideUp">
+            <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Game Access Control</h1>
+            <p class="mt-1.5 text-[13.5px] text-slate-500">Aktifkan atau nonaktifkan akses game untuk semua pembeli paket bundling.</p>
+          </div>
+
+          <div class="glass animate-slideUp rounded-3xl p-6 shadow-glass" style="animation-delay:.05s">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between gap-4 rounded-2xl bg-white/60 p-4 ring-1 ring-slate-100">
+                <div class="flex items-center gap-3">
+                  <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-spark-500 to-indigo-500 text-white"><i data-lucide="brain" class="h-5 w-5"></i></span>
+                  <div>
+                    <p class="font-display text-[14px] font-extrabold text-ink-900">Memory Match</p>
+                    <p class="text-[11.5px] text-slate-500">Aktif untuk 1.240 member</p>
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between gap-4 rounded-2xl bg-white/60 p-4 ring-1 ring-slate-100">
+                <div class="flex items-center gap-3">
+                  <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-cyan-500 to-sky-500 text-white"><i data-lucide="spell-check-2" class="h-5 w-5"></i></span>
+                  <div>
+                    <p class="font-display text-[14px] font-extrabold text-ink-900">Word Scramble</p>
+                    <p class="text-[11.5px] text-slate-500">Aktif untuk 1.180 member</p>
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between gap-4 rounded-2xl bg-white/60 p-4 ring-1 ring-slate-100">
+                <div class="flex items-center gap-3">
+                  <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white"><i data-lucide="palette" class="h-5 w-5"></i></span>
+                  <div>
+                    <p class="font-display text-[14px] font-extrabold text-ink-900">Color Quiz</p>
+                    <p class="text-[11.5px] text-slate-500">Aktif untuk 1.050 member</p>
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-6 rounded-2xl border border-dashed border-amber-200 bg-amber-50/70 p-4">
+              <div class="flex items-start gap-3">
+                <i data-lucide="key-round" class="mt-0.5 h-4 w-4 shrink-0 text-amber-600"></i>
+                <div>
+                  <p class="text-[12.5px] font-bold text-amber-900">Sandi Akses Game</p>
+                  <p class="mt-0.5 text-[12px] text-amber-800/85">
+                    Sandi saat ini: <code class="rounded bg-amber-100 px-2 py-0.5 font-mono font-bold text-amber-900">spark2025</code>
+                  </p>
+                  <p class="mt-1 text-[11px] text-amber-700/70">Ubah sandi di file <code class="font-mono">js/app.js</code> → <code class="font-mono">CONFIG.GAME_PASSCODE</code>.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== PAGE: SETTINGS ====== -->
+        <section data-content="settings" class="hidden space-y-6">
+          <div class="animate-slideUp">
+            <h1 class="font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">Pengaturan</h1>
+            <p class="mt-1.5 text-[13.5px] text-slate-500">Konfigurasi umum dashboard &amp; keamanan.</p>
+          </div>
+
+          <div class="glass animate-slideUp rounded-3xl p-6 shadow-glass" style="animation-delay:.05s">
+            <h2 class="font-display text-base font-extrabold text-ink-900">Konfigurasi Client-Side</h2>
+            <p class="mt-1 text-[12.5px] text-slate-500">Nilai ini dibaca dari <code class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11.5px]">js/app.js</code>.</p>
+
+            <div class="mt-5 space-y-3">
+              <div class="flex items-center justify-between gap-4 rounded-xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+                <span class="text-[13px] font-semibold text-slate-600">Passcode Admin</span>
+                <span class="font-mono text-[12.5px] font-bold text-ink-900" id="cfgAdminPass">—</span>
+              </div>
+              <div class="flex items-center justify-between gap-4 rounded-xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+                <span class="text-[13px] font-semibold text-slate-600">Passcode Game</span>
+                <span class="font-mono text-[12.5px] font-bold text-ink-900" id="cfgGamePass">—</span>
+              </div>
+              <div class="flex items-center justify-between gap-4 rounded-xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+                <span class="text-[13px] font-semibold text-slate-600">Session TTL</span>
+                <span class="font-mono text-[12.5px] font-bold text-ink-900" id="cfgTtl">—</span>
+              </div>
+              <div class="flex items-center justify-between gap-4 rounded-xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+                <span class="text-[13px] font-semibold text-slate-600">Versi App</span>
+                <span class="font-mono text-[12.5px] font-bold text-ink-900" id="cfgVersion">—</span>
+              </div>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-2.5">
+              <button type="button" id="clearAllDataBtn"
+                class="inline-flex items-center gap-1.5 rounded-xl bg-rose-500 px-4 py-2.5 text-[12.5px] font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-rose-600">
+                <i data-lucide="trash-2" class="h-3.5 w-3.5"></i> Hapus Semua Data Lokal
+              </button>
+              <button type="button" id="exportDataBtn"
+                class="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-[12.5px] font-bold text-slate-600 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-spark-600">
+                <i data-lucide="download" class="h-3.5 w-3.5"></i> Ekspor State
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="mx-auto max-w-[1600px] px-4 pb-8 sm:px-6">
+    <div class="glass flex flex-col items-center justify-between gap-3 rounded-2xl px-5 py-4 shadow-glass sm:flex-row">
+      <p class="text-[12px] text-slate-400">© <span data-year>2025</span> EduSpark Studio Pro — Portal Admin</p>
+      <div class="flex items-center gap-4 text-[12px] font-bold">
+        <a href="index.html" class="text-slate-500 transition hover:text-spark-600">Situs Publik</a>
+        <a href="ebooks.html" class="text-slate-500 transition hover:text-spark-600">Katalog</a>
+        <a href="games.html" class="text-slate-500 transition hover:text-spark-600">Game Hub</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ====== SCRIPTS ====== -->
+<script src="js/app.js"></script>
+<script src="js/auth-guard.js"></script>
+<script>
+/* =========================================================
+   ADMIN DASHBOARD — logika UI
+   ========================================================= */
+(function () {
+  'use strict';
+
+  const E = window.EduSpark;
+  const STORAGE_ADMIN = E.storage.ADMIN_SESSION;
+  const ADMIN_PASSCODE = E.config.ADMIN_PASSCODE;
+
+  /* ============ DUMMY DATA ============ */
+  const TX_DATA = [
+    { id: 'TRX-2401', name: 'Aisyah Putri',    product: 'Worksheet Tracing Letters', date: '2025-01-12', amount: 49000,  status: 'success' },
+    { id: 'TRX-2402', name: 'Budi Santoso',    product: 'Master Bundle SD',          date: '2025-01-12', amount: 329000, status: 'success' },
+    { id: 'TRX-2403', name: 'Citra Dewi',      product: 'Flashcard Alfabet A–Z',     date: '2025-01-11', amount: 39000,  status: 'success' },
+    { id: 'TRX-2404', name: 'Dedi Pratama',    product: 'Modul Lesson Plan',         date: '2025-01-11', amount: 149000, status: 'pending' },
+    { id: 'TRX-2405', name: 'Eka Wulandari',   product: 'Buku Cerita: Brave Cat',    date: '2025-01-10', amount: 65000,  status: 'success' },
+    { id: 'TRX-2406', name: 'Fajar Nugroho',   product: 'Ultimate All-Access',       date: '2025-01-10', amount: 699000, status: 'success' },
+    { id: 'TRX-2407', name: 'Gita Sari',       product: 'Worksheet Numbers 1–20',    date: '2025-01-09', amount: 45000,  status: 'refund' },
+    { id: 'TRX-2408', name: 'Hadi Susanto',    product: 'Starter Pack TK',           date: '2025-01-09', amount: 112000, status: 'success' },
+    { id: 'TRX-2409', name: 'Indah Permata',   product: 'Flashcard Hewan & Habitat', date: '2025-01-08', amount: 45000,  status: 'success' },
+    { id: 'TRX-2410', name: 'Joko Widodo',     product: 'Worksheet Color & Shape',   date: '2025-01-08', amount: 42000,  status: 'success' },
+    { id: 'TRX-2411', name: 'Kartika Sari',    product: 'Buku Cerita: Goodnight',    date: '2025-01-07', amount: 59000,  status: 'success' },
+    { id: 'TRX-2412', name: 'Lukman Hakim',    product: 'Master Bundle SD',          date: '2025-01-07', amount: 329000, status: 'pending' }
+  ];
+
+  const PRODUCTS_ADMIN = [
+    { id: 'p1', title: 'Flashcard Alfabet A–Z',   category: 'flashcard', price: 39000,  sold: 1240, active: true,  img: 'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=600&q=80' },
+    { id: 'p2', title: 'Worksheet Tracing Letters',category: 'worksheet', price: 49000,  sold: 1580, active: true,  img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=600&q=80' },
+    { id: 'p3', title: 'Buku Cerita: Brave Cat',  category: 'storybook', price: 65000,  sold: 320,  active: true,  img: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80' },
+    { id: 'p4', title: 'Modul Lesson Plan',       category: 'module',    price: 149000, sold: 210,  active: true,  img: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=80' },
+    { id: 'p5', title: 'Flashcard Hewan & Habitat',category:'flashcard', price: 45000,  sold: 890,  active: true,  img: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=600&q=80' },
+    { id: 'p6', title: 'Worksheet Daily Routine', category: 'worksheet', price: 55000,  sold: 480,  active: false, img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=80' }
+  ];
+
+  const STUDENTS_DATA = [
+    { name: 'Aisyah Putri',   class: 'TK B',  progress: 92, fav: 'Memory Match', status: 'active' },
+    { name: 'Raka Kurniawan', class: 'SD 1',  progress: 78, fav: 'Word Scramble', status: 'active' },
+    { name: 'Dinda Maharani', class: 'SD 2',  progress: 85, fav: 'Color Quiz',   status: 'active' },
+    { name: 'Bima Saputra',   class: 'TK A',  progress: 64, fav: 'Memory Match', status: 'active' },
+    { name: 'Nadia Rahma',    class: 'SD 1',  progress: 90, fav: 'Word Scramble', status: 'active' },
+    { name: 'Fikri Alfarizi', class: 'SD 3',  progress: 45, fav: 'Color Quiz',   status: 'inactive' }
+  ];
+
+  const REVENUE_7D = [
+    { day: 'Sen', value: 4200000,  tx: 12 },
+    { day: 'Sel', value: 5800000,  tx: 18 },
+    { day: 'Rab', value: 4900000,  tx: 15 },
+    { day: 'Kam', value: 7200000,  tx: 22 },
+    { day: 'Jum', value: 6400000,  tx: 20 },
+    { day: 'Sab', value: 8900000,  tx: 28 },
+    { day: 'Min', value: 5200000,  tx: 16 }
+  ];
+
+  /* ============ DOM ============ */
+  const loginScreen = document.getElementById('loginScreen');
+  const dashboard = document.getElementById('dashboard');
+  const loginForm = document.getElementById('loginForm');
+  const adminPin = document.getElementById('adminPin');
+  const adminHint = document.getElementById('adminHint');
+  const adminHintText = adminHint.querySelector('[data-error-text]');
+
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  const userMenu = document.getElementById('userMenu');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  const sideLinks = document.querySelectorAll('.side-link[data-page]');
+  const contents = document.querySelectorAll('[data-content]');
+  const gotoBtns = document.querySelectorAll('[data-goto]');
+
+  /* ============ HELPERS ============ */
+  const formatRupiah = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+  const formatNumber = (n) => Number(n).toLocaleString('id-ID');
+  const fmtDate = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+
+  const statusBadge = (status) => {
+    const map = {
+      success: { cls: 'bg-emerald-100 text-emerald-700', label: 'Berhasil', icon: 'check-circle-2' },
+      pending: { cls: 'bg-amber-100 text-amber-700',    label: 'Menunggu', icon: 'clock' },
+      refund:  { cls: 'bg-rose-100 text-rose-700',      label: 'Refund',   icon: 'rotate-ccw' }
+    };
+    const s = map[status] || map.success;
+    return `<span class="status-badge ${s.cls}"><i data-lucide="${s.icon}" class="h-3 w-3"></i>${s.label}</span>`;
+  };
+
+  /* ============ LOGIN ============ */
+  const setLoginError = (msg) => {
+    adminHintText.textContent = msg;
+    adminHint.classList.remove('hidden');
+    adminPin.classList.add('is-error', 'animate-shake');
+    setTimeout(() => adminPin.classList.remove('animate-shake'), 500);
+    adminPin.focus();
+    adminPin.select();
+  };
+
+  const clearLoginError = () => {
+    adminHint.classList.add('hidden');
+    adminPin.classList.remove('is-error');
+  };
+
+  const showDashboard = (silent = false) => {
+    loginScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    E.UI.refreshIcons();
+
+    // Animate content in
+    document.querySelectorAll('.animate-slideUp').forEach((el) => {
+      el.style.animation = 'none';
+      // reflow
+      void el.offsetWidth;
+      el.style.animation = '';
+    });
+
+    if (!silent) {
+      E.toast.success('Selamat datang di Portal Admin', { title: 'Login Berhasil', duration: 3200 });
+    }
+
+    // Init data-driven UI
+    initOverview();
+  };
+
+  const showLogin = () => {
+    dashboard.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+    adminPin.value = '';
+    clearLoginError();
+    adminPin.focus();
+  };
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const val = adminPin.value.trim();
+
+    if (!val) {
+      setLoginError('Kode akses tidak boleh kosong.');
+      return;
+    }
+
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    const originalHTML = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '.75';
+    submitBtn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Memverifikasi…';
+    E.UI.refreshIcons();
+
+    setTimeout(() => {
+      const valid = E.Session.verify(val, ADMIN_PASSCODE);
+
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+      submitBtn.innerHTML = originalHTML;
+      E.UI.refreshIcons();
+
+      if (valid) {
+        E.Session.set(STORAGE_ADMIN, { ts: Date.now(), role: 'admin' });
+        clearLoginError();
+        showDashboard(false);
+      } else {
+        setLoginError('Kode akses salah. Periksa kembali.');
+        E.toast.error('Kode akses admin tidak valid.', { title: 'Akses Ditolak' });
+      }
+    }, 600);
+  });
+
+  adminPin.addEventListener('input', () => {
+    if (!adminHint.classList.contains('hidden')) clearLoginError();
+  });
+
+  /* ============ LOGOUT ============ */
+  logoutBtn.addEventListener('click', () => {
+    if (!confirm('Keluar dari Portal Admin?')) return;
+    E.Session.clear(STORAGE_ADMIN);
+    userMenu.classList.add('hidden');
+    showLogin();
+    E.toast.info('Anda telah keluar dari Portal Admin.');
+  });
+
+  /* ============ USER MENU ============ */
+  userMenuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    userMenu.classList.toggle('hidden');
+  });
+  document.addEventListener('click', (e) => {
+    if (!userMenu.contains(e.target) && e.target !== userMenuBtn) {
+      userMenu.classList.add('hidden');
+    }
+  });
+
+  /* ============ NAVIGATION ============ */
+  const gotoPage = (page) => {
+    sideLinks.forEach((b) => b.classList.toggle('is-active', b.dataset.page === page));
+    contents.forEach((c) => c.classList.toggle('hidden', c.dataset.content !== page));
+
+    // Close mobile menu
+    const navMenu = document.querySelector('[data-nav-menu]');
+    if (navMenu) navMenu.classList.add('hidden');
+
+    E.UI.refreshIcons();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  sideLinks.forEach((btn) => {
+    btn.addEventListener('click', () => gotoPage(btn.dataset.page));
+  });
+
+  gotoBtns.forEach((btn) => {
+    btn.addEventListener('click', () => gotoPage(btn.dataset.goto));
+  });
+
+  /* ============ COUNTER ANIMATION ============ */
+  const animateCounters = () => {
+    document.querySelectorAll('[data-counter]').forEach((el) => {
+      const target = Number(el.dataset.counter) || 0;
+      const format = el.dataset.format || 'number';
+      const duration = 1200;
+      const start = performance.now();
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const val = Math.round(target * eased);
+        el.textContent = format === 'rupiah' ? formatRupiah(val) : formatNumber(val);
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  };
+
+  /* ============ OVERVIEW INIT ============ */
+  let overviewInited = false;
+
+  const initOverview = () => {
+    if (overviewInited) return;
+    overviewInited = true;
+
+    // Counters
+    animateCounters();
+
+    // Bar chart
+    const chart = document.getElementById('barChart');
+    const maxVal = Math.max(...REVENUE_7D.map((d) => d.value));
+    chart.innerHTML = REVENUE_7D.map((d) => {
+      const h = Math.max(8, Math.round((d.value / maxVal) * 100));
+      return `
+        <div class="chart-col">
+          <div class="chart-bar" style="height:0%;" data-height="${h}%" data-value="${formatRupiah(d.value)}"></div>
+          <span class="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">${d.day}</span>
+        </div>
+      `;
+    }).join('');
+
+    // Animate bars
+    requestAnimationFrame(() => {
+      chart.querySelectorAll('.chart-bar').forEach((bar, i) => {
+        setTimeout(() => {
+          bar.style.height = bar.dataset.height;
+        }, 100 + i * 80);
+      });
+    });
+
+    // Chart summary
+    const weekTotal = REVENUE_7D.reduce((s, d) => s + d.value, 0);
+    const weekTx = REVENUE_7D.reduce((s, d) => s + d.tx, 0);
+    const bestDay = REVENUE_7D.reduce((a, b) => (a.value > b.value ? a : b));
+    document.getElementById('weekTotal').textContent = formatRupiah(weekTotal);
+    document.getElementById('avgDaily').textContent = formatRupiah(Math.round(weekTotal / 7));
+    document.getElementById('bestDay').textContent = bestDay.day + ' — ' + formatRupiah(bestDay.value);
+    document.getElementById('weekTx').textContent = formatNumber(weekTx);
+
+    // Recent transactions
+    renderRecentTx();
+
+    // Bar-fill width animation
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach((b) => {
+        b.style.width = b.dataset.width || '0%';
+      });
+    }, 400);
+
+    // Render other pages (lazy)
+    renderAllTx();
+    renderProducts();
+    renderStudents();
+    renderSettings();
+  };
+
+  /* ============ RENDER: TRANSAKSI ============ */
+  const renderRecentTx = () => {
+    const body = document.getElementById('recentTxBody');
+    body.innerHTML = TX_DATA.slice(0, 6).map((tx) => `
+      <tr>
+        <td><span class="font-mono text-[12px] font-bold text-spark-600">${tx.id}</span></td>
+        <td>
+          <div class="flex items-center gap-2.5">
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-spark-400 to-cyan-400 text-[10.5px] font-extrabold text-white">${tx.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</span>
+            <span class="font-semibold text-ink-900">${tx.name}</span>
+          </div>
+        </td>
+        <td class="text-slate-500">${tx.product}</td>
+        <td class="text-slate-500 whitespace-nowrap">${fmtDate(tx.date)}</td>
+        <td><span class="font-display font-extrabold text-ink-900">${formatRupiah(tx.amount)}</span></td>
+        <td>${statusBadge(tx.status)}</td>
+      </tr>
+    `).join('');
+    E.UI.refreshIcons();
+  };
+
+  const renderAllTx = () => {
+    const body = document.getElementById('allTxBody');
+    const countEl = document.getElementById('txCount');
+    const searchEl = document.getElementById('txSearch');
+    const filterEl = document.getElementById('txFilter');
+
+    const doRender = () => {
+      const q = searchEl.value.trim().toLowerCase();
+      const f = filterEl.value;
+
+      const filtered = TX_DATA.filter((tx) => {
+        const matchQ = !q || tx.id.toLowerCase().includes(q) || tx.name.toLowerCase().includes(q) || tx.product.toLowerCase().includes(q);
+        const matchF = f === 'all' || tx.status === f;
+        return matchQ && matchF;
+      });
+
+      body.innerHTML = filtered.map((tx) => `
+        <tr>
+          <td><span class="font-mono text-[12px] font-bold text-spark-600">${tx.id}</span></td>
+          <td>
+            <div class="flex items-center gap-2.5">
+              <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-spark-400 to-cyan-400 text-[10.5px] font-extrabold text-white">${tx.name.split(' ').map(n=>n[0]).slice(0,2).join('')}</span>
+              <span class="font-semibold text-ink-900">${tx.name}</span>
+            </div>
+          </td>
+          <td class="text-slate-500">${tx.product}</td>
+          <td class="text-slate-500 whitespace-nowrap">${fmtDate(tx.date)}</td>
+          <td><span class="font-display font-extrabold text-ink-900">${formatRupiah(tx.amount)}</span></td>
+          <td>${statusBadge(tx.status)}</td>
+        </tr>
+      `).join('') || `<tr><td colspan="6" class="py-10 text-center text-slate-400">Tidak ada transaksi cocok.</td></tr>`;
+
+      countEl.textContent = 'Menampilkan ' + filtered.length + ' dari ' + TX_DATA.length + ' transaksi';
+      E.UI.refreshIcons();
+    };
+
+    searchEl.addEventListener('input', E.debounce(doRender, 150));
+    filterEl.addEventListener('change', doRender);
+    doRender();
+  };
+
+  /* ============ RENDER: PRODUK ============ */
+  const renderProducts = () => {
+    const grid = document.getElementById('productGrid');
+    const catColor = {
+      flashcard: 'bg-indigo-100 text-indigo-700',
+      worksheet: 'bg-cyan-100 text-cyan-700',
+      storybook: 'bg-rose-100 text-rose-700',
+      module: 'bg-amber-100 text-amber-700'
+    };
+    const catLabel = {
+      flashcard: 'Flashcard',
+      worksheet: 'Worksheet',
+      storybook: 'Buku Cerita',
+      module: 'Modul'
+    };
+
+    grid.innerHTML = PRODUCTS_ADMIN.map((p) => `
+      <article class="glass rounded-3xl overflow-hidden shadow-glass ring-1 ring-white/70 transition hover:-translate-y-1 hover:shadow-card">
+        <div class="relative h-36 overflow-hidden">
+          <img src="${p.img}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.id}/600/400';"
+            alt="${p.title}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+          <span class="absolute left-3 top-3 rounded-full ${catColor[p.category]} px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider">
+            ${catLabel[p.category]}
+          </span>
+          <span class="absolute right-3 top-3 ${p.active ? 'bg-emerald-500' : 'bg-slate-400'} rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+            ${p.active ? 'Aktif' : 'Nonaktif'}
+          </span>
+        </div>
+        <div class="p-4">
+          <h3 class="font-display text-[14px] font-bold leading-snug text-ink-900 line-clamp-2">${p.title}</h3>
+          <div class="mt-2 flex items-center justify-between">
+            <p class="font-display text-base font-extrabold text-spark-600">${formatRupiah(p.price)}</p>
+            <p class="text-[11.5px] font-semibold text-slate-400">${formatNumber(p.sold)} terjual</p>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button type="button" class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-[11.5px] font-bold text-slate-600 ring-1 ring-slate-200 transition hover:text-spark-600">
+              <i data-lucide="pencil" class="h-3 w-3"></i> Edit
+            </button>
+            <label class="switch mt-1.5">
+              <input type="checkbox" ${p.active ? 'checked' : ''} />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </article>
+    `).join('');
+    E.UI.refreshIcons();
+  };
+
+  /* ============ RENDER: SISWA ============ */
+  const renderStudents = () => {
+    const body = document.getElementById('studentsBody');
+    body.innerHTML = STUDENTS_DATA.map((s) => `
+      <tr>
+        <td>
+          <div class="flex items-center gap-2.5">
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-spark-400 to-cyan-400 text-[10.5px] font-extrabold text-white">
+              ${s.name.split(' ').map(n=>n[0]).slice(0,2).join('')}
+            </span>
+            <span class="font-semibold text-ink-900">${s.name}</span>
+          </div>
+        </td>
+        <td><span class="rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">${s.class}</span></td>
+        <td>
+          <div class="flex items-center gap-2">
+            <div class="bar-track" style="width:100px;"><div class="bar-fill" style="width:${s.progress}%"></div></div>
+            <span class="font-display text-[12px] font-extrabold text-ink-900">${s.progress}%</span>
+          </div>
+        </td>
+        <td class="text-slate-500">${s.fav}</td>
+        <td>${s.status === 'active'
+          ? '<span class="status-badge bg-emerald-100 text-emerald-700"><i data-lucide="check-circle-2" class="h-3 w-3"></i>Aktif</span>'
+          : '<span class="status-badge bg-slate-100 text-slate-500"><i data-lucide="pause-circle" class="h-3 w-3"></i>Nonaktif</span>'}</td>
+      </tr>
+    `).join('');
+    E.UI.refreshIcons();
+  };
+
+  /* ============ RENDER: SETTINGS ============ */
+  const renderSettings = () => {
+    document.getElementById('cfgAdminPass').textContent = ADMIN_PASSCODE;
+    document.getElementById('cfgGamePass').textContent = E.config.GAME_PASSCODE;
+    const ttlH = Math.round(E.config.SESSION_TTL / (1000 * 60 * 60));
+    document.getElementById('cfgTtl').textContent = ttlH + ' jam';
+    document.getElementById('cfgVersion').textContent = 'v' + E.version;
+
+    document.getElementById('clearAllDataBtn').addEventListener('click', () => {
+      if (!confirm('Hapus semua data lokal (keranjang, session, highscore)? Tindakan tidak bisa dibatalkan.')) return;
+      try {
+        Object.values(E.storage).forEach((k) => localStorage.removeItem(k));
+        E.toast.success('Semua data lokal dihapus.', { title: 'Berhasil' });
+        setTimeout(() => location.reload(), 900);
+      } catch (err) {
+        E.toast.error('Gagal menghapus data.');
+      }
+    });
+
+    document.getElementById('exportDataBtn').addEventListener('click', () => {
+      try {
+        const dump = {};
+        Object.entries(E.storage).forEach(([key, storageKey]) => {
+          dump[key] = localStorage.getItem(storageKey);
+        });
+        const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'eduspark-state-' + Date.now() + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        E.toast.success('State diekspor.', { title: 'Berhasil' });
+      } catch (err) {
+        E.toast.error('Gagal ekspor state.');
+      }
+    });
+  };
+
+  /* ============ INIT ============ */
+  const boot = () => {
+    // Jika sudah login, langsung tampil dashboard
+    const isLoggedIn = E.Session.has(STORAGE_ADMIN);
+    if (isLoggedIn) {
+      showDashboard(true);
+    } else {
+      showLogin();
+    }
+    E.UI.refreshIcons();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+})();
+</script>
+</body>
+</html>

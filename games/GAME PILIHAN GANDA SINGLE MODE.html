@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎯 SINGLE PLAYER VOCABULARY QUIZ</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&display=swap');
+
+        :root {
+            --primary-color: #6366f1;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background: #020617;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 900px;
+            max-height: 700px;
+            background: var(--bg-dark);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        /* Top Animation / Character Display Area */
+        .header-arena-box {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            background: linear-gradient(180deg, #020617 0%, #1e1b4b 100%);
+            border-bottom: 3px solid rgba(255,255,255,0.1);
+        }
+
+        #arenaCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Top HUD Bar (Score, Timer, Teacher Mode) */
+        .hud-overlay {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .hud-card {
+            background: rgba(15, 23, 42, 0.85);
+            padding: 8px 16px;
+            border-radius: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+            font-weight: 800;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .teacher-btn-top {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* Question Panel Area */
+        .question-section {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #090d16;
+        }
+
+        .player-panel {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            position: relative;
+        }
+
+        .p-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .p-name-tag {
+            font-size: 1.1rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            text-transform: uppercase;
+        }
+
+        .progress-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .q-prompt-box {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .q-sub {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .q-title {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-ans {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 2px solid #334155;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.05s ease, background-color 0.15s ease;
+            text-align: center;
+        }
+
+        .btn-ans:active { transform: scale(0.97); }
+
+        .btn-ans.correct {
+            background: var(--correct) !important;
+            border-color: #16a34a !important;
+            color: #fff !important;
+        }
+
+        .btn-ans.wrong {
+            background: var(--wrong) !important;
+            border-color: #dc2626 !important;
+            color: #fff !important;
+        }
+
+        /* MODAL OVERLAYS */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .setup-card {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .setup-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fbbf24;
+            margin-bottom: 16px;
+        }
+
+        .input-name {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .char-selector {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .char-opt {
+            font-size: 2.2rem;
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .char-opt.selected {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+            width: 100%;
+        }
+
+        /* Teacher Mode UI */
+        .teacher-box {
+            width: 100%;
+            max-width: 800px;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #334155;
+        }
+
+        .teacher-textarea {
+            width: 100%;
+            height: 220px;
+            background: #0f172a;
+            color: #38bdf8;
+            font-family: monospace;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            margin: 10px 0;
+            resize: none;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <!-- Top Arena Display Box -->
+    <div class="header-arena-box">
+        <div class="hud-overlay">
+            <div class="hud-card">
+                ⭐ Skor: <span id="score-val" style="color: #fbbf24;">0</span>
+            </div>
+            <div class="hud-card">
+                ⏳ Timer: <span id="timer-val" style="color: #ef4444;">15s</span>
+            </div>
+            <button class="teacher-btn-top" onclick="openTeacherModal()">⚙️ Teacher Mode</button>
+        </div>
+        <canvas id="arenaCanvas"></canvas>
+    </div>
+
+    <!-- Question Section -->
+    <div class="question-section">
+        <div class="player-panel">
+            <div class="p-panel-header">
+                <span class="p-name-tag" id="player-tag-name">SISWA</span>
+                <span class="progress-tag" id="q-prog-text">Soal: 1 / 12</span>
+            </div>
+            <div class="q-prompt-box">
+                <div class="q-sub">TERJEMAHKAN KATA INI:</div>
+                <div class="q-title" id="q-title">...</div>
+            </div>
+            <div class="answers-grid" id="answers-grid"></div>
+        </div>
+    </div>
+
+    <!-- 1. SETUP MODAL (Nama & Karakter) -->
+    <div class="modal-overlay active" id="setupModal">
+        <div class="setup-card">
+            <h1 class="setup-title">🎯 VOCAB QUIZ SETUP</h1>
+            <input type="text" id="input-name" class="input-name" value="SISWA" placeholder="Nama Kamu">
+            
+            <div class="char-selector">
+                <span class="char-opt selected" onclick="selectChar('🧙‍♂️', this)">🧙‍♂️</span>
+                <span class="char-opt" onclick="selectChar('🥷', this)">🥷</span>
+                <span class="char-opt" onclick="selectChar('🤖', this)">🤖</span>
+                <span class="char-opt" onclick="selectChar('🦁', this)">🦁</span>
+                <span class="char-opt" onclick="selectChar('👽', this)">👽</span>
+            </div>
+
+            <button class="btn-main" onclick="startGame()">🚀 MULAI BERMAIN</button>
+        </div>
+    </div>
+
+    <!-- 2. TEACHER MODE MODAL -->
+    <div class="modal-overlay" id="teacherModal">
+        <div class="teacher-box">
+            <h2 style="color: #fbbf24; margin-bottom: 6px;">⚙️ TEACHER MODE (INPUT TEKS BIASA)</h2>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px;">
+                Format: <code>Pertanyaan | Jawaban Benar | Salah 1 | Salah 2 | Salah 3</code>
+            </p>
+
+            <textarea id="textInput" class="teacher-textarea"></textarea>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="teacher-btn-top" onclick="loadDefaultQuestions()">🔄 Reset Default</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="teacher-btn-top" style="background: #334155;" onclick="closeTeacherModal()">Batal</button>
+                    <button class="btn-main" style="width: auto; padding: 10px 20px; font-size: 1rem;" onclick="saveTeacherQuestions()">💾 Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. GAME OVER MODAL -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="setup-card">
+            <h1 style="font-size: 2.5rem; color: #fbbf24; margin-bottom: 6px;">🏆 SELESAI!</h1>
+            <p style="font-size: 1.1rem; color: #cbd5e1; margin-bottom: 16px;" id="finalScoreText">Skor akhir kamu: 0</p>
+            <button class="btn-main" onclick="showSetupScreen()">🔄 MAIN LAGI</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    /* ==========================================================================
+       1. AUDIO SYNTHESIZER
+       ========================================================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, now);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now); osc.stop(now + 0.25);
+        } else if (type === 'victory') {
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.12);
+            osc.frequency.setValueAtTime(783.99, now + 0.24);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.start(now); osc.stop(now + 0.5);
+        }
+    }
+
+    /* ==========================================================================
+       2. DATA BANK & CONFIG
+       ========================================================================== */
+    const defaultTextQuestions = 
+`ANJING | DOG | HORSE | CAT | BREAD
+HARIMAU | TIGER | RABBIT | LIBRARY | BIRD
+KUCING | CAT | FISH | LION | DUCK
+RUMAH | HOUSE | SCHOOL | MARKET | PARK
+BURUNG | BIRD | SNAKE | MONKEY | COW
+GAJAH | ELEPHANT | BEAR | PIG | SHEEP
+ULAR | SNAKE | FROG | MOUSE | HORSE
+IKAN | FISH | CHICKEN | GOAT | FOX
+SEKOLAH | SCHOOL | HOSPITAL | BANK | STORE
+BUKU | BOOK | PEN | BAG | DESK
+APEL | APPLE | BANANA | GRAPE | MELON
+MELATI | JASMINE | ROSE | ORCHID | LILY`;
+
+    let questionDataset = [];
+    let playerConfig = { name: "SISWA", char: "🧙‍♂️" };
+    
+    let gameState = {
+        score: 0,
+        currentIndex: 0,
+        questions: [],
+        isLocked: false,
+        timer: 15,
+        timerInterval: null
+    };
+
+    function parseTextToQuestions(text) {
+        const lines = text.trim().split('\n');
+        const list = [];
+        lines.forEach(line => {
+            const parts = line.split('|').map(s => s.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+                list.push({
+                    word: parts[0],
+                    correct: parts[1],
+                    wrong: parts.slice(2)
+                });
+            }
+        });
+        return list;
+    }
+
+    function parseQuestionsToText(questions) {
+        return questions.map(q => [q.word, q.correct, ...q.wrong].join(' | ')).join('\n');
+    }
+
+    questionDataset = parseTextToQuestions(defaultTextQuestions);
+
+    /* ==========================================================================
+       3. SETUP & TEACHER MODE
+       ========================================================================== */
+    function selectChar(charSymbol, element) {
+        document.querySelectorAll('.char-opt').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        playerConfig.char = charSymbol;
+    }
+
+    function showSetupScreen() {
+        document.getElementById('resultModal').classList.remove('active');
+        document.getElementById('setupModal').classList.add('active');
+    }
+
+    function startGame() {
+        playerConfig.name = document.getElementById('input-name').value.trim() || "SISWA";
+        document.getElementById('player-tag-name').innerText = `${playerConfig.name} ${playerConfig.char}`;
+
+        document.getElementById('setupModal').classList.remove('active');
+        initGame();
+    }
+
+    function openTeacherModal() {
+        document.getElementById('textInput').value = parseQuestionsToText(questionDataset);
+        document.getElementById('teacherModal').classList.add('active');
+    }
+
+    function closeTeacherModal() {
+        document.getElementById('teacherModal').classList.remove('active');
+    }
+
+    function loadDefaultQuestions() {
+        document.getElementById('textInput').value = defaultTextQuestions;
+    }
+
+    function saveTeacherQuestions() {
+        const rawText = document.getElementById('textInput').value;
+        const parsed = parseTextToQuestions(rawText);
+
+        if (parsed.length === 0) {
+            alert("Harap masukkan minimal 1 baris soal dengan format yang benar!");
+            return;
+        }
+
+        questionDataset = parsed;
+        alert(`Berhasil menyimpan ${questionDataset.length} soal!`);
+        closeTeacherModal();
+        if (!document.getElementById('setupModal').classList.contains('active')) {
+            initGame();
+        }
+    }
+
+    /* ==========================================================================
+       4. CANVAS ANIMATION ENGINE (Single Character Idle/Bounce)
+       ========================================================================== */
+    const canvas = document.getElementById('arenaCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    let charEntity = { x: 0, y: 0, emoji: '🧙‍♂️', timer: 0, scale: 1 };
+
+    function initEntity() {
+        resizeCanvas();
+        charEntity = {
+            x: canvas.width / 2,
+            y: canvas.height * 0.65,
+            emoji: playerConfig.char,
+            timer: 0,
+            scale: 1
+        };
+    }
+
+    function triggerBounce() {
+        charEntity.scale = 1.3;
+        setTimeout(() => { charEntity.scale = 1; }, 200);
+    }
+
+    function renderLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        charEntity.timer += 0.05;
+        let bounce = Math.sin(charEntity.timer * 2) * 6;
+
+        ctx.save();
+        ctx.font = "65px sans-serif";
+        ctx.textAlign = "center";
+        ctx.translate(charEntity.x, charEntity.y + bounce);
+        ctx.scale(charEntity.scale, charEntity.scale);
+        ctx.fillText(charEntity.emoji, 0, 0);
+        ctx.restore();
+
+        requestAnimationFrame(renderLoop);
+    }
+
+    /* ==========================================================================
+       5. GAMEPLAY & TIMER LOGIC
+       ========================================================================== */
+    function initGame() {
+        gameState.score = 0;
+        gameState.currentIndex = 0;
+        gameState.questions = [...questionDataset].sort(() => Math.random() - 0.5);
+        document.getElementById('score-val').innerText = gameState.score;
+
+        initEntity();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (gameState.currentIndex >= gameState.questions.length) {
+            endGame();
+            return;
+        }
+
+        gameState.isLocked = false;
+        const q = gameState.questions[gameState.currentIndex];
+
+        document.getElementById('q-prog-text').innerText = `Soal: ${gameState.currentIndex + 1} / ${gameState.questions.length}`;
+        document.getElementById('q-title').innerText = q.word;
+
+        const container = document.getElementById('answers-grid');
+        container.innerHTML = '';
+
+        const opts = [q.correct, ...q.wrong].sort(() => Math.random() - 0.5);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-ans';
+            btn.innerText = opt;
+            btn.onclick = () => handleAnswer(opt, q.correct, btn);
+            container.appendChild(btn);
+        });
+
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(gameState.timerInterval);
+        gameState.timer = 15;
+        document.getElementById('timer-val').innerText = `${gameState.timer}s`;
+
+        gameState.timerInterval = setInterval(() => {
+            gameState.timer--;
+            document.getElementById('timer-val').innerText = `${gameState.timer}s`;
+
+            if (gameState.timer <= 0) {
+                clearInterval(gameState.timerInterval);
+                handleTimeOut();
+            }
+        }, 1000);
+    }
+
+    function handleTimeOut() {
+        if (gameState.isLocked) return;
+        gameState.isLocked = true;
+        playSound('wrong');
+
+        gameState.currentIndex++;
+        setTimeout(loadQuestion, 800);
+    }
+
+    function handleAnswer(selected, correct, btn) {
+        if (gameState.isLocked) return;
+        gameState.isLocked = true;
+        clearInterval(gameState.timerInterval);
+
+        const isCorrect = selected === correct;
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            gameState.score += 20; // Skor tepat 20 per soal benar
+            document.getElementById('score-val').innerText = gameState.score;
+            playSound('correct');
+            triggerBounce();
+        } else {
+            btn.classList.add('wrong');
+            playSound('wrong');
+        }
+
+        gameState.currentIndex++;
+        setTimeout(loadQuestion, 800);
+    }
+
+    function endGame() {
+        clearInterval(gameState.timerInterval);
+        playSound('victory');
+        document.getElementById('finalScoreText').innerText = `Skor akhir kamu: ${gameState.score}`;
+        document.getElementById('resultModal').classList.add('active');
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+    }
+
+    // Start background loop
+    renderLoop();
+</script>
+</body>
+</html>

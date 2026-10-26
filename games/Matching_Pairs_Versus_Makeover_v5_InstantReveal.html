@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<title>Matching Pairs Arena — Versus v5 Instant Reveal</title>
+<style>
+  :root{
+    --bg1:#091426;
+    --bg2:#15294a;
+    --ink:#f8fbff;
+    --muted:#a9b8d0;
+    --panel:rgba(13,24,44,.78);
+    --panel2:rgba(255,255,255,.08);
+    --line:rgba(255,255,255,.14);
+    --p1:#38bdf8;
+    --p1rgb:56,189,248;
+    --p2:#fb923c;
+    --p2rgb:251,146,60;
+    --good:#4ade80;
+    --bad:#fb7185;
+    --gold:#facc15;
+    --shadow:0 22px 70px rgba(0,0,0,.38);
+    --radius:26px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  body{
+    min-height:100vh;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 14% 14%, rgba(56,189,248,.18), transparent 28%),
+      radial-gradient(circle at 88% 18%, rgba(251,146,60,.18), transparent 30%),
+      radial-gradient(circle at 50% 105%, rgba(168,85,247,.17), transparent 35%),
+      linear-gradient(145deg,var(--bg1),var(--bg2));
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;inset:0;pointer-events:none;opacity:.24;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:32px 32px;
+    mask-image:linear-gradient(to bottom,#000,transparent 75%);
+  }
+
+  body[data-theme="ocean"]{
+    --bg1:#041a2d;--bg2:#0a4961;
+  }
+  body[data-theme="jungle"]{
+    --bg1:#102718;--bg2:#285b35;
+  }
+  body[data-theme="sunset"]{
+    --bg1:#2b1234;--bg2:#7c2d52;
+  }
+  body[data-theme="classroom"]{
+    --bg1:#172033;--bg2:#34445f;
+  }
+  body[data-theme="cosmic"]{
+    --bg1:#090b23;--bg2:#24245b;
+  }
+
+  button,input,textarea{font:inherit}
+  button{touch-action:manipulation}
+
+  .app{
+    width:min(1440px,100%);
+    min-height:100vh;
+    margin:auto;
+    padding:clamp(10px,1.6vw,22px);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    position:relative;
+    z-index:1;
+  }
+
+  .topbar{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border:1px solid var(--line);
+    background:rgba(7,13,26,.66);
+    backdrop-filter:blur(16px);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+  }
+
+  .brand{
+    min-width:0;
+    user-select:none;
+    -webkit-user-select:none;
+    cursor:default;
+  }
+  .brand .eyebrow{
+    font-size:11px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#7dd3fc;
+  }
+  .brand h1{
+    margin:2px 0 0;
+    font-size:clamp(18px,2.2vw,28px);
+    letter-spacing:-.03em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  .timer-box{
+    min-width:152px;
+    text-align:center;
+    padding:7px 18px 8px;
+    border-radius:18px;
+    background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));
+    border:1px solid rgba(255,255,255,.17);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  .timer-label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:900}
+  #timerDisplay{font-weight:950;font-size:clamp(23px,3vw,34px);font-variant-numeric:tabular-nums;line-height:1.08}
+
+  .top-actions{
+    display:flex;justify-content:flex-end;gap:8px;align-items:center;
+  }
+  .icon-btn{
+    width:42px;height:42px;border:1px solid var(--line);border-radius:14px;
+    background:rgba(255,255,255,.08);color:#fff;cursor:pointer;
+    display:grid;place-items:center;font-size:19px;
+    box-shadow:0 8px 18px rgba(0,0,0,.15);
+    transition:.16s ease;
+  }
+  .icon-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.13)}
+  .icon-btn:active{transform:translateY(1px) scale(.97)}
+
+  .race-meta{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:12px;
+    align-items:center;
+  }
+  .meta-pill{
+    border:1px solid var(--line);
+    background:rgba(7,13,26,.56);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:12px;
+    font-weight:850;
+    color:var(--muted);
+    backdrop-filter:blur(12px);
+  }
+  .meta-pill.center{text-align:center;min-width:150px}
+  .meta-pill.right{text-align:right}
+
+  .versus{
+    flex:1;
+    min-height:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:12px;
+  }
+
+  .player{
+    --team:var(--p1);
+    --team-rgb:var(--p1rgb);
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    border-radius:var(--radius);
+    padding:12px;
+    border:1px solid rgba(var(--team-rgb),.42);
+    background:
+      linear-gradient(180deg,rgba(var(--team-rgb),.10),rgba(255,255,255,.03)),
+      rgba(6,13,26,.70);
+    backdrop-filter:blur(15px);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    position:relative;
+  }
+  .player::before{
+    content:"";
+    position:absolute;inset:0 0 auto 0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--team),transparent);
+    opacity:.85;
+  }
+  .player.p2{--team:var(--p2);--team-rgb:var(--p2rgb)}
+
+  .player.is-finished{
+    box-shadow:0 0 0 1px rgba(var(--team-rgb),.28),0 22px 70px rgba(0,0,0,.38),0 0 42px rgba(var(--team-rgb),.18);
+  }
+
+  .player-head{
+    display:flex;align-items:center;gap:10px;min-height:52px;
+  }
+  .avatar{
+    width:46px;height:46px;border-radius:15px;
+    display:grid;place-items:center;
+    background:rgba(var(--team-rgb),.18);
+    border:1px solid rgba(var(--team-rgb),.42);
+    font-size:24px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  .player-id{min-width:0;flex:1}
+  .player-name{
+    font-size:clamp(16px,2vw,22px);
+    font-weight:950;letter-spacing:-.025em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .player-sub{
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    color:var(--muted);font-size:11px;font-weight:750;margin-top:1px;
+  }
+  .status-dot{
+    width:7px;height:7px;border-radius:50%;display:inline-block;background:var(--team);
+    box-shadow:0 0 0 4px rgba(var(--team-rgb),.12),0 0 14px rgba(var(--team-rgb),.7);
+  }
+  .score-chip{
+    font-size:13px;font-weight:900;
+    padding:7px 10px;border-radius:13px;
+    background:rgba(var(--team-rgb),.12);
+    border:1px solid rgba(var(--team-rgb),.25);
+    color:#fff;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .progress-shell{
+    height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;
+    border:1px solid rgba(255,255,255,.06);
+  }
+  .progress-fill{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--team),#fff);
+    border-radius:inherit;
+    transition:width .35s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 0 16px rgba(var(--team-rgb),.45);
+  }
+
+  .grid{
+    flex:1;min-height:0;
+    display:grid;
+    grid-template-columns:repeat(var(--cols,4),minmax(0,1fr));
+    grid-auto-rows:minmax(64px,1fr);
+    gap:clamp(6px,.8vw,10px);
+    align-content:stretch;
+    overflow:auto;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,.18) transparent;
+    padding:2px;
+  }
+
+  .card{
+    min-height:62px;
+    width:100%;
+    height:100%;
+    perspective:900px;
+    cursor:pointer;
+    position:relative;
+    outline:none;
+    user-select:none;
+    -webkit-user-select:none;
+
+    /* Multi-touch friendly: each card can receive its own pointer independently */
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+
+    /* Remove default browser button appearance */
+    border:0;
+    padding:0;
+    margin:0;
+    background:transparent;
+    color:inherit;
+    appearance:none;
+    -webkit-appearance:none;
+    overflow:visible;
+  }
+  .card:focus-visible .card-inner{outline:3px solid #fff;outline-offset:2px}
+  .card-inner{
+    display:block;
+    width:100%;height:100%;min-height:62px;position:relative;
+    border-radius:16px;
+    transition:filter .08s ease;
+  }
+  .card:hover .card-inner{filter:brightness(1.08)}
+  .card:active .card-inner{filter:brightness(1.16)}
+
+  /*
+     IMPORTANT VISUAL RULE:
+     The vocabulary face is not dependent on a 180deg 3D rotation anymore.
+     As soon as .flipped is added, the back disappears and the word is visible
+     in the very same visual state. The quick flip is now decorative only.
+  */
+  .card-face{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    border-radius:16px;
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:9px;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .card-back{
+    opacity:1;
+    visibility:visible;
+    background:
+      radial-gradient(circle at 28% 24%,rgba(255,255,255,.16),transparent 23%),
+      linear-gradient(145deg,rgba(var(--team-rgb),.24),rgba(255,255,255,.07));
+    border:1px solid rgba(var(--team-rgb),.38);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.10),
+      0 8px 14px rgba(0,0,0,.18);
+  }
+  .card-back::before{
+    content:"";
+    width:34px;height:34px;border-radius:12px;
+    border:2px solid rgba(255,255,255,.36);
+    transform:rotate(12deg);
+    box-shadow:inset 0 0 0 5px rgba(var(--team-rgb),.10);
+  }
+  .card-back::after{
+    content:"?";
+    position:absolute;
+    font-size:19px;font-weight:1000;color:#fff;
+    text-shadow:0 3px 8px rgba(0,0,0,.35);
+  }
+  .card-front{
+    opacity:0;
+    visibility:hidden;
+    background:linear-gradient(160deg,#ffffff,#eef6ff);
+    color:#10203a;
+    border:2px solid rgba(var(--team-rgb),.62);
+    box-shadow:0 8px 18px rgba(0,0,0,.16);
+    font-weight:950;
+    font-size:clamp(14px,1.55vw,21px);
+    line-height:1.12;
+    letter-spacing:-.01em;
+    word-break:break-word;
+    overflow-wrap:anywhere;
+    hyphens:auto;
+  }
+  .card-front .word-text{
+    display:block;
+    width:100%;
+    text-align:center;
+  }
+
+  /* INSTANT REVEAL: text is visible immediately; animation is only a fast flourish. */
+  .card.flipped .card-back,
+  .card.matched .card-back{
+    opacity:0;
+    visibility:hidden;
+  }
+  .card.flipped .card-front,
+  .card.matched .card-front{
+    opacity:1;
+    visibility:visible;
+    animation:instantFlipIn .10s ease-out both;
+  }
+
+  /* Matched cards can NEVER visually return to the question-mark side. */
+  .card.matched{
+    pointer-events:none;
+    cursor:default;
+  }
+  .card.matched .card-inner{
+    filter:saturate(.92) brightness(1);
+  }
+  .card.matched .card-front{
+    opacity:1 !important;
+    visibility:visible !important;
+    background:linear-gradient(155deg,#effff4,#d8ffe5);
+    border-color:var(--good);
+  }
+  .card.matched .card-back{
+    opacity:0 !important;
+    visibility:hidden !important;
+  }
+  .card.matched::after{
+    content:"✓";
+    position:absolute;right:-4px;top:-5px;
+    width:23px;height:23px;border-radius:50%;
+    display:grid;place-items:center;
+    color:#072e15;background:var(--good);
+    border:2px solid #fff;
+    font-weight:1000;font-size:13px;
+    z-index:5;
+    animation:badgePop .22s ease both;
+  }
+
+  /* Feedback animations are on the CARD shell, never on the face visibility. */
+  .card.correct{animation:correctPop .20s cubic-bezier(.2,.9,.3,1)}
+  .card.wrong{animation:wrongShake .22s ease}
+  .card.closing .card-front{animation:instantFlipOut .09s ease-in both}
+
+  @keyframes instantFlipIn{
+    0%{transform:perspective(650px) rotateY(-18deg) scaleX(.90);filter:brightness(1.08)}
+    100%{transform:perspective(650px) rotateY(0deg) scaleX(1);filter:none}
+  }
+  @keyframes instantFlipOut{
+    0%{transform:perspective(650px) rotateY(0deg) scaleX(1);opacity:1}
+    100%{transform:perspective(650px) rotateY(16deg) scaleX(.92);opacity:0}
+  }
+  @keyframes badgePop{0%{transform:scale(0) rotate(-30deg)}75%{transform:scale(1.2)}100%{transform:scale(1)}}
+  @keyframes correctPop{50%{transform:scale(1.035)}}
+  @keyframes wrongShake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-6px)}
+    40%{transform:translateX(5px)}
+    60%{transform:translateX(-3px)}
+    80%{transform:translateX(2px)}
+  }
+
+  .feedback{
+    min-height:28px;
+    display:flex;align-items:center;justify-content:center;
+    text-align:center;
+    font-weight:900;font-size:12px;letter-spacing:.01em;
+    border-radius:12px;
+    transition:.2s ease;
+  }
+  .feedback.good{color:#a7f3d0;background:rgba(74,222,128,.10)}
+  .feedback.bad{color:#fecdd3;background:rgba(251,113,133,.10)}
+  .feedback.neutral{color:var(--muted)}
+
+  .finish-strip{
+    display:none;
+    border-radius:16px;
+    padding:9px 12px;
+    background:linear-gradient(90deg,rgba(var(--team-rgb),.18),rgba(255,255,255,.06));
+    border:1px solid rgba(var(--team-rgb),.34);
+    font-size:12px;
+    font-weight:850;
+    animation:finishIn .4s ease;
+  }
+  .finish-strip.show{display:flex;justify-content:space-between;gap:10px;align-items:center}
+  .finish-strip strong{font-size:14px}
+  @keyframes finishIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+  .footer{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    color:#8697b1;font-size:10px;font-weight:700;
+    padding:0 5px;
+    user-select:none;-webkit-user-select:none;
+  }
+  .footer-lock{cursor:default}
+
+  .overlay{
+    position:fixed;inset:0;
+    display:none;
+    align-items:center;justify-content:center;
+    padding:18px;
+    background:rgba(1,5,13,.72);
+    backdrop-filter:blur(13px);
+    z-index:1000;
+  }
+  .overlay.show{display:flex}
+  .modal{
+    width:min(560px,100%);
+    border-radius:28px;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),
+      #0d1728;
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow:0 32px 100px rgba(0,0,0,.58);
+    padding:22px;
+    animation:modalIn .28s cubic-bezier(.2,.9,.3,1);
+  }
+  @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+
+  .start-modal{text-align:center;max-width:630px}
+  .start-icon{
+    width:76px;height:76px;border-radius:25px;margin:0 auto 12px;
+    display:grid;place-items:center;font-size:42px;
+    background:linear-gradient(145deg,rgba(56,189,248,.22),rgba(251,146,60,.20));
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 15px 40px rgba(0,0,0,.24);
+  }
+  .modal h2{font-size:clamp(24px,5vw,38px);margin:0;letter-spacing:-.04em}
+  .modal p{color:var(--muted);margin:7px 0 0;line-height:1.5}
+  .duel-preview{
+    display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
+    margin:18px 0;
+  }
+  .team-preview{
+    padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid var(--line);
+    font-weight:950;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .vs-badge{
+    font-weight:1000;font-size:13px;letter-spacing:.1em;color:var(--gold);
+    width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+    border:1px solid rgba(250,204,21,.32);background:rgba(250,204,21,.08);
+  }
+
+  .primary,.secondary,.danger{
+    border:none;border-radius:16px;cursor:pointer;font-weight:950;
+    padding:12px 17px;
+    transition:.14s ease;
+  }
+  .primary{
+    color:#06101c;
+    background:linear-gradient(180deg,#7dd3fc,#38bdf8);
+    box-shadow:0 7px 0 #0e7490,0 13px 25px rgba(56,189,248,.18);
+  }
+  .primary:hover{transform:translateY(-2px)}
+  .primary:active{transform:translateY(5px);box-shadow:0 2px 0 #0e7490}
+  .secondary{
+    color:#fff;background:rgba(255,255,255,.09);border:1px solid var(--line)
+  }
+  .secondary:hover{background:rgba(255,255,255,.14)}
+  .danger{
+    color:#fff;background:rgba(251,113,133,.14);border:1px solid rgba(251,113,133,.28)
+  }
+  .full{width:100%}
+
+  .countdown{
+    position:fixed;inset:0;z-index:2000;
+    display:none;place-items:center;
+    pointer-events:none;
+    background:rgba(3,7,18,.38);
+    backdrop-filter:blur(7px);
+  }
+  .countdown.show{display:grid}
+  .countdown-value{
+    font-size:min(30vw,190px);
+    line-height:1;
+    font-weight:1000;
+    letter-spacing:-.08em;
+    text-shadow:0 15px 55px rgba(0,0,0,.45),0 0 45px rgba(125,211,252,.35);
+    animation:countPop .75s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes countPop{0%{opacity:0;transform:scale(.55)}45%{opacity:1;transform:scale(1.1)}100%{opacity:.1;transform:scale(1.3)}}
+
+  .result-modal{max-width:670px}
+  .result-hero{text-align:center}
+  .trophy{font-size:62px;filter:drop-shadow(0 10px 22px rgba(250,204,21,.22));animation:trophyFloat 1.8s ease-in-out infinite}
+  @keyframes trophyFloat{50%{transform:translateY(-5px) rotate(2deg)}}
+  .winner-title{font-size:clamp(25px,5vw,40px);font-weight:1000;letter-spacing:-.04em;margin:4px 0 4px}
+  .result-sub{color:var(--muted);font-size:13px}
+  .rankings{display:grid;gap:9px;margin:18px 0}
+  .rank-row{
+    display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;
+    padding:12px 14px;border-radius:17px;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);
+  }
+  .rank-row:first-child{
+    background:linear-gradient(90deg,rgba(250,204,21,.17),rgba(255,255,255,.05));
+    border-color:rgba(250,204,21,.34);
+  }
+  .medal{font-size:25px}
+  .rank-name{font-weight:950}
+  .rank-detail{text-align:right;font-weight:850;font-variant-numeric:tabular-nums}
+  .rank-detail small{display:block;color:var(--muted);font-size:10px;font-weight:700}
+  .result-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+  .pin-modal{max-width:410px;text-align:center}
+  .pin-icon{font-size:40px;margin-bottom:5px}
+  .field{
+    width:100%;border:1px solid var(--line);background:rgba(255,255,255,.07);
+    color:#fff;border-radius:14px;padding:11px 12px;outline:none;
+  }
+  .field:focus{border-color:#7dd3fc;box-shadow:0 0 0 3px rgba(56,189,248,.12)}
+  .pin-input{text-align:center;font-size:24px;font-weight:950;letter-spacing:.28em;margin:15px 0 9px}
+  .error-msg{color:#fecdd3;font-size:12px;min-height:18px;font-weight:800}
+
+  .admin-modal{width:min(860px,100%);max-height:min(90vh,900px);overflow:auto}
+  .admin-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:14px}
+  .admin-head h2{font-size:25px}
+  .close-btn{flex:0 0 auto}
+  .admin-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:13px}
+  .panel-card{
+    border:1px solid var(--line);border-radius:18px;padding:13px;background:rgba(255,255,255,.045);
+  }
+  .panel-card h3{font-size:13px;margin:0 0 8px;letter-spacing:.02em}
+  .helper{font-size:11px;line-height:1.5;color:var(--muted);margin-bottom:8px}
+  textarea.field{min-height:245px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.45}
+  .stack{display:grid;gap:9px}
+  .field-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+  .field-row label{font-size:11px;color:var(--muted);font-weight:850}
+  input[type="color"]{
+    width:44px;height:38px;border:1px solid var(--line);background:transparent;border-radius:10px;padding:3px;cursor:pointer;
+  }
+  select.field{appearance:none}
+  .admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+  .admin-status{min-height:20px;margin-top:8px;font-size:12px;font-weight:850}
+  .admin-status.ok{color:#bbf7d0}.admin-status.err{color:#fecdd3}
+  .tiny-note{font-size:10px;color:#7f91ad;margin-top:7px}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;z-index:2500;
+    transform:translate(-50%,18px);
+    opacity:0;pointer-events:none;
+    padding:10px 15px;border-radius:999px;
+    background:#f8fbff;color:#0b1323;font-weight:900;font-size:12px;
+    box-shadow:0 14px 35px rgba(0,0,0,.3);
+    transition:.25s ease;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  .particle-layer{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:2400}
+  .particle{
+    position:absolute;width:10px;height:15px;border-radius:3px;
+    animation:fall var(--dur,2.5s) cubic-bezier(.1,.7,.25,1) forwards;
+  }
+  @keyframes fall{
+    0%{transform:translate3d(0,-8vh,0) rotate(0deg);opacity:1}
+    100%{transform:translate3d(var(--drift,0px),108vh,0) rotate(900deg);opacity:0}
+  }
+
+  .spark{
+    position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:2300;
+    animation:spark .55s ease-out forwards;
+  }
+  @keyframes spark{to{transform:translate(var(--x),var(--y)) scale(.1);opacity:0}}
+
+  @media (max-width:820px){
+    .topbar{grid-template-columns:1fr auto}
+    .timer-box{grid-row:2;grid-column:1/-1;width:100%}
+    .race-meta{grid-template-columns:1fr 1fr}
+    .meta-pill.center{display:none}
+    .versus{grid-template-columns:1fr}
+    .player{min-height:420px}
+    .admin-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:520px){
+    .app{padding:7px;gap:8px}
+    .topbar{padding:9px 10px;border-radius:17px}
+    .brand .eyebrow{font-size:8px}
+    .brand h1{font-size:17px}
+    .icon-btn{width:37px;height:37px;border-radius:12px}
+    .player{padding:8px;border-radius:19px;min-height:390px}
+    .avatar{width:39px;height:39px;font-size:20px;border-radius:12px}
+    .score-chip{padding:6px 8px}
+    .grid{gap:5px;grid-auto-rows:minmax(58px,1fr)}
+    .card-inner{min-height:58px;border-radius:12px}
+    .card-face{border-radius:12px;padding:5px}
+    .card-front{font-size:11px}
+    .duel-preview{grid-template-columns:1fr}
+    .vs-badge{margin:auto}
+    .result-actions{grid-template-columns:1fr}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body data-theme="cosmic">
+<div class="app">
+  <header class="topbar">
+    <div class="brand" id="secretTitle" title="Matching Pairs Arena">
+      <div class="eyebrow">English Game • 2 Player Race</div>
+      <h1>⚔️ Matching Pairs Arena</h1>
+    </div>
+
+    <div class="timer-box">
+      <div class="timer-label">Race Timer</div>
+      <div id="timerDisplay">00:00.0</div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="soundBtn" aria-label="Sound on/off" title="Sound">🔊</button>
+      <button class="icon-btn" id="fullscreenBtn" aria-label="Fullscreen" title="Fullscreen">⛶</button>
+      <button class="icon-btn" id="restartBtn" aria-label="Restart" title="Restart">↻</button>
+    </div>
+  </header>
+
+  <div class="race-meta">
+    <div class="meta-pill" id="p1Meta">🔵 0 / 0 pasangan</div>
+    <div class="meta-pill center" id="roundMeta">Memory • Speed • Focus</div>
+    <div class="meta-pill right" id="p2Meta">🟠 0 / 0 pasangan</div>
+  </div>
+
+  <main class="versus">
+    <section class="player p1" id="player1Area">
+      <div class="player-head">
+        <div class="avatar">🦁</div>
+        <div class="player-id">
+          <div class="player-name" id="p1Name">Tim 1</div>
+          <div class="player-sub"><span><span class="status-dot"></span> <span id="p1Status">Siap</span></span><span id="p1Mistakes">0 salah</span></div>
+        </div>
+        <div class="score-chip"><span id="p1Score">0</span>/<span class="totalPairsLabel">0</span></div>
+      </div>
+      <div class="progress-shell"><div class="progress-fill" id="p1Progress"></div></div>
+      <div class="finish-strip" id="p1Finish"><strong>🏁 Selesai!</strong><span id="p1FinishTime">00:00.0</span></div>
+      <div class="grid" id="grid1" aria-label="Kartu Tim 1"></div>
+      <div class="feedback neutral" id="feedback1">Temukan pasangan yang cocok.</div>
+    </section>
+
+    <section class="player p2" id="player2Area">
+      <div class="player-head">
+        <div class="avatar">🐯</div>
+        <div class="player-id">
+          <div class="player-name" id="p2Name">Tim 2</div>
+          <div class="player-sub"><span><span class="status-dot"></span> <span id="p2Status">Siap</span></span><span id="p2Mistakes">0 salah</span></div>
+        </div>
+        <div class="score-chip"><span id="p2Score">0</span>/<span class="totalPairsLabel">0</span></div>
+      </div>
+      <div class="progress-shell"><div class="progress-fill" id="p2Progress"></div></div>
+      <div class="finish-strip" id="p2Finish"><strong>🏁 Selesai!</strong><span id="p2FinishTime">00:00.0</span></div>
+      <div class="grid" id="grid2" aria-label="Kartu Tim 2"></div>
+      <div class="feedback neutral" id="feedback2">Temukan pasangan yang cocok.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Works offline • Instant Reveal • Multi-Touch • No external audio/files</span>
+    <span class="footer-lock" id="secretFooter">Teacher Mode 🔒</span>
+  </footer>
+</div>
+
+<!-- START -->
+<div class="overlay show" id="startOverlay">
+  <div class="modal start-modal">
+    <div class="start-icon">🧠</div>
+    <h2>Ready to Race?</h2>
+    <p>Cari semua pasangan secepat mungkin. Setiap tim mendapat susunan kartu yang berbeda.</p>
+    <div class="duel-preview">
+      <div class="team-preview" id="startP1">🦁 Tim 1</div>
+      <div class="vs-badge">VS</div>
+      <div class="team-preview" id="startP2">🐯 Tim 2</div>
+    </div>
+    <button class="primary full" id="startBtn">🚀 Mulai Balapan</button>
+    <div class="tiny-note">Tip guru: tekan lama judul “Matching Pairs Arena” selama 2 detik untuk membuka Teacher Mode.</div>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="countdown" id="countdown"><div class="countdown-value" id="countdownValue">3</div></div>
+
+<!-- RESULT -->
+<div class="overlay" id="resultOverlay">
+  <div class="modal result-modal">
+    <div class="result-hero">
+      <div class="trophy">🏆</div>
+      <div class="winner-title" id="winnerTitle">Pemenang!</div>
+      <div class="result-sub" id="winnerSub">Hasil akhir perlombaan</div>
+    </div>
+    <div class="rankings" id="rankings"></div>
+    <div class="result-actions">
+      <button class="secondary" id="closeResultBtn">Lihat Papan</button>
+      <button class="primary" id="playAgainBtn">🔄 Main Lagi</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN -->
+<div class="overlay" id="pinOverlay">
+  <div class="modal pin-modal">
+    <div class="pin-icon">🔐</div>
+    <h2 style="font-size:25px">Teacher Mode</h2>
+    <p>Masukkan PIN guru.</p>
+    <input class="field pin-input" id="pinInput" type="password" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="••••" />
+    <div class="error-msg" id="pinError"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:5px">
+      <button class="secondary" id="cancelPinBtn">Batal</button>
+      <button class="primary" id="unlockBtn">Buka</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal admin-modal">
+    <div class="admin-head">
+      <div>
+        <h2>🛠️ Teacher Control Center</h2>
+        <p style="font-size:12px">Kelola materi, tim, warna, tema, dan PIN. Semua tersimpan di browser ini.</p>
+      </div>
+      <button class="icon-btn close-btn" id="closeAdminBtn">✕</button>
+    </div>
+
+    <div class="admin-grid">
+      <div class="panel-card">
+        <h3>📚 Bulk Vocabulary Editor</h3>
+        <div class="helper">
+          Satu pasangan per baris. Format terbaik: <b>English | Indonesia</b>.<br>
+          Contoh: <b>apple | apel</b>. Jika hanya menulis <b>apple</b>, game membuat dua kartu identik.
+        </div>
+        <textarea class="field" id="vocabInput" spellcheck="false"></textarea>
+        <div class="admin-actions">
+          <button class="primary" id="saveVocabBtn">💾 Simpan & Terapkan</button>
+          <button class="danger" id="resetVocabBtn">↺ Reset Default</button>
+        </div>
+        <div class="admin-status" id="adminStatus"></div>
+      </div>
+
+      <div class="stack">
+        <div class="panel-card">
+          <h3>👥 Tim</h3>
+          <div class="stack">
+            <div class="field-row"><input class="field" id="p1NameInput" maxlength="20" placeholder="Tim 1"><input type="color" id="p1ColorInput"></div>
+            <div class="field-row"><input class="field" id="p2NameInput" maxlength="20" placeholder="Tim 2"><input type="color" id="p2ColorInput"></div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h3>🎨 Arena Theme</h3>
+          <select class="field" id="themeInput">
+            <option value="cosmic">🌌 Cosmic Arena</option>
+            <option value="ocean">🌊 Ocean Deep</option>
+            <option value="jungle">🌿 Jungle Quest</option>
+            <option value="sunset">🌇 Sunset Rush</option>
+            <option value="classroom">🏫 Smart Classroom</option>
+          </select>
+        </div>
+
+        <div class="panel-card">
+          <h3>🔑 Teacher PIN</h3>
+          <input class="field" id="newPinInput" type="password" inputmode="numeric" maxlength="8" placeholder="PIN baru (opsional)">
+          <div class="tiny-note">PIN default: 1234. Kosongkan jika tidak ingin mengganti.</div>
+        </div>
+
+        <div class="panel-card">
+          <h3>⚙️ Game Feel</h3>
+          <label style="display:flex;align-items:center;gap:9px;font-size:12px;font-weight:850">
+            <input type="checkbox" id="autoSoundInput"> Aktifkan sound effects
+          </label>
+          <div class="tiny-note">Audio dibuat langsung dengan Web Audio API, tanpa file MP3.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="particle-layer" id="particleLayer"></div>
+<div class="toast" id="toast">Tersimpan</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const DEFAULT_PAIRS = [
+    ["apple","apel"],
+    ["car","mobil"],
+    ["school","sekolah"],
+    ["bus","bus"],
+    ["teacher","guru"],
+    ["book","buku"],
+    ["chair","kursi"],
+    ["window","jendela"]
+  ];
+
+  const LS = {
+    pairs:"mpa_pairs_v2",
+    p1Name:"mpa_p1_name",
+    p2Name:"mpa_p2_name",
+    p1Color:"mpa_p1_color",
+    p2Color:"mpa_p2_color",
+    theme:"mpa_theme",
+    pin:"mpa_teacher_pin",
+    sound:"mpa_sound"
+  };
+
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+
+  const state = {
+    pairs: [],
+    running: false,
+    finished: false,
+    startAt: 0,
+    raf: 0,
+    soundEnabled: true,
+    players: {
+      1:{cards:[],open:[],matched:0,mistakes:0,locked:false,done:false,finishMs:null},
+      2:{cards:[],open:[],matched:0,mistakes:0,locked:false,done:false,finishMs:null}
+    }
+  };
+
+  const els = {
+    timer:$("#timerDisplay"),
+    startOverlay:$("#startOverlay"),
+    resultOverlay:$("#resultOverlay"),
+    countdown:$("#countdown"),
+    countdownValue:$("#countdownValue"),
+    rankings:$("#rankings"),
+    winnerTitle:$("#winnerTitle"),
+    winnerSub:$("#winnerSub"),
+    pinOverlay:$("#pinOverlay"),
+    adminOverlay:$("#adminOverlay"),
+    pinInput:$("#pinInput"),
+    pinError:$("#pinError"),
+    vocabInput:$("#vocabInput"),
+    adminStatus:$("#adminStatus"),
+    toast:$("#toast"),
+    particleLayer:$("#particleLayer")
+  };
+
+  function safeGet(key, fallback=null){
+    try{
+      const v = localStorage.getItem(key);
+      return v === null ? fallback : v;
+    }catch(_){ return fallback; }
+  }
+  function safeSet(key, value){
+    try{ localStorage.setItem(key, value); return true; }catch(_){ return false; }
+  }
+
+  function hexToRgb(hex){
+    let h=(hex||"").replace("#","").trim();
+    if(h.length===3) h=h.split("").map(x=>x+x).join("");
+    if(!/^[0-9a-fA-F]{6}$/.test(h)) return [56,189,248];
+    return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+  }
+
+  function loadSettings(){
+    let parsed;
+    try{ parsed=JSON.parse(safeGet(LS.pairs,"null")); }catch(_){ parsed=null; }
+    if(!Array.isArray(parsed) || parsed.length<2){
+      parsed=DEFAULT_PAIRS.map(x=>[...x]);
+      safeSet(LS.pairs,JSON.stringify(parsed));
+    }
+    state.pairs = parsed
+      .filter(x=>Array.isArray(x) && x.length>=2)
+      .map(x=>[String(x[0]).trim(),String(x[1]).trim()])
+      .filter(x=>x[0] && x[1]);
+
+    if(state.pairs.length<2) state.pairs=DEFAULT_PAIRS.map(x=>[...x]);
+
+    const p1Name=safeGet(LS.p1Name,"Tim 1") || "Tim 1";
+    const p2Name=safeGet(LS.p2Name,"Tim 2") || "Tim 2";
+    const p1Color=safeGet(LS.p1Color,"#38bdf8") || "#38bdf8";
+    const p2Color=safeGet(LS.p2Color,"#fb923c") || "#fb923c";
+    const theme=safeGet(LS.theme,"cosmic") || "cosmic";
+    const sound=safeGet(LS.sound,"1");
+
+    state.soundEnabled = sound !== "0";
+    document.body.dataset.theme=theme;
+    setTeamColor(1,p1Color);
+    setTeamColor(2,p2Color);
+
+    $("#p1Name").textContent=p1Name;
+    $("#p2Name").textContent=p2Name;
+    $("#startP1").textContent="🦁 "+p1Name;
+    $("#startP2").textContent="🐯 "+p2Name;
+
+    $("#p1NameInput").value=p1Name;
+    $("#p2NameInput").value=p2Name;
+    $("#p1ColorInput").value=p1Color;
+    $("#p2ColorInput").value=p2Color;
+    $("#themeInput").value=theme;
+    $("#autoSoundInput").checked=state.soundEnabled;
+    updateSoundIcon();
+
+    els.vocabInput.value=state.pairs.map(([a,b])=>a===b?a:`${a} | ${b}`).join("\n");
+  }
+
+  function setTeamColor(id,hex){
+    const rgb=hexToRgb(hex).join(",");
+    document.documentElement.style.setProperty(`--p${id}`,hex);
+    document.documentElement.style.setProperty(`--p${id}rgb`,rgb);
+  }
+
+  function parseBulk(text){
+    const rows=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const out=[];
+    const seen=new Set();
+    for(const row of rows){
+      const parts=row.split("|").map(x=>x.trim()).filter(Boolean);
+      const a=parts[0]||"";
+      const b=parts[1]||a;
+      if(!a||!b) continue;
+      const key=[a.toLocaleLowerCase(),b.toLocaleLowerCase()].sort().join("⇄");
+      if(seen.has(key)) continue;
+      seen.add(key);
+      out.push([a,b]);
+    }
+    return out;
+  }
+
+  function shuffle(arr){
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function buildDeck(){
+    const deck=[];
+    state.pairs.forEach(([a,b],pairId)=>{
+      deck.push({pairId,text:a,side:"EN",matched:false});
+      deck.push({pairId,text:b,side:a===b?"WORD":"ID",matched:false});
+    });
+    return shuffle(deck);
+  }
+
+  function bestColumns(cardCount){
+    if(cardCount<=8) return 4;
+    if(cardCount<=12) return 4;
+    if(cardCount<=20) return 5;
+    if(cardCount<=30) return 6;
+    return 7;
+  }
+
+  function renderPlayer(id){
+    const p=state.players[id];
+    const grid=$(`#grid${id}`);
+    grid.innerHTML="";
+    grid.style.setProperty("--cols",bestColumns(p.cards.length));
+    p.cards.forEach((card,index)=>{
+      const el=document.createElement("button");
+      el.type="button";
+      el.className="card";
+      el.dataset.index=index;
+      el.setAttribute("aria-label",`Kartu ${index+1}`);
+      el.innerHTML=`
+        <span class="card-inner">
+          <span class="card-face card-back"></span>
+          <span class="card-face card-front">
+            <span class="word-text">${escapeHtml(card.text)}</span>
+          </span>
+        </span>`;
+      // Multi-Touch Support:
+      // Pointer events allow Player 1 and Player 2 to press different cards
+      // at the same time without sharing a global input lock.
+      const activateCard = (ev) => {
+        // Only accept primary mouse button, but allow every touch/pen pointer.
+        if (ev.pointerType === "mouse" && ev.button !== 0) return;
+        ev.preventDefault();
+        onCardClick(id,index);
+      };
+
+      if (window.PointerEvent) {
+        el.addEventListener("pointerdown", activateCard, {passive:false});
+      } else {
+        // Fallback for older browsers.
+        el.addEventListener("touchstart", (ev)=>{
+          ev.preventDefault();
+          onCardClick(id,index);
+        }, {passive:false});
+        el.addEventListener("click", ()=>onCardClick(id,index));
+      }
+
+      grid.appendChild(el);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+  }
+
+  function resetBoard(showStart=true){
+    cancelAnimationFrame(state.raf);
+    state.running=false;
+    state.finished=false;
+    state.startAt=0;
+    els.timer.textContent="00:00.0";
+    els.resultOverlay.classList.remove("show");
+
+    for(const id of [1,2]){
+      const p=state.players[id];
+      p.cards=buildDeck();
+      p.open=[];
+      p.matched=0;
+      p.mistakes=0;
+      p.locked=false;
+      p.done=false;
+      p.finishMs=null;
+      renderPlayer(id);
+      $(`#p${id}Score`).textContent="0";
+      $(`#p${id}Mistakes`).textContent="0 salah";
+      $(`#p${id}Status`).textContent="Siap";
+      $(`#p${id}Progress`).style.width="0%";
+      $(`#p${id}Finish`).classList.remove("show");
+      $(`#player${id}Area`).classList.remove("is-finished");
+      setFeedback(id,"Temukan pasangan yang cocok.","neutral");
+    }
+
+    $$(".totalPairsLabel").forEach(x=>x.textContent=state.pairs.length);
+    updateMeta();
+    if(showStart) els.startOverlay.classList.add("show");
+  }
+
+  function updateMeta(){
+    const total=state.pairs.length;
+    $("#p1Meta").textContent=`🔵 ${state.players[1].matched} / ${total} pasangan`;
+    $("#p2Meta").textContent=`🟠 ${state.players[2].matched} / ${total} pasangan`;
+  }
+
+  function setFeedback(id,text,type="neutral"){
+    const e=$(`#feedback${id}`);
+    e.textContent=text;
+    e.className=`feedback ${type}`;
+  }
+
+  async function beginRace(){
+    if(state.running) return;
+    els.startOverlay.classList.remove("show");
+    await runCountdown();
+    state.running=true;
+    state.finished=false;
+    state.startAt=performance.now();
+    $("#p1Status").textContent="Bermain";
+    $("#p2Status").textContent="Bermain";
+    setFeedback(1,"GO! Ingat posisi kartu.","neutral");
+    setFeedback(2,"GO! Ingat posisi kartu.","neutral");
+    sound("go");
+    tick();
+  }
+
+  function runCountdown(){
+    return new Promise(resolve=>{
+      const seq=["3","2","1","GO!"];
+      let i=0;
+      els.countdown.classList.add("show");
+      const next=()=>{
+        els.countdownValue.textContent=seq[i];
+        els.countdownValue.style.animation="none";
+        void els.countdownValue.offsetWidth;
+        els.countdownValue.style.animation="";
+        if(seq[i]!=="GO!") sound("count");
+        i++;
+        if(i<seq.length){
+          setTimeout(next,720);
+        }else{
+          setTimeout(()=>{
+            els.countdown.classList.remove("show");
+            resolve();
+          },620);
+        }
+      };
+      next();
+    });
+  }
+
+  function tick(){
+    if(!state.running) return;
+    const ms=performance.now()-state.startAt;
+    els.timer.textContent=formatTime(ms);
+    state.raf=requestAnimationFrame(tick);
+  }
+
+  function formatTime(ms){
+    const totalTenths=Math.max(0,Math.floor(ms/100));
+    const mins=Math.floor(totalTenths/600);
+    const secs=Math.floor((totalTenths%600)/10);
+    const tenth=totalTenths%10;
+    return `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}.${tenth}`;
+  }
+
+  function cardEl(id,index){ return $(`#grid${id}`).children[index]; }
+
+  const FLIP_MS = 100;
+  const WRONG_READ_MS = 850;
+  const WRONG_FEEDBACK_MS = 220;
+
+  function delay(ms){
+    return new Promise(resolve=>setTimeout(resolve,ms));
+  }
+
+  function nextPaint(){
+    return new Promise(resolve=>requestAnimationFrame(resolve));
+  }
+
+  // The word becomes visible synchronously with the click.
+  // No waiting for transitionend, no double requestAnimationFrame, no 3D face dependency.
+  function openCardVisual(el){
+    if(!el) return;
+    el.classList.remove('closing');
+    el.classList.add('flipped');
+  }
+
+  async function closeCardVisual(el){
+    if(!el || el.classList.contains('matched')) return;
+    el.classList.add('closing');
+    await delay(90);
+    el.classList.remove('flipped','closing','wrong');
+  }
+
+  async function onCardClick(id,index){
+    const p=state.players[id];
+    if(!state.running || state.finished || p.done || p.locked) return;
+
+    const card=p.cards[index];
+    const el=cardEl(id,index);
+    if(!card || !el || card.matched || el.classList.contains('flipped')) return;
+
+    // VISUAL FIRST, synchronously: vocabulary is revealed immediately on this event.
+    openCardVisual(el);
+    sound('click');
+    p.open.push(index);
+
+    if(p.open.length===1){
+      setFeedback(id,'Pilih satu kartu lagi…','neutral');
+      return;
+    }
+    if(p.open.length!==2) return;
+
+    // Lock only this player; the other side remains independently touchable.
+    p.locked=true;
+
+    const [i1,i2]=p.open;
+    const c1=p.cards[i1], c2=p.cards[i2];
+    const e1=cardEl(id,i1), e2=cardEl(id,i2);
+    const isMatch=!!(c1 && c2 && c1.pairId===c2.pairId && i1!==i2);
+
+    // One browser paint only. This is not a gameplay delay; it guarantees the
+    // just-clicked vocabulary is on screen before feedback/sound changes.
+    await nextPaint();
+
+    if(isMatch){
+      c1.matched=true;
+      c2.matched=true;
+
+      // Explicit permanent open state. Matched CSS also forces the front face visible.
+      e1.classList.add('flipped','matched','correct');
+      e2.classList.add('flipped','matched','correct');
+
+      p.matched++;
+      p.open=[];
+      p.locked=false;
+
+      $(`#p${id}Score`).textContent=p.matched;
+      $(`#p${id}Progress`).style.width=`${(p.matched/state.pairs.length)*100}%`;
+      updateMeta();
+      setFeedback(id,`✨ Cocok! ${c1.text} ↔ ${c2.text}`,'good');
+      sound('correct');
+      burstAt(e2,id);
+
+      setTimeout(()=>{
+        // Remove only the temporary pop effect. Never remove flipped/matched.
+        e1.classList.remove('correct');
+        e2.classList.remove('correct');
+      },220);
+
+      if(p.matched===state.pairs.length) finishPlayer(id);
+      return;
+    }
+
+    // Wrong pair: both vocabulary faces are already visible BEFORE this branch.
+    p.mistakes++;
+    $(`#p${id}Mistakes`).textContent=`${p.mistakes} salah`;
+    setFeedback(id,'👀 Lihat dan ingat kedua kartu…','neutral');
+
+    // Give students reading time while BOTH cards remain open.
+    await delay(WRONG_READ_MS);
+
+    // Only now mark it wrong; both vocabulary words are still visible.
+    e1.classList.add('wrong');
+    e2.classList.add('wrong');
+    setFeedback(id,'✖ Belum cocok — ingat kedua posisinya!','bad');
+    sound('wrong');
+
+    await delay(WRONG_FEEDBACK_MS);
+    e1.classList.remove('wrong');
+    e2.classList.remove('wrong');
+
+    // Close only wrong cards. Matched cards are protected inside closeCardVisual().
+    await Promise.all([closeCardVisual(e1), closeCardVisual(e2)]);
+
+    p.open=[];
+    p.locked=false;
+    setFeedback(id,'Coba pasangan lain.','neutral');
+  }
+
+  function finishPlayer(id){
+    const p=state.players[id];
+    p.done=true;
+    p.finishMs=performance.now()-state.startAt;
+    $(`#p${id}Status`).textContent="Selesai";
+    $(`#p${id}FinishTime`).textContent=formatTime(p.finishMs);
+    $(`#p${id}Finish`).classList.add("show");
+    $(`#player${id}Area`).classList.add("is-finished");
+    setFeedback(id,`🏁 Finish! ${formatTime(p.finishMs)}`,"good");
+    sound("finish");
+    miniConfetti(id);
+
+    if(state.players[1].done && state.players[2].done) finishGame();
+  }
+
+  function finishGame(){
+    if(state.finished) return;
+    state.finished=true;
+    state.running=false;
+    cancelAnimationFrame(state.raf);
+
+    const results=[1,2].map(id=>({
+      id,
+      name:$(`#p${id}Name`).textContent,
+      time:state.players[id].finishMs ?? Infinity,
+      mistakes:state.players[id].mistakes
+    })).sort((a,b)=>a.time-b.time || a.mistakes-b.mistakes);
+
+    const draw=Math.abs(results[0].time-results[1].time)<50;
+    els.winnerTitle.textContent=draw ? "🤝 Hasil Seri!" : `🏆 ${results[0].name} Menang!`;
+    els.winnerSub.textContent=draw
+      ? "Kedua tim menyelesaikan arena hampir bersamaan."
+      : `Lebih cepat ${formatGap(results[1].time-results[0].time)} dari lawan.`;
+
+    els.rankings.innerHTML="";
+    results.forEach((r,idx)=>{
+      const row=document.createElement("div");
+      row.className="rank-row";
+      row.innerHTML=`
+        <div class="medal">${draw?"🏅":(idx===0?"🥇":"🥈")}</div>
+        <div class="rank-name">${escapeHtml(r.name)}</div>
+        <div class="rank-detail">${formatTime(r.time)}<small>${r.mistakes} kesalahan</small></div>`;
+      els.rankings.appendChild(row);
+    });
+
+    setTimeout(()=>{
+      els.resultOverlay.classList.add("show");
+      sound("victory");
+      launchConfetti(95);
+    },550);
+  }
+
+  function formatGap(ms){
+    if(!isFinite(ms)) return "—";
+    if(ms<1000) return `${Math.max(0,Math.round(ms))} ms`;
+    return `${(ms/1000).toFixed(1)} detik`;
+  }
+
+  // ---------- Web Audio API ----------
+  let audioCtx=null;
+  function getAudio(){
+    if(!state.soundEnabled) return null;
+    try{
+      if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==="suspended") audioCtx.resume();
+      return audioCtx;
+    }catch(_){return null;}
+  }
+
+  function tone(freq,duration=0.08,type="sine",gain=.035,when=0){
+    const ctx=getAudio(); if(!ctx) return;
+    const t=ctx.currentTime+when;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=type;o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(.0002,gain),t+.008);
+    g.gain.exponentialRampToValueAtTime(.0001,t+duration);
+    o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+duration+.02);
+  }
+
+  function sound(kind){
+    if(!state.soundEnabled) return;
+    if(kind==="click"){
+      tone(180,.035,"square",.016); tone(120,.025,"sine",.012,.025);
+    }else if(kind==="count"){
+      tone(520,.09,"sine",.028);
+    }else if(kind==="go"){
+      tone(660,.08,"triangle",.035);tone(880,.10,"triangle",.035,.08);tone(1100,.16,"triangle",.035,.16);
+    }else if(kind==="correct"){
+      tone(660,.07,"sine",.03);tone(880,.08,"sine",.035,.065);tone(1175,.12,"triangle",.032,.135);
+    }else if(kind==="wrong"){
+      const ctx=getAudio(); if(!ctx) return;
+      const t=ctx.currentTime;
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sawtooth";
+      o.frequency.setValueAtTime(165,t);
+      o.frequency.exponentialRampToValueAtTime(78,t+.22);
+      g.gain.setValueAtTime(.028,t);
+      g.gain.exponentialRampToValueAtTime(.0001,t+.23);
+      o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+.24);
+    }else if(kind==="finish"){
+      tone(523,.08,"triangle",.03);tone(659,.08,"triangle",.03,.07);tone(784,.13,"triangle",.035,.14);
+    }else if(kind==="victory"){
+      [523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,i===6?.24:.11,"triangle",.038,i*.10));
+    }
+  }
+
+  function updateSoundIcon(){
+    $("#soundBtn").textContent=state.soundEnabled?"🔊":"🔇";
+    $("#soundBtn").title=state.soundEnabled?"Sound: ON":"Sound: OFF";
+  }
+
+  // ---------- FX ----------
+  function burstAt(el,id){
+    const rect=el.getBoundingClientRect();
+    const x=rect.left+rect.width/2, y=rect.top+rect.height/2;
+    const color=getComputedStyle(document.documentElement).getPropertyValue(`--p${id}`).trim()||"#7dd3fc";
+    for(let i=0;i<10;i++){
+      const s=document.createElement("span");
+      s.className="spark";
+      s.style.left=x+"px";s.style.top=y+"px";
+      const a=(Math.PI*2*i)/10;
+      const d=24+Math.random()*42;
+      s.style.setProperty("--x",Math.cos(a)*d+"px");
+      s.style.setProperty("--y",Math.sin(a)*d+"px");
+      s.style.background=i%3===0?"#fff":color;
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(),650);
+    }
+  }
+
+  function launchConfetti(count=80){
+    const colors=["#38bdf8","#fb923c","#facc15","#4ade80","#c084fc","#f472b6","#ffffff"];
+    for(let i=0;i<count;i++){
+      const p=document.createElement("i");
+      p.className="particle";
+      p.style.left=Math.random()*100+"vw";
+      p.style.top=(-5-Math.random()*15)+"vh";
+      p.style.background=colors[Math.floor(Math.random()*colors.length)];
+      p.style.width=(6+Math.random()*8)+"px";
+      p.style.height=(8+Math.random()*12)+"px";
+      p.style.setProperty("--dur",(1.8+Math.random()*2)+"s");
+      p.style.setProperty("--drift",(-120+Math.random()*240)+"px");
+      p.style.animationDelay=(Math.random()*.35)+"s";
+      els.particleLayer.appendChild(p);
+      setTimeout(()=>p.remove(),4300);
+    }
+  }
+
+  function miniConfetti(id){
+    const player=$(`#player${id}Area`);
+    const r=player.getBoundingClientRect();
+    const color=getComputedStyle(document.documentElement).getPropertyValue(`--p${id}`).trim()||"#7dd3fc";
+    for(let i=0;i<20;i++){
+      const p=document.createElement("i");
+      p.className="particle";
+      p.style.left=(r.left+Math.random()*r.width)+"px";
+      p.style.top=(r.top-10)+"px";
+      p.style.background=i%3===0?"#fff":color;
+      p.style.setProperty("--dur",(1.4+Math.random()*1.2)+"s");
+      p.style.setProperty("--drift",(-80+Math.random()*160)+"px");
+      els.particleLayer.appendChild(p);
+      setTimeout(()=>p.remove(),3000);
+    }
+  }
+
+  function showToast(msg){
+    els.toast.textContent=msg;
+    els.toast.classList.add("show");
+    clearTimeout(showToast.t);
+    showToast.t=setTimeout(()=>els.toast.classList.remove("show"),1800);
+  }
+
+  // ---------- Teacher mode ----------
+  function bindLongPress(el){
+    let t=null;
+    const start=()=>{
+      clearTimeout(t);
+      t=setTimeout(()=>openPin(),2000);
+    };
+    const stop=()=>clearTimeout(t);
+    el.addEventListener("pointerdown",start);
+    ["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev,stop));
+    el.addEventListener("contextmenu",e=>e.preventDefault());
+  }
+
+  function openPin(){
+    sound("click");
+    els.pinInput.value="";
+    els.pinError.textContent="";
+    els.pinOverlay.classList.add("show");
+    setTimeout(()=>els.pinInput.focus(),60);
+  }
+
+  function tryUnlock(){
+    const saved=safeGet(LS.pin,"1234")||"1234";
+    if(els.pinInput.value===saved){
+      els.pinOverlay.classList.remove("show");
+      openAdmin();
+      sound("correct");
+    }else{
+      els.pinError.textContent="PIN salah. Coba lagi.";
+      els.pinInput.select();
+      sound("wrong");
+    }
+  }
+
+  function openAdmin(){
+    $("#p1NameInput").value=$("#p1Name").textContent;
+    $("#p2NameInput").value=$("#p2Name").textContent;
+    $("#p1ColorInput").value=safeGet(LS.p1Color,"#38bdf8");
+    $("#p2ColorInput").value=safeGet(LS.p2Color,"#fb923c");
+    $("#themeInput").value=document.body.dataset.theme||"cosmic";
+    $("#autoSoundInput").checked=state.soundEnabled;
+    $("#newPinInput").value="";
+    els.vocabInput.value=state.pairs.map(([a,b])=>a===b?a:`${a} | ${b}`).join("\n");
+    els.adminStatus.textContent="";
+    els.adminStatus.className="admin-status";
+    els.adminOverlay.classList.add("show");
+  }
+
+  function saveAdmin(){
+    const pairs=parseBulk(els.vocabInput.value);
+    if(pairs.length<2){
+      els.adminStatus.textContent="Minimal 2 pasangan/kosakata berbeda.";
+      els.adminStatus.className="admin-status err";
+      sound("wrong");
+      return;
+    }
+    if(pairs.length>30){
+      els.adminStatus.textContent="Maksimal 30 pasangan agar permainan tetap nyaman.";
+      els.adminStatus.className="admin-status err";
+      sound("wrong");
+      return;
+    }
+
+    const p1Name=$("#p1NameInput").value.trim()||"Tim 1";
+    const p2Name=$("#p2NameInput").value.trim()||"Tim 2";
+    const p1Color=$("#p1ColorInput").value;
+    const p2Color=$("#p2ColorInput").value;
+    const theme=$("#themeInput").value;
+    const newPin=$("#newPinInput").value.trim();
+
+    state.pairs=pairs;
+    safeSet(LS.pairs,JSON.stringify(pairs));
+    safeSet(LS.p1Name,p1Name);safeSet(LS.p2Name,p2Name);
+    safeSet(LS.p1Color,p1Color);safeSet(LS.p2Color,p2Color);
+    safeSet(LS.theme,theme);
+    state.soundEnabled=$("#autoSoundInput").checked;
+    safeSet(LS.sound,state.soundEnabled?"1":"0");
+    if(newPin){
+      if(!/^\d{4,8}$/.test(newPin)){
+        els.adminStatus.textContent="PIN baru harus 4–8 digit angka.";
+        els.adminStatus.className="admin-status err";
+        return;
+      }
+      safeSet(LS.pin,newPin);
+    }
+
+    $("#p1Name").textContent=p1Name;
+    $("#p2Name").textContent=p2Name;
+    $("#startP1").textContent="🦁 "+p1Name;
+    $("#startP2").textContent="🐯 "+p2Name;
+    document.body.dataset.theme=theme;
+    setTeamColor(1,p1Color);setTeamColor(2,p2Color);
+    updateSoundIcon();
+
+    els.adminStatus.textContent=`✓ Tersimpan: ${pairs.length} pasangan. Arena di-refresh.`;
+    els.adminStatus.className="admin-status ok";
+    sound("correct");
+    showToast("Pengaturan tersimpan");
+    resetBoard(true);
+  }
+
+  function resetDefaults(){
+    if(!confirm("Reset kosakata ke materi default?")) return;
+    state.pairs=DEFAULT_PAIRS.map(x=>[...x]);
+    safeSet(LS.pairs,JSON.stringify(state.pairs));
+    els.vocabInput.value=state.pairs.map(([a,b])=>`${a} | ${b}`).join("\n");
+    els.adminStatus.textContent="Kosakata default dimuat. Klik Simpan & Terapkan.";
+    els.adminStatus.className="admin-status ok";
+  }
+
+  // ---------- Controls ----------
+  $("#startBtn").addEventListener("click",beginRace);
+  $("#playAgainBtn").addEventListener("click",()=>{els.resultOverlay.classList.remove("show");resetBoard(true);});
+  $("#closeResultBtn").addEventListener("click",()=>els.resultOverlay.classList.remove("show"));
+  $("#restartBtn").addEventListener("click",()=>{sound("click");resetBoard(true);});
+
+  $("#soundBtn").addEventListener("click",()=>{
+    state.soundEnabled=!state.soundEnabled;
+    safeSet(LS.sound,state.soundEnabled?"1":"0");
+    updateSoundIcon();
+    if(state.soundEnabled) sound("correct");
+  });
+
+  $("#fullscreenBtn").addEventListener("click",async()=>{
+    sound("click");
+    try{
+      if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch(_){ showToast("Fullscreen tidak didukung di browser ini"); }
+  });
+
+  bindLongPress($("#secretTitle"));
+  bindLongPress($("#secretFooter"));
+  $("#unlockBtn").addEventListener("click",tryUnlock);
+  $("#cancelPinBtn").addEventListener("click",()=>els.pinOverlay.classList.remove("show"));
+  els.pinInput.addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock();});
+  $("#closeAdminBtn").addEventListener("click",()=>els.adminOverlay.classList.remove("show"));
+  $("#saveVocabBtn").addEventListener("click",saveAdmin);
+  $("#resetVocabBtn").addEventListener("click",resetDefaults);
+
+  $("#p1ColorInput").addEventListener("input",e=>setTeamColor(1,e.target.value));
+  $("#p2ColorInput").addEventListener("input",e=>setTeamColor(2,e.target.value));
+  $("#themeInput").addEventListener("change",e=>document.body.dataset.theme=e.target.value);
+
+  [els.pinOverlay,els.resultOverlay].forEach(ov=>{
+    ov.addEventListener("click",e=>{
+      if(e.target===ov) ov.classList.remove("show");
+    });
+  });
+
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){
+      els.pinOverlay.classList.remove("show");
+      els.adminOverlay.classList.remove("show");
+      els.resultOverlay.classList.remove("show");
+    }
+  });
+
+  // Prevent accidental drag / double selection during race
+  document.addEventListener("dragstart",e=>{ if(e.target.closest(".card")) e.preventDefault(); });
+
+  loadSettings();
+  resetBoard(true);
+})();
+</script>
+</body>
+</html>

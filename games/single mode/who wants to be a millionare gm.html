@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💰 Hot Seat Jutawan - Single Mode Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Orbitron:wght@700;900&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', cursive, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #0a0f24 0%, #02040a 100%);
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+        }
+
+        /* Top Bar Navigation */
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid #1e3a8a;
+            padding: 8px 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #f59e0b;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .btn-teacher-mode {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #0f172a;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-teacher-mode:hover { transform: scale(1.05); }
+
+        /* Main TV Stage Layout (Single Sidebar di Kiri / Kanan) */
+        .stage-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
+            height: calc(100vh - 80px);
+            align-items: stretch;
+        }
+
+        /* Progress Ladder Sidebar */
+        .ladder-sidebar {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid #1e3a8a;
+            border-radius: 20px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(8px);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .player-header {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            flex-shrink: 0;
+            border-color: #06b6d4;
+            background: rgba(6, 182, 212, 0.15);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .player-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #38bdf8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-score-badge {
+            font-size: 1rem;
+            color: #f59e0b;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        /* Lifelines (Bantuan) */
+        .lifelines-container {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .btn-lifeline {
+            background: #0f172a;
+            border: 1.5px solid #0284c7;
+            color: #e0f2fe;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.2s ease;
+        }
+
+        .btn-lifeline:hover:not(:disabled) {
+            background: #0284c7;
+            color: #fff;
+        }
+
+        .btn-lifeline:disabled {
+            background: #1e293b;
+            border-color: #475569;
+            color: #64748b;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Points Ladder List - Responsif Full Atas ke Bawah */
+        .ladder-list {
+            display: flex;
+            flex-direction: column-reverse; /* Poin tertinggi di atas */
+            gap: 4px;
+            margin: 10px 0;
+            flex-grow: 1;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .ladder-step {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #94a3b8;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+
+        .ladder-step.achieved {
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+            color: #fff;
+            border-color: #86efac;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .ladder-step.current-target {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            color: #0f172a;
+            border-color: #fef08a;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+            transform: scale(1.03);
+            animation: pulseGlow 1.2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
+            100% { box-shadow: 0 0 25px rgba(245, 158, 11, 1); }
+        }
+
+        /* Center Quiz Arena */
+        .quiz-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: rgba(15, 23, 42, 0.85);
+            border: 3px solid #0284c7;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(2, 132, 199, 0.25);
+            position: relative;
+        }
+
+        .center-hud-top {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background: rgba(2, 6, 23, 0.6);
+            padding: 8px 16px;
+            border-radius: 16px;
+            border: 1px solid #1e3a8a;
+        }
+
+        .timer-circle {
+            background: #0f172a;
+            border: 3px solid #f59e0b;
+            color: #f59e0b;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .timer-circle.warning {
+            border-color: #ef4444;
+            color: #ef4444;
+            animation: blinkTimer 0.5s infinite alternate;
+        }
+
+        @keyframes blinkTimer {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+            100% { transform: scale(1.1); box-shadow: 0 0 20px rgba(239, 68, 68, 1); }
+        }
+
+        /* Question Display Box */
+        .question-card {
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            border: 3px solid #38bdf8;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            margin: 15px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.4;
+            color: #ffffff;
+        }
+
+        /* Options Grid (A, B, C, D) */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid #0284c7;
+            color: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+            border-color: #86efac !important;
+            color: #fff !important;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+            border-color: #fca5a5 !important;
+        }
+
+        .opt-prefix {
+            color: #f59e0b;
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Modal Screens */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(2, 6, 23, 0.92);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-card {
+            background: #0f172a;
+            border: 3px solid #38bdf8;
+            padding: 32px;
+            border-radius: 28px;
+            text-align: center;
+            width: 90%;
+            max-width: 550px;
+            box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #475569;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .teacher-textarea {
+            width: 100%;
+            height: 160px;
+            background: #1e293b;
+            color: #fff;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #475569;
+            resize: none;
+            font-size: 0.85rem;
+        }
+
+        /* Animasi Pemenang Berputar 3D */
+        .winner-animation-box {
+            perspective: 1000px;
+            margin: 20px 0;
+        }
+
+        .spinning-player-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #f59e0b;
+            text-shadow: 0 0 25px rgba(245, 158, 11, 0.8), 0 0 50px rgba(245, 158, 11, 0.5);
+            animation: spin3D 3s infinite linear;
+            display: inline-block;
+        }
+
+        @keyframes spin3D {
+            0% { transform: rotateY(0deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.15); }
+            100% { transform: rotateY(360deg) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-navbar">
+        <div class="game-title">💰 HOT SEAT JUTAWAN — SINGLE MODE</div>
+        <button class="btn-teacher-mode" onclick="openTeacherModal()">⚙️ TEACHER MODE</button>
+    </div>
+
+    <!-- Stage Grid (Single Mode: Ladder di Kiri, Quiz di Kanan) -->
+    <div class="stage-grid">
+        <!-- Sisi Kiri: Progress Ladder Pemain -->
+        <div class="ladder-sidebar">
+            <div class="player-header">
+                <div class="player-name" id="labelPlayerName">SISWA / PEMAIN</div>
+                <div class="player-score-badge"><span id="scoreDisplay">0</span> Poin</div>
+                <div class="lifelines-container">
+                    <button class="btn-lifeline" id="lifelineTeacher" onclick="useLifeline('Teacher')">👨‍🏫 Teacher</button>
+                    <button class="btn-lifeline" id="lifelineAudience" onclick="useLifeline('Audience')">👥 Audience</button>
+                </div>
+            </div>
+
+            <div class="ladder-list" id="ladderList"></div>
+        </div>
+
+        <!-- Tengah/Kanan: Quiz Arena -->
+        <div class="quiz-center">
+            <div class="center-hud-top">
+                <div class="timer-circle" id="timerDisplay">15</div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionDisplay">MEMUAT PERTANYAAN...</div>
+            </div>
+
+            <div class="options-grid" id="optionsGrid"></div>
+        </div>
+    </div>
+
+    <!-- START MODAL -->
+    <div class="modal-overlay active" id="startModal">
+        <div class="modal-card">
+            <h1 style="color: #f59e0b; margin-bottom: 10px; font-family: 'Orbitron', sans-serif;">💰 JUTAWAN SINGLE MODE</h1>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">
+                Capai target 1.000.000 Poin di puncak tangga! Soal akan berputar kembali secara otomatis jika habis sampai Anda menang.
+            </p>
+            <button class="btn-start" onclick="startGame()">🚀 MULAI BERMAIN</button>
+        </div>
+    </div>
+
+    <!-- TEACHER MODE MODAL -->
+    <div class="modal-overlay" id="teacherModal">
+        <div class="modal-card" style="max-width: 650px; text-align: left;">
+            <h2 style="color: #f59e0b; margin-bottom: 15px; text-align: center; font-family: 'Orbitron', sans-serif;">⚙️ TEACHER MODE</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 120px; gap: 10px;">
+                <div class="form-group">
+                    <label>Nama Pemain / Siswa:</label>
+                    <input type="text" id="inputPlayerName" class="form-control" value="SISWA / PEMAIN">
+                </div>
+                <div class="form-group">
+                    <label>Timer (Detik):</label>
+                    <input type="number" id="inputTimer" class="form-control" value="15" min="5" max="60">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Daftar Soal (Format: <code>Soal | Jawaban Benar | Salah 1 | Salah 2 | Salah 3</code>):</label>
+                <textarea id="inputQuestions" class="teacher-textarea"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-start" style="background: #475569; margin-top:0;" onclick="closeTeacherModal()">Batal</button>
+                <button class="btn-start" style="margin-top:0;" onclick="saveTeacherSettings()">💾 Simpan & Mulai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WINNER RESULT MODAL -->
+    <div class="modal-overlay" id="winnerModal">
+        <div class="modal-card" style="max-width: 650px;">
+            <h2 style="color: #38bdf8; letter-spacing: 2px;">🏆 SELAMAT, JUTAWAN! 🏆</h2>
+            
+            <div class="winner-animation-box">
+                <div class="spinning-player-title" id="winnerNameText">NAMA SISWA</div>
+            </div>
+
+            <p style="font-size: 1.2rem; color: #e2e8f0; margin-bottom: 20px;" id="winnerDetail">Berhasil Mencapai 1.000.000 Poin!</p>
+            <button class="btn-start" onclick="restartGame()">🔄 MAIN LAGI</button>
+        </div>
+    </div>
+
+<script>
+    const defaultQuestions = 
+`Judul mana yang MURNI merupakan cerita FANTASI / FIKSI tentang legenda asal usul tempat di Sumatra? | Asal Usul Danau Toba | Panduan Wisata Danau Toba | Laporan Kedalaman Danau Toba | Peta Geografis Danau Toba
+Ki Hajar Dewantara: Bapak Pendidikan Indonesia. Teks ini tergolong? | NONFIKSI karena berisi riwayat hidup tokoh nyata | FIKSI karena ceritanya rekaan | DONGENG Mitos masa lalu | NOVEL khayalan pengarang
+What is the past tense of 'eat'? | Ate | Eated | Eaten | Eating
+Choose the correct sentence: | She goes to school | She go to school | She going school | She is go to school
+Which one is a fruit? | Apple | Carrot | Broccoli | Potato`;
+
+    let config = {
+        playerName: "SISWA / PEMAIN",
+        timerDuration: 15,
+        questions: []
+    };
+
+    let playerState = {
+        score: 0,
+        lifelines: { Teacher: true, Audience: true }
+    };
+
+    let currentQIndex = 0;
+    let timerInterval = null;
+    let timeLeft = 15;
+    let isAnswerLocked = false;
+
+    function parseQuestions(text) {
+        const lines = text.trim().split('\n');
+        const list = [];
+        lines.forEach(line => {
+            const parts = line.split('|').map(s => s.trim()).filter(Boolean);
+            if (parts.length >= 5) {
+                list.push({
+                    q: parts[0],
+                    correct: parts[1],
+                    wrong: [parts[2], parts[3], parts[4]]
+                });
+            }
+        });
+        return list;
+    }
+
+    function initGameConfig() {
+        config.questions = parseQuestions(defaultQuestions);
+    }
+
+    function startGame() {
+        document.getElementById('startModal').classList.remove('active');
+        restartGame();
+    }
+
+    function restartGame() {
+        document.getElementById('winnerModal').classList.remove('active');
+        playerState = {
+            score: 0,
+            lifelines: { Teacher: true, Audience: true }
+        };
+        currentQIndex = 0;
+        
+        updateUI();
+        buildProgressLadder();
+        loadQuestion();
+    }
+
+    function getPointsPerStep() {
+        const totalQ = config.questions.length;
+        return Math.round(1000000 / totalQ);
+    }
+
+    function buildProgressLadder() {
+        const ladder = document.getElementById('ladderList');
+        ladder.innerHTML = '';
+
+        const totalQ = config.questions.length;
+        const ptsPerStep = getPointsPerStep();
+
+        for (let i = 1; i <= totalQ; i++) {
+            let pts = (i === totalQ) ? 1000000 : (i * ptsPerStep);
+
+            const step = document.createElement('div');
+            step.className = 'ladder-step';
+            step.id = `step_${i}`;
+            step.innerHTML = `<span>${i}.</span><span>${pts.toLocaleString()} Poin</span>`;
+            ladder.appendChild(step);
+        }
+    }
+
+    function updateLadderHighlights() {
+        const totalQ = config.questions.length;
+        const ptsPerStep = getPointsPerStep();
+
+        let currentLevel = Math.min(totalQ, Math.round(playerState.score / ptsPerStep));
+        if (playerState.score >= 1000000) currentLevel = totalQ;
+
+        for (let i = 1; i <= totalQ; i++) {
+            const step = document.getElementById(`step_${i}`);
+            if (step) {
+                step.className = 'ladder-step';
+                if (i <= currentLevel) step.classList.add('achieved');
+                if (i === currentLevel + 1) step.classList.add('current-target');
+            }
+        }
+    }
+
+    function loadQuestion() {
+        isAnswerLocked = false;
+        const q = config.questions[currentQIndex];
+        document.getElementById('questionDisplay').innerText = q.q;
+
+        const options = [q.correct, ...q.wrong].sort(() => Math.random() - 0.5);
+        const container = document.getElementById('optionsGrid');
+        container.innerHTML = '';
+
+        options.forEach((optText, idx) => {
+            const label = ['A', 'B', 'C', 'D'][idx];
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="opt-prefix">${label}.</span> ${optText}`;
+            btn.onclick = () => handleAnswer(optText, q.correct, btn);
+            container.appendChild(btn);
+        });
+
+        updateUI();
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = config.timerDuration;
+        const display = document.getElementById('timerDisplay');
+        display.innerText = timeLeft;
+        display.classList.remove('warning');
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            display.innerText = timeLeft;
+
+            if (timeLeft <= 5) {
+                display.classList.add('warning');
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                handleTimeout();
+            }
+        }, 1000);
+    }
+
+    function handleTimeout() {
+        if (isAnswerLocked) return;
+        isAnswerLocked = true;
+
+        alert(`⏱ WAKTU HABIS! Jawab dianggap salah.`);
+        handleWrongAnswer();
+    }
+
+    function handleAnswer(selected, correct, btnElement) {
+        if (isAnswerLocked) return;
+        isAnswerLocked = true;
+        clearInterval(timerInterval);
+
+        const isCorrect = (selected === correct);
+        const ptsPerStep = getPointsPerStep();
+
+        if (isCorrect) {
+            btnElement.classList.add('correct');
+            playerState.score += ptsPerStep;
+
+            if (playerState.score >= 1000000) {
+                playerState.score = 1000000;
+            }
+
+            confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+
+            if (playerState.score >= 1000000) {
+                setTimeout(() => triggerWinAnimation(), 1200);
+                return;
+            }
+
+            setTimeout(() => {
+                nextQuestionLoop();
+            }, 1600);
+        } else {
+            btnElement.classList.add('wrong');
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => {
+                if (b.innerText.includes(correct)) b.classList.add('correct');
+            });
+
+            setTimeout(() => {
+                alert(`❌ JAWABAN SALAH! Coba lagi di soal berikutnya.`);
+                handleWrongAnswer();
+            }, 1800);
+        }
+    }
+
+    function handleWrongAnswer() {
+        // Mode Single: Salah tidak menurunkan skor, hanya lanjut ke soal berikutnya/loop
+        nextQuestionLoop();
+    }
+
+    function nextQuestionLoop() {
+        currentQIndex++;
+        if (currentQIndex >= config.questions.length) {
+            currentQIndex = 0; // Looping soal kembali ke awal
+        }
+        loadQuestion();
+    }
+
+    function useLifeline(type) {
+        if (!playerState.lifelines[type]) return;
+
+        playerState.lifelines[type] = false;
+        document.getElementById(`lifeline${type}`).disabled = true;
+
+        if (type === 'Teacher') {
+            alert(`👨‍🏫 ASK TEACHER: Guru memberikan petunjuk/bantuan kepada siswa.`);
+        } else {
+            alert(`👥 ASK AUDIENCE: Seluruh kelas / teman sekelompok memberikan masukan.`);
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('labelPlayerName').innerText = config.playerName;
+        document.getElementById('scoreDisplay').innerText = playerState.score.toLocaleString();
+
+        document.getElementById('lifelineTeacher').disabled = !playerState.lifelines.Teacher;
+        document.getElementById('lifelineAudience').disabled = !playerState.lifelines.Audience;
+
+        updateLadderHighlights();
+    }
+
+    function triggerWinAnimation() {
+        clearInterval(timerInterval);
+        document.getElementById('winnerNameText').innerText = config.playerName;
+        document.getElementById('winnerDetail').innerText = `Selamat! Berhasil Mencapai Puncak 1.000.000 Poin!`;
+        document.getElementById('winnerModal').classList.add('active');
+
+        const duration = 3 * 1000;
+        const end = Date.now() + duration;
+
+        (function frame() {
+            confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+            confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+            if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+    }
+
+    function openTeacherModal() {
+        clearInterval(timerInterval);
+        document.getElementById('inputPlayerName').value = config.playerName;
+        document.getElementById('inputTimer').value = config.timerDuration;
+
+        let txt = "";
+        config.questions.forEach(q => {
+            txt += `${q.q} | ${q.correct} | ${q.wrong.join(' | ')}\n`;
+        });
+        document.getElementById('inputQuestions').value = txt.trim();
+        document.getElementById('teacherModal').classList.add('active');
+    }
+
+    function closeTeacherModal() {
+        document.getElementById('teacherModal').classList.remove('active');
+        if (timeLeft > 0) startTimer();
+    }
+
+    function saveTeacherSettings() {
+        const playerName = document.getElementById('inputPlayerName').value.trim() || "SISWA / PEMAIN";
+        const timerVal = parseInt(document.getElementById('inputTimer').value) || 15;
+        const rawQs = document.getElementById('inputQuestions').value.trim();
+
+        const parsed = parseQuestions(rawQs);
+        if (parsed.length === 0) {
+            alert("Harap masukkan minimal 1 soal dengan format yang benar!");
+            return;
+        }
+
+        config.playerName = playerName;
+        config.timerDuration = timerVal;
+        config.questions = parsed;
+
+        alert(`Berhasil menyimpan pengaturan & ${parsed.length} soal baru! Poin otomatis dibagi rata menuju 1 Juta.`);
+        closeTeacherModal();
+        restartGame();
+    }
+
+    initGameConfig();
+</script>
+</body>
+</html>

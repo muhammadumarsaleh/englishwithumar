@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Solo Millionaire — Who Wants to Be a Millionaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<style>
+  :root { color-scheme: dark; }
+  * { -webkit-font-smoothing: antialiased; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  body { background: #050514; color: #fff; }
+  .font-display { font-family: 'Outfit', system-ui, sans-serif; }
+
+  /* ============ AMBIENT BG ============ */
+  .arena-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(900px 700px at 50% -10%, rgba(99,102,241,.42), transparent 65%),
+      radial-gradient(700px 500px at 10% 110%, rgba(14,165,233,.32), transparent 65%),
+      radial-gradient(700px 500px at 90% 110%, rgba(236,72,153,.28), transparent 65%),
+      radial-gradient(1200px 800px at 50% 50%, rgba(30,27,75,.5), transparent 70%),
+      #050514;
+  }
+  .grid-lines {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(99,102,241,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,.06) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .spotlight {
+    position: fixed; top: -30vh; left: 50%;
+    width: 120vw; height: 100vh;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center top, rgba(251,191,36,.18), transparent 60%);
+    pointer-events: none; z-index: 1;
+    animation: spotFlicker 8s ease-in-out infinite;
+  }
+  @keyframes spotFlicker { 0%,100% { opacity: .85; } 50% { opacity: 1; } }
+
+  /* ============ PANELS ============ */
+  .panel {
+    background: linear-gradient(180deg, rgba(30,27,75,.72), rgba(15,15,40,.78));
+    border: 1px solid rgba(129,140,248,.18);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 60px -30px rgba(0,0,0,.9);
+  }
+  .panel-gold {
+    border-color: rgba(251,191,36,.32);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 1px rgba(251,191,36,.15), 0 24px 60px -30px rgba(251,191,36,.4);
+  }
+
+  /* ============ LADDER ============ */
+  .ladder {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 3px;
+    height: 100%;
+    min-height: 0;
+  }
+  .rung {
+    flex: 1 1 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    background: rgba(30,41,59,.55);
+    border: 1px solid rgba(71,85,105,.4);
+    color: #94a3b8;
+    transition: all .55s cubic-bezier(.2,.8,.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .rung .rung-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: rgba(71,85,105,.5);
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px; font-weight: 800;
+    color: #cbd5e1;
+    transition: all .5s;
+    margin-right: 10px;
+  }
+  .rung .rung-val {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+    flex: 1;
+  }
+  .rung .rung-unit {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .68em;
+    font-weight: 700;
+    opacity: .6;
+    margin-left: 4px;
+    letter-spacing: .02em;
+  }
+
+  /* Adaptive font sizing */
+  .ladder.d-size-1 .rung { font-size: 16px; padding: 0 16px; }
+  .ladder.d-size-1 .rung .rung-num { width: 26px; height: 26px; font-size: 13px; }
+  .ladder.d-size-1 .rung .rung-val { font-size: 17px; }
+  .ladder.d-size-2 .rung { font-size: 14px; padding: 0 14px; }
+  .ladder.d-size-2 .rung .rung-val { font-size: 15px; }
+  .ladder.d-size-3 .rung { font-size: 12px; padding: 0 12px; }
+  .ladder.d-size-3 .rung .rung-num { width: 20px; height: 20px; font-size: 10px; }
+  .ladder.d-size-3 .rung .rung-val { font-size: 13px; }
+  .ladder.d-size-4 .rung { font-size: 10.5px; padding: 0 10px; }
+  .ladder.d-size-4 .rung .rung-num { width: 18px; height: 18px; font-size: 9px; }
+  .ladder.d-size-4 .rung .rung-val { font-size: 11.5px; }
+
+  .rung.achieved {
+    background: linear-gradient(90deg, rgba(16,185,129,.32), rgba(16,185,129,.14));
+    border-color: rgba(16,185,129,.65);
+    color: #86efac;
+    box-shadow: 0 0 18px -4px rgba(16,185,129,.5), inset 0 0 12px -6px rgba(16,185,129,.4);
+  }
+  .rung.achieved .rung-num {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(16,185,129,.7);
+  }
+  .rung.achieved .rung-val { color: #a7f3d0; }
+
+  .rung.active-target {
+    background: linear-gradient(90deg, rgba(251,191,36,.5), rgba(245,158,11,.28));
+    border-color: rgba(251,191,36,.95);
+    color: #fff;
+    animation: rungPulse 1.4s ease-in-out infinite;
+    box-shadow: 0 0 30px -4px rgba(251,191,36,.85), inset 0 0 20px -8px rgba(251,191,36,.5);
+    z-index: 2;
+    transform: translateX(6px);
+  }
+  .rung.active-target .rung-num {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1e1b4b;
+    box-shadow: 0 0 16px rgba(251,191,36,.95);
+  }
+  .rung.active-target .rung-val {
+    color: #fef3c7;
+    text-shadow: 0 0 12px rgba(251,191,36,.9);
+  }
+  @keyframes rungPulse {
+    0%,100% { box-shadow: 0 0 30px -4px rgba(251,191,36,.85), inset 0 0 20px -8px rgba(251,191,36,.5); }
+    50%     { box-shadow: 0 0 45px -2px rgba(251,191,36,1), inset 0 0 24px -6px rgba(251,191,36,.8); }
+  }
+
+  .rung.just-lit { animation: rungFlash 1.2s ease-out; }
+  @keyframes rungFlash {
+    0%   { transform: translateX(6px) scale(1); box-shadow: 0 0 0 0 rgba(251,191,36,.95), 0 0 30px -4px rgba(251,191,36,.85); }
+    45%  { transform: translateX(8px) scale(1.05); box-shadow: 0 0 0 18px rgba(251,191,36,0), 0 0 70px 0 rgba(251,191,36,1); }
+    100% { transform: translateX(6px) scale(1); box-shadow: 0 0 18px -4px rgba(16,185,129,.5), inset 0 0 12px -6px rgba(16,185,129,.4); }
+  }
+
+  /* Final level (1jt) — extra special */
+  .rung.final-level {
+    background: linear-gradient(90deg, rgba(236,72,153,.28), rgba(244,63,94,.15));
+    border-color: rgba(236,72,153,.6);
+    color: #f9a8d4;
+  }
+  .rung.final-level .rung-num {
+    background: linear-gradient(135deg, #ec4899, #f43f5e);
+  }
+
+  /* ============ QUESTION PANEL ============ */
+  .q-panel {
+    background: linear-gradient(180deg, rgba(30,27,75,.92), rgba(15,15,40,.95));
+    border: 1px solid rgba(129,140,248,.35);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 0 1px rgba(99,102,241,.15), 0 40px 90px -40px rgba(0,0,0,.95), 0 0 80px -20px rgba(99,102,241,.4);
+  }
+
+  /* ============ ANSWERS ============ */
+  .answer-btn {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; padding: 18px 22px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(30,41,59,.75), rgba(15,23,42,.85));
+    border: 1px solid rgba(99,102,241,.32);
+    color: #e2e8f0;
+    font-size: 15.5px; font-weight: 600;
+    text-align: left; cursor: pointer;
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
+    position: relative; overflow: hidden;
+  }
+  .answer-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(251,191,36,.18), transparent 60%);
+    opacity: 0; transition: opacity .25s;
+  }
+  .answer-btn:hover:not(:disabled)::before { opacity: 1; }
+  .answer-btn:hover:not(:disabled) {
+    border-color: rgba(251,191,36,.7);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px -14px rgba(251,191,36,.55);
+  }
+  .answer-btn:disabled { cursor: default; }
+  .answer-letter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800; font-size: 15px;
+    box-shadow: 0 6px 16px -6px rgba(79,70,229,.8);
+    z-index: 1;
+  }
+  .answer-text { position: relative; z-index: 1; }
+  .answer-btn.correct {
+    background: linear-gradient(90deg, rgba(16,185,129,.35), rgba(5,150,105,.25));
+    border-color: rgba(16,185,129,.9); color: #fff;
+    animation: correctFlash .7s ease;
+  }
+  .answer-btn.correct .answer-letter { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 0 20px rgba(16,185,129,.9); }
+  @keyframes correctFlash {
+    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    50%     { box-shadow: 0 0 0 16px rgba(16,185,129,0), 0 0 40px 0 rgba(16,185,129,.9); }
+  }
+  .answer-btn.wrong {
+    background: linear-gradient(90deg, rgba(239,68,68,.35), rgba(190,18,60,.25));
+    border-color: rgba(239,68,68,.9); color: #fff;
+    animation: wrongShake .45s ease;
+  }
+  .answer-btn.wrong .answer-letter { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  @keyframes wrongShake {
+    0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); }
+  }
+  .answer-btn.dimmed { opacity: .35; filter: grayscale(.6); }
+
+  /* ============ TIMER ============ */
+  .timer-ring { transform: rotate(-90deg); }
+  .timer-ring circle { transition: stroke-dashoffset .95s linear, stroke .3s; }
+  .timer-number { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 28px; letter-spacing: -.02em; }
+  .timer-danger .timer-number { color: #f87171; animation: timerPulse .6s ease-in-out infinite; }
+  @keyframes timerPulse {
+    0%,100% { transform: scale(1); } 50% { transform: scale(1.15); text-shadow: 0 0 20px rgba(248,113,113,.9); }
+  }
+
+  /* ============ LIFELINES ============ */
+  .lifeline {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    border-radius: 11px;
+    background: rgba(30,41,59,.7);
+    border: 1px solid rgba(99,102,241,.35);
+    color: #cbd5e1;
+    font-size: 12px; font-weight: 800;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
+    text-transform: uppercase;
+  }
+  .lifeline:hover:not(:disabled):not(.used) {
+    background: rgba(99,102,241,.2);
+    border-color: rgba(251,191,36,.7);
+    color: #fbbf24;
+    transform: translateY(-2px);
+  }
+  .lifeline.used {
+    opacity: .32; cursor: not-allowed; filter: grayscale(.8);
+    text-decoration: line-through; text-decoration-color: rgba(239,68,68,.7); text-decoration-thickness: 2px;
+  }
+
+  /* ============ HEARTS ============ */
+  .heart {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: rgba(244,63,94,.15);
+    border: 1px solid rgba(244,63,94,.5);
+    transition: all .45s cubic-bezier(.2,.8,.2,1);
+    position: relative;
+  }
+  .heart svg {
+    width: 18px; height: 18px;
+    color: #fb7185;
+    fill: #fb7185;
+    filter: drop-shadow(0 0 6px rgba(251,113,133,.7));
+  }
+  .heart.lost {
+    background: rgba(71,85,105,.3);
+    border-color: rgba(71,85,105,.5);
+    opacity: .45;
+  }
+  .heart.lost svg {
+    color: #64748b;
+    fill: transparent;
+    filter: none;
+  }
+  .heart.just-lost { animation: heartBreak .8s ease-out; }
+  @keyframes heartBreak {
+    0%   { transform: scale(1); background: rgba(244,63,94,.6); }
+    30%  { transform: scale(1.25) rotate(-8deg); background: rgba(244,63,94,.9); }
+    60%  { transform: scale(.9) rotate(6deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  /* ============ RANK BADGE ============ */
+  .rank-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    transition: all .4s;
+  }
+  .rank-1 { background: rgba(107,114,128,.25); color: #cbd5e1; border: 1px solid rgba(148,163,184,.4); }
+  .rank-2 { background: rgba(16,185,129,.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,.5); }
+  .rank-3 { background: rgba(59,130,246,.2); color: #93c5fd; border: 1px solid rgba(59,130,246,.5); }
+  .rank-4 { background: rgba(168,85,247,.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,.5); }
+  .rank-5 { background: linear-gradient(135deg, rgba(251,191,36,.35), rgba(245,158,11,.2)); color: #fde68a; border: 1px solid rgba(251,191,36,.7); box-shadow: 0 0 20px -4px rgba(251,191,36,.6); animation: rankGlow 2s ease-in-out infinite; }
+  @keyframes rankGlow {
+    0%,100% { box-shadow: 0 0 20px -4px rgba(251,191,36,.6); }
+    50%     { box-shadow: 0 0 30px 0 rgba(251,191,36,.9); }
+  }
+
+  /* ============ BUTTONS ============ */
+  .btn-gold {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 26px; border-radius: 14px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    color: #1e1b4b;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 900; font-size: 14px; letter-spacing: .02em;
+    border: 0; cursor: pointer;
+    box-shadow: 0 20px 45px -18px rgba(251,191,36,.9), inset 0 1px 0 rgba(255,255,255,.5);
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
+  }
+  .btn-gold:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 28px 55px -18px rgba(251,191,36,1), inset 0 1px 0 rgba(255,255,255,.6); }
+  .btn-gold:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px; border-radius: 12px;
+    background: rgba(30,41,59,.6);
+    border: 1px solid rgba(99,102,241,.32);
+    color: #cbd5e1; font-weight: 700; font-size: 13px;
+    cursor: pointer; transition: all .25s;
+    text-decoration: none;
+  }
+  .btn-ghost:hover {
+    background: rgba(99,102,241,.15);
+    border-color: rgba(251,191,36,.5);
+    color: #fbbf24; transform: translateY(-2px);
+  }
+
+  /* ============ INPUTS ============ */
+  .input-dark {
+    width: 100%; padding: 13px 16px; border-radius: 12px;
+    background: rgba(15,23,42,.7);
+    border: 1px solid rgba(99,102,241,.3);
+    color: #fff; font-size: 14px; font-weight: 600;
+    outline: none; transition: all .22s;
+  }
+  .input-dark:focus {
+    border-color: rgba(251,191,36,.75);
+    background: rgba(15,23,42,.9);
+    box-shadow: 0 0 0 4px rgba(251,191,36,.15);
+  }
+  .input-dark::placeholder { color: rgba(148,163,184,.55); font-weight: 500; }
+
+  /* ============ WINNER TICKER ============ */
+  .ticker-wrap {
+    position: relative; overflow: hidden;
+    background: linear-gradient(180deg, #1e1b4b, #0f0a2e);
+    border-top: 2px solid rgba(251,191,36,.5);
+    border-bottom: 2px solid rgba(251,191,36,.5);
+    padding: 16px 0;
+    box-shadow: inset 0 0 40px rgba(251,191,36,.15), 0 0 60px rgba(251,191,36,.3);
+  }
+  .ticker-wrap::before, .ticker-wrap::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 80px;
+    pointer-events: none; z-index: 2;
+  }
+  .ticker-wrap::before { left: 0; background: linear-gradient(90deg, #0f0a2e, transparent); }
+  .ticker-wrap::after { right: 0; background: linear-gradient(270deg, #0f0a2e, transparent); }
+
+  .ticker-content {
+    display: inline-block; white-space: nowrap;
+    animation: tickerScroll 14s linear infinite;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900; font-size: 26px; letter-spacing: .06em;
+    background: linear-gradient(90deg, #fbbf24, #fde68a, #fbbf24, #f59e0b, #fbbf24);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 40px rgba(251,191,36,.4);
+    animation: tickerScroll 14s linear infinite, goldShine 3s linear infinite;
+  }
+  @keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes goldShine { to { background-position: 200% center; } }
+  .ticker-sep { display: inline-block; margin: 0 40px; color: rgba(251,191,36,.6); font-size: 20px; vertical-align: middle; }
+
+  /* ============ OVERLAYS ============ */
+  .overlay {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background: rgba(5,5,20,.88);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    z-index: 100;
+    animation: fadeIn .4s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    width: 100%; max-width: 520px; padding: 32px; border-radius: 28px;
+    background: linear-gradient(180deg, rgba(30,27,75,.95), rgba(15,15,40,.98));
+    border: 1px solid rgba(251,191,36,.35);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 40px 100px -40px rgba(0,0,0,.95), 0 0 80px -20px rgba(251,191,36,.4);
+    animation: modalPop .5s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes modalPop {
+    0%   { transform: scale(.9) translateY(20px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  /* ============ AUDIENCE POLL ============ */
+  .poll-bar-track {
+    height: 34px; border-radius: 8px;
+    background: rgba(30,41,59,.75);
+    border: 1px solid rgba(99,102,241,.3);
+    overflow: hidden; position: relative;
+  }
+  .poll-bar-fill {
+    height: 100%; border-radius: 7px;
+    background: linear-gradient(90deg, #6366f1, #0ea5e9);
+    transition: width 1s cubic-bezier(.2,.8,.2,1);
+    display: flex; align-items: center; padding-left: 12px;
+    font-weight: 800; font-size: 12px; color: #fff; width: 0;
+  }
+
+  /* ============ CONFETTI ============ */
+  .confetti {
+    position: fixed; top: -12px;
+    width: 10px; height: 14px;
+    pointer-events: none; z-index: 200;
+    animation: fall linear forwards; border-radius: 2px;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ============ TROPHY ============ */
+  .trophy-icon {
+    display: grid; place-items: center;
+    width: 110px; height: 110px; margin: 0 auto; border-radius: 32px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706);
+    box-shadow: 0 0 0 10px rgba(251,191,36,.15), 0 0 70px -10px rgba(251,191,36,.9), 0 30px 60px -20px rgba(0,0,0,.9);
+    animation: trophyFloat 2.5s ease-in-out infinite;
+  }
+  @keyframes trophyFloat {
+    0%,100% { transform: translateY(0) rotate(-3deg); }
+    50%     { transform: translateY(-10px) rotate(3deg); }
+  }
+  .trophy-icon.lost {
+    background: linear-gradient(135deg, #64748b, #475569, #334155);
+    box-shadow: 0 0 0 10px rgba(100,116,139,.15), 0 0 60px -10px rgba(100,116,139,.7), 0 30px 60px -20px rgba(0,0,0,.9);
+    animation: trophySad 3s ease-in-out infinite;
+  }
+  @keyframes trophySad {
+    0%,100% { transform: translateY(0) rotate(0); }
+    50%     { transform: translateY(4px) rotate(0); }
+  }
+
+  .winner-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900; font-size: 3rem; letter-spacing: -.02em;
+    background: linear-gradient(90deg, #fbbf24, #fde68a, #fbbf24);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: goldShine 2.5s linear infinite;
+    text-align: center; line-height: 1.1; word-break: break-word;
+  }
+
+  .scroll-y { overflow-y: auto; }
+  .scroll-y::-webkit-scrollbar { width: 8px; }
+  .scroll-y::-webkit-scrollbar-thumb { background: rgba(99,102,241,.5); border-radius: 99px; }
+  .hidden { display: none !important; }
+
+  /* ============ TOAST ============ */
+  #toastContainer {
+    position: fixed; top: 80px; right: 20px;
+    z-index: 99999;
+    display: flex; flex-direction: column; gap: 10px;
+    pointer-events: none;
+    max-width: calc(100vw - 40px);
+  }
+  .toast-item {
+    pointer-events: auto;
+    display: flex; align-items: flex-start; gap: 12px;
+    min-width: 260px; max-width: 360px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(30,27,75,.98), rgba(15,15,40,.98));
+    border: 1px solid rgba(99,102,241,.35);
+    box-shadow: 0 24px 60px -30px rgba(0,0,0,.95);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    opacity: 0;
+    transform: translateX(24px) scale(.96);
+    transition: opacity .35s cubic-bezier(.2,.8,.2,1), transform .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .toast-item.show { opacity: 1; transform: translateX(0) scale(1); }
+  .toast-accent {
+    width: 4px; align-self: stretch;
+    border-radius: 99px;
+    flex-shrink: 0;
+  }
+  .toast-item.success .toast-accent { background: linear-gradient(180deg, #10b981, #059669); }
+  .toast-item.error   .toast-accent { background: linear-gradient(180deg, #ef4444, #dc2626); }
+  .toast-item.warning .toast-accent { background: linear-gradient(180deg, #f59e0b, #d97706); }
+  .toast-item.info    .toast-accent { background: linear-gradient(180deg, #6366f1, #0ea5e9); }
+  .toast-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800; font-size: 13.5px; color: #fff;
+    margin: 0 0 2px;
+  }
+  .toast-msg {
+    font-size: 13px; line-height: 1.45;
+    color: #cbd5e1; margin: 0;
+  }
+
+  /* ============ HIGH SCORE CARD ============ */
+  .hiscore-card {
+    background: linear-gradient(135deg, rgba(251,191,36,.15), rgba(245,158,11,.08));
+    border: 1px solid rgba(251,191,36,.4);
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hiscore-icon {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    display: grid; place-items: center;
+    box-shadow: 0 0 20px -4px rgba(251,191,36,.7);
+    flex-shrink: 0;
+  }
+
+  @media (max-height: 800px) {
+    .answer-btn { padding: 14px 18px; font-size: 14px; }
+    .rung .rung-num { width: 18px; height: 18px; font-size: 9px; }
+    .rung .rung-val { font-size: 12px; }
+  }
+</style>
+</head>
+<body class="relative">
+
+<div class="arena-bg" aria-hidden="true"></div>
+<div class="grid-lines" aria-hidden="true"></div>
+<div class="spotlight" aria-hidden="true"></div>
+
+<div id="toastContainer" aria-live="polite"></div>
+
+<!-- ============================================================
+     SETUP SCREEN
+     ============================================================ -->
+<div id="setupScreen" class="relative z-10 h-screen flex flex-col items-center justify-center p-6 overflow-y-auto scroll-y">
+
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-amber-400/40 bg-amber-400/10 backdrop-blur mb-6">
+      <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
+      <span class="text-[11px] font-black uppercase tracking-[.25em] text-amber-300">Solo Millionaire</span>
+    </div>
+    <h1 class="font-display text-5xl md:text-6xl font-black tracking-tight leading-[1.05] mb-4">
+      <span class="text-white">Jadilah</span>
+      <span class="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent">Jutawan</span><br>
+      <span class="text-white">Pertama!</span>
+    </h1>
+    <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto">
+      Jawab soal Bahasa Inggris, naiki tangga, dan capai <strong class="text-amber-300">1.000.000 poin</strong>.
+      Hati-hati — kamu hanya punya <strong class="text-rose-400">3 nyawa</strong>!
+    </p>
+  </div>
+
+  <!-- High score card -->
+  <div id="hiscoreDisplay" class="w-full max-w-md mb-6 hidden">
+    <div class="hiscore-card">
+      <div class="hiscore-icon">
+        <i data-lucide="trophy" class="w-5 h-5 text-slate-900"></i>
+      </div>
+      <div class="flex-1">
+        <p class="text-[10.5px] font-black uppercase tracking-[.15em] text-amber-300">High Score</p>
+        <p class="font-display font-black text-xl text-white" id="hiscoreValue">0</p>
+      </div>
+      <p class="text-[11px] text-slate-400 text-right" id="hiscoreBy"></p>
+    </div>
+  </div>
+
+  <div class="panel panel-gold rounded-3xl p-7 w-full max-w-2xl">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+        <i data-lucide="user-circle-2" class="w-5 h-5 text-slate-900"></i>
+      </div>
+      <div>
+        <h2 class="font-display font-bold text-lg text-white">Pengaturan Permainan</h2>
+        <p class="text-xs text-slate-400">Atur nama, soal, dan timer</p>
+      </div>
+    </div>
+
+    <!-- Player name -->
+    <div class="mb-5">
+      <label class="block text-[11px] font-black uppercase tracking-[.15em] text-amber-300 mb-2">
+        <i data-lucide="user" class="w-3 h-3 inline mr-1"></i> Nama Pemain
+      </label>
+      <input type="text" id="setupPlayer" class="input-dark" value="Petualang" maxlength="20" placeholder="Masukkan namamu..." />
+    </div>
+
+    <!-- Questions per set -->
+    <div class="mb-5">
+      <label class="block text-[11px] font-black uppercase tracking-[.15em] text-amber-300 mb-2">
+        <i data-lucide="list-checks" class="w-3 h-3 inline mr-1"></i> Jumlah Soal per Tangga
+      </label>
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-2" id="setupQCount">
+        <button type="button" class="qcount-btn input-dark !py-3 text-center font-bold" data-value="4">4</button>
+        <button type="button" class="qcount-btn input-dark !py-3 text-center font-bold active" data-value="5">5</button>
+        <button type="button" class="qcount-btn input-dark !py-3 text-center font-bold" data-value="8">8</button>
+        <button type="button" class="qcount-btn input-dark !py-3 text-center font-bold" data-value="10">10</button>
+        <button type="button" class="qcount-btn input-dark !py-3 text-center font-bold" data-value="16">16</button>
+        <button type="button" class="qcount-btn input-dark !py-3 text-center font-bold" data-value="20">20</button>
+      </div>
+      <div class="mt-3 rounded-xl bg-amber-400/10 border border-amber-400/30 p-3">
+        <p class="text-[12px] text-amber-200 leading-relaxed">
+          <i data-lucide="target" class="w-3.5 h-3.5 inline mr-1"></i>
+          <strong>Target: 1.000.000 poin</strong> • Poin per soal: <strong id="previewPerSoal" class="text-amber-300">200.000</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- Timer -->
+    <div class="mb-5">
+      <label class="block text-[11px] font-black uppercase tracking-[.15em] text-cyan-300 mb-2">
+        <i data-lucide="timer" class="w-3 h-3 inline mr-1"></i> Durasi Timer per Soal
+      </label>
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-2" id="setupTimer">
+        <button type="button" class="timer-btn input-dark !py-3 text-center font-bold" data-value="10">10s</button>
+        <button type="button" class="timer-btn input-dark !py-3 text-center font-bold active" data-value="15">15s</button>
+        <button type="button" class="timer-btn input-dark !py-3 text-center font-bold" data-value="20">20s</button>
+        <button type="button" class="timer-btn input-dark !py-3 text-center font-bold" data-value="30">30s</button>
+        <button type="button" class="timer-btn input-dark !py-3 text-center font-bold" data-value="45">45s</button>
+        <button type="button" class="timer-btn input-dark !py-3 text-center font-bold" data-value="60">60s</button>
+      </div>
+    </div>
+
+    <!-- Lives info -->
+    <div class="mb-5 rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4">
+      <div class="flex items-center gap-3">
+        <div class="flex gap-1">
+          <div class="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-500/50 flex items-center justify-center">
+            <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-400 fill-rose-400"></i>
+          </div>
+          <div class="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-500/50 flex items-center justify-center">
+            <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-400 fill-rose-400"></i>
+          </div>
+          <div class="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-500/50 flex items-center justify-center">
+            <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-400 fill-rose-400"></i>
+          </div>
+        </div>
+        <p class="text-[12px] text-rose-200 leading-relaxed flex-1">
+          <strong>3 nyawa</strong> — salah atau waktu habis = <strong>-1 nyawa</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Custom questions -->
+    <div class="mb-6 rounded-2xl border border-indigo-500/25 bg-indigo-500/5 p-4">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" id="setupCustomToggle" class="w-4 h-4 accent-amber-400" />
+        <span class="text-sm font-bold text-indigo-200">Gunakan soal custom (opsional)</span>
+      </label>
+      <p class="text-[11px] text-slate-400 mt-1 ml-7">
+        Kalau tidak dicentang, pakai bank soal Bahasa Inggris default (24 soal).
+      </p>
+
+      <div id="customQPanel" class="hidden mt-4">
+        <p class="text-[11px] font-bold text-amber-300 mb-2">Format per baris:</p>
+        <code class="text-[10.5px] text-slate-400 block mb-2 bg-black/40 rounded px-2 py-1.5">Pertanyaan | Opsi A | Opsi B | Opsi C | Opsi D | Index benar (0-3)</code>
+        <textarea id="setupCustomQ" rows="4" class="input-dark font-mono text-xs" placeholder="What color is the sky?|Red|Blue|Green|Yellow|1
+How many legs does a cat have?|2|4|6|8|1"></textarea>
+      </div>
+    </div>
+
+    <button type="button" id="startGameBtn" class="btn-gold w-full !py-4 !text-base">
+      <i data-lucide="play" class="w-5 h-5"></i>
+      Mulai Petualangan
+    </button>
+
+    <!-- Reset high score -->
+    <button type="button" id="resetHiscoreBtn" class="mt-3 w-full text-center text-[11px] font-bold text-slate-500 hover:text-rose-400 transition">
+      <i data-lucide="trash-2" class="w-3 h-3 inline"></i>
+      Reset High Score
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     GAME SCREEN
+     ============================================================ -->
+<div id="gameScreen" class="hidden relative z-10 h-screen flex flex-col">
+
+  <!-- Top bar -->
+  <div class="flex-shrink-0 px-4 py-3 flex items-center justify-between gap-3 border-b border-indigo-500/15 bg-black/30 backdrop-blur">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
+        <i data-lucide="crown" class="w-5 h-5 text-slate-900"></i>
+      </div>
+      <div>
+        <p class="font-display font-black text-sm text-amber-300 tracking-wide">SOLO MILLIONAIRE</p>
+        <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-[.15em]">
+          Pemain: <span id="playerNameDisplay" class="text-slate-300">Petualang</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Center: score + rank -->
+    <div class="hidden md:flex items-center gap-4">
+      <div class="flex items-baseline gap-2">
+        <span class="text-[11px] font-black uppercase tracking-wider text-slate-400">SKOR</span>
+        <span id="playerScore" class="font-display font-black text-2xl text-amber-300 tabular-nums">0</span>
+      </div>
+      <div id="rankBadge" class="rank-badge rank-1">
+        <i data-lucide="sparkles" class="w-3 h-3"></i>
+        <span id="rankText">Pemula</span>
+      </div>
+    </div>
+
+    <!-- Hearts (nyawa) -->
+    <div class="flex items-center gap-1.5" id="heartsContainer">
+      <div class="heart" data-heart="0"><i data-lucide="heart"></i></div>
+      <div class="heart" data-heart="1"><i data-lucide="heart"></i></div>
+      <div class="heart" data-heart="2"><i data-lucide="heart"></i></div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button type="button" id="teacherModeBtn" class="lifeline !text-[10px]">
+        <i data-lucide="wrench" class="w-3 h-3"></i> <span class="hidden sm:inline">Teacher</span>
+      </button>
+      <button type="button" id="restartBtn" class="lifeline !text-[10px]">
+        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> <span class="hidden sm:inline">Reset</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main grid: Ladder left | Question right -->
+  <div class="flex-1 min-h-0 grid grid-cols-[1.2fr_2.4fr] gap-3 md:gap-4 p-3 md:p-4">
+
+    <!-- LADDER PANEL -->
+    <div class="panel rounded-2xl p-4 flex flex-col min-h-0">
+      <div class="flex items-center justify-between mb-3 flex-shrink-0">
+        <div>
+          <p class="text-[10px] font-black uppercase tracking-[.2em] text-slate-400">Tangga Poin</p>
+          <p class="text-[10.5px] text-slate-500 mt-0.5">Naik ke puncak <span class="text-amber-300 font-bold">1JT</span></p>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400">Putaran</p>
+          <p class="font-display font-black text-lg text-sky-300" id="cycleDisplay">1</p>
+        </div>
+      </div>
+
+      <div class="flex-1 min-h-0">
+        <div class="ladder d-size-2" id="ladder"></div>
+      </div>
+    </div>
+
+    <!-- QUESTION PANEL -->
+    <div class="min-h-0 flex flex-col gap-3">
+
+      <!-- Turn info + timer -->
+      <div class="flex items-center justify-between gap-3 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="turn-badge team-a" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(6,182,212,.15));border:1px solid rgba(56,189,248,.6);color:#7dd3fc;box-shadow:0 0 30px -8px rgba(56,189,248,.7);">
+            <i data-lucide="target" class="w-4 h-4"></i>
+            <span id="qCounterSmall">SOAL 1 / 5</span>
+          </div>
+          <div class="hidden md:flex items-baseline gap-2">
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">PUTARAN</span>
+            <span class="font-display font-black text-base text-sky-300" id="cycleDisplaySm">1</span>
+          </div>
+        </div>
+
+        <div class="relative flex-shrink-0">
+          <svg class="timer-ring w-16 h-16" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(71,85,105,.4)" stroke-width="4"></circle>
+            <circle id="timerRing" cx="22" cy="22" r="18" fill="none" stroke="#fbbf24" stroke-width="4"
+                    stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span id="timerNumber" class="timer-number text-amber-300">15</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question card -->
+      <div class="q-panel rounded-3xl p-5 md:p-7 flex-1 min-h-0 flex flex-col">
+        <div class="flex items-center justify-between mb-4 flex-shrink-0">
+          <span class="text-[10px] font-black uppercase tracking-[.2em] text-indigo-300">
+            <i data-lucide="help-circle" class="w-3 h-3 inline mr-1"></i> Pertanyaan
+          </span>
+          <span class="text-[10px] font-black uppercase tracking-[.15em] text-slate-500" id="progressLabel">
+            Level 1 • 200K poin
+          </span>
+        </div>
+
+        <h2 id="questionText" class="font-display font-bold text-lg md:text-2xl leading-snug text-white mb-5 flex-shrink-0">
+          Question loading...
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-2.5 flex-1 min-h-0 auto-rows-min" id="answersGrid">
+          <button class="answer-btn" data-index="0">
+            <span class="answer-letter">A</span>
+            <span class="answer-text" id="answerText0">—</span>
+          </button>
+          <button class="answer-btn" data-index="1">
+            <span class="answer-letter">B</span>
+            <span class="answer-text" id="answerText1">—</span>
+          </button>
+          <button class="answer-btn" data-index="2">
+            <span class="answer-letter">C</span>
+            <span class="answer-text" id="answerText2">—</span>
+          </button>
+          <button class="answer-btn" data-index="3">
+            <span class="answer-letter">D</span>
+            <span class="answer-text" id="answerText3">—</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Lifelines + feedback -->
+      <div class="flex items-center gap-2.5 flex-shrink-0">
+        <button type="button" class="lifeline flex-1 justify-center" data-lifeline="teacher">
+          <i data-lucide="graduation-cap" class="w-4 h-4"></i> Tanya Guru
+        </button>
+        <button type="button" class="lifeline flex-1 justify-center" data-lifeline="audience">
+          <i data-lucide="megaphone" class="w-4 h-4"></i> Tanya Audiens
+        </button>
+      </div>
+
+      <div id="feedbackStrip" class="flex-shrink-0 rounded-2xl border border-indigo-500/25 bg-black/40 backdrop-blur px-4 py-3 text-center transition-all duration-300">
+        <p id="feedbackText" class="text-xs font-bold text-slate-400">
+          <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+          Pilih jawaban sebelum waktu habis
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     TEACHER MODE PANEL
+     ============================================================ -->
+<div id="teacherPanel" class="hidden fixed top-16 right-4 w-80 z-40 panel panel-gold rounded-2xl p-4 shadow-2xl">
+  <div class="flex items-center justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <i data-lucide="wrench" class="w-4 h-4 text-amber-300"></i>
+      <h3 class="font-display font-bold text-sm text-amber-200">Teacher Mode</h3>
+    </div>
+    <button type="button" id="closeTeacher" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center">
+      <i data-lucide="x" class="w-3.5 h-3.5 text-slate-400"></i>
+    </button>
+  </div>
+
+  <div class="space-y-3 text-xs">
+    <div>
+      <label class="block font-black uppercase tracking-wider text-slate-400 mb-1.5 text-[10px]">Nama Pemain</label>
+      <input type="text" id="tmPlayer" class="input-dark !py-2 !text-xs" maxlength="20" />
+    </div>
+
+    <div>
+      <label class="block font-black uppercase tracking-wider text-slate-400 mb-1.5 text-[10px]">Timer (detik)</label>
+      <div class="grid grid-cols-6 gap-1">
+        <button class="tm-timer-btn input-dark !py-1.5 !text-[10px]" data-value="10">10</button>
+        <button class="tm-timer-btn input-dark !py-1.5 !text-[10px] active" data-value="15">15</button>
+        <button class="tm-timer-btn input-dark !py-1.5 !text-[10px]" data-value="20">20</button>
+        <button class="tm-timer-btn input-dark !py-1.5 !text-[10px]" data-value="30">30</button>
+        <button class="tm-timer-btn input-dark !py-1.5 !text-[10px]" data-value="45">45</button>
+        <button class="tm-timer-btn input-dark !py-1.5 !text-[10px]" data-value="60">60</button>
+      </div>
+    </div>
+
+    <div>
+      <label class="block font-black uppercase tracking-wider text-slate-400 mb-1.5 text-[10px]">Nyawa</label>
+      <div class="grid grid-cols-4 gap-1">
+        <button class="tm-lives-btn input-dark !py-1.5 !text-[10px]" data-value="1">1</button>
+        <button class="tm-lives-btn input-dark !py-1.5 !text-[10px]" data-value="2">2</button>
+        <button class="tm-lives-btn input-dark !py-1.5 !text-[10px] active" data-value="3">3</button>
+        <button class="tm-lives-btn input-dark !py-1.5 !text-[10px]" data-value="5">5</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-indigo-500/20">
+      <button type="button" id="tmSkip" class="btn-ghost !py-2 !text-[11px]">
+        <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i> Skip
+      </button>
+      <button type="button" id="tmForceEnd" class="btn-ghost !py-2 !text-[11px]">
+        <i data-lucide="flag" class="w-3.5 h-3.5"></i> Akhiri
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2">
+      <button type="button" id="tmGivePoint" class="btn-ghost !py-2 !text-[10px]">
+        <i data-lucide="plus" class="w-3 h-3"></i> +<span data-givePoint>200.000</span>
+      </button>
+      <button type="button" id="tmAddLife" class="btn-ghost !py-2 !text-[10px]">
+        <i data-lucide="heart" class="w-3 h-3"></i> +1 Nyawa
+      </button>
+    </div>
+
+    <p class="text-[10px] text-slate-500 pt-2 border-t border-indigo-500/20 leading-relaxed">
+      💡 Perubahan nama langsung tersimpan. Timer berlaku untuk soal berikutnya.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     ASK TEACHER MODAL
+     ============================================================ -->
+<div id="askTeacherModal" class="overlay hidden">
+  <div class="modal text-center">
+    <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mb-5 shadow-2xl">
+      <i data-lucide="graduation-cap" class="w-10 h-10 text-slate-900"></i>
+    </div>
+    <h3 class="font-display font-black text-2xl text-amber-300 mb-2">Tanya pada Guru</h3>
+    <p class="text-slate-300 text-sm mb-6">
+      Diskusikan soal ini dengan gurumu. Minta petunjuk sebelum waktu habis!
+    </p>
+    <div class="rounded-2xl bg-amber-400/10 border border-amber-400/30 p-4 mb-6">
+      <p class="text-xs text-amber-200 leading-relaxed">
+        ⏱️ <strong>Waktu dijeda sementara.</strong> Klik tombol di bawah untuk melanjutkan.
+      </p>
+    </div>
+    <button type="button" id="closeAskTeacher" class="btn-gold w-full">
+      <i data-lucide="play" class="w-4 h-4"></i> Lanjutkan Kuis
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     ASK AUDIENCE MODAL
+     ============================================================ -->
+<div id="askAudienceModal" class="overlay hidden">
+  <div class="modal">
+    <div class="text-center mb-6">
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-indigo-500 to-sky-500 flex items-center justify-center mb-4 shadow-2xl">
+        <i data-lucide="megaphone" class="w-10 h-10 text-white"></i>
+      </div>
+      <h3 class="font-display font-black text-2xl text-sky-300 mb-2">Polling Audiens</h3>
+      <p class="text-slate-300 text-sm">Suara dari penonton di ruangan</p>
+    </div>
+
+    <div id="pollResults" class="space-y-2.5 mb-6"></div>
+
+    <button type="button" id="closeAskAudience" class="btn-gold w-full">
+      <i data-lucide="play" class="w-4 h-4"></i> Lanjutkan Kuis
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     WINNER OVERLAY
+     ============================================================ -->
+<div id="winnerOverlay" class="overlay hidden !p-0">
+  <div class="w-full max-w-3xl px-6">
+    <div class="text-center">
+      <div class="trophy-icon">
+        <i data-lucide="trophy" class="w-16 h-16 text-slate-900"></i>
+      </div>
+      <p class="mt-8 text-[13px] font-black uppercase tracking-[.3em] text-amber-400 mb-3">🏆 JUTAWAN BARU 🏆</p>
+      <h2 class="winner-name" id="winnerName">Petualang</h2>
+      <p class="mt-3 text-slate-300 text-lg">Berhasil mencapai <strong class="text-amber-300">1.000.000 poin</strong>!</p>
+    </div>
+
+    <div class="mt-8 grid grid-cols-4 gap-3">
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Poin</p>
+        <p class="font-display font-black text-xl text-amber-300" id="winnerScore">1.000.000</p>
+      </div>
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Benar</p>
+        <p class="font-display font-black text-xl text-emerald-400" id="winnerCorrect">5</p>
+      </div>
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Salah</p>
+        <p class="font-display font-black text-xl text-rose-400" id="winnerWrong">0</p>
+      </div>
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Putaran</p>
+        <p class="font-display font-black text-xl text-sky-300" id="winnerCycle">1</p>
+      </div>
+    </div>
+
+    <div class="ticker-wrap rounded-2xl mt-8">
+      <div class="ticker-content" id="winnerTicker"></div>
+    </div>
+
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+      <button type="button" id="playAgainBtn" class="btn-gold">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Main Lagi
+      </button>
+      <button type="button" id="newSetupBtn" class="btn-ghost !py-3.5 !px-6">
+        <i data-lucide="settings-2" class="w-4 h-4"></i> Pengaturan Baru
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     GAME OVER OVERLAY
+     ============================================================ -->
+<div id="gameOverOverlay" class="overlay hidden !p-0">
+  <div class="w-full max-w-2xl px-6">
+    <div class="text-center">
+      <div class="trophy-icon lost">
+        <i data-lucide="heart-crack" class="w-16 h-16 text-slate-200"></i>
+      </div>
+      <p class="mt-8 text-[13px] font-black uppercase tracking-[.3em] text-slate-400 mb-3">💔 Nyawa Habis</p>
+      <h2 class="font-display font-black text-4xl text-slate-200 mb-2">Game Over</h2>
+      <p class="text-slate-400 text-sm">Jangan menyerah! Coba lagi dan raih 1 juta poin.</p>
+    </div>
+
+    <div class="mt-8 grid grid-cols-4 gap-3">
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Poin Akhir</p>
+        <p class="font-display font-black text-xl text-amber-300" id="gameOverScore">0</p>
+      </div>
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Benar</p>
+        <p class="font-display font-black text-xl text-emerald-400" id="gameOverCorrect">0</p>
+      </div>
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Salah</p>
+        <p class="font-display font-black text-xl text-rose-400" id="gameOverWrong">0</p>
+      </div>
+      <div class="panel rounded-2xl p-4 text-center">
+        <p class="text-[10px] font-black uppercase tracking-[.15em] text-slate-400 mb-1">Putaran</p>
+        <p class="font-display font-black text-xl text-sky-300" id="gameOverCycle">1</p>
+      </div>
+    </div>
+
+    <div id="newHiscoreBanner" class="hidden mt-6 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-4 text-center">
+      <p class="text-sm font-black text-amber-300">
+        <i data-lucide="award" class="w-4 h-4 inline mr-1"></i> Rekor Baru!
+      </p>
+      <p class="text-xs text-amber-200 mt-1">Skor tertinggimu sebelumnya: <span id="prevHiscore">0</span></p>
+    </div>
+
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+      <button type="button" id="gameOverRetry" class="btn-gold">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Coba Lagi
+      </button>
+      <button type="button" id="gameOverSetup" class="btn-ghost !py-3.5 !px-6">
+        <i data-lucide="settings-2" class="w-4 h-4"></i> Pengaturan Baru
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==========================================================
+   SOLO MILLIONAIRE — Single Player Mode
+   Target: 1.000.000 poin + 3 nyawa
+   ========================================================== */
+(function () {
+  'use strict';
+
+  const TARGET_POINTS = 1000000;
+  const HISCORE_KEY = 'eduspark_solo_millionaire_hiscore_v1';
+  const DEFAULT_LIVES = 3;
+
+  /* =========================================================
+     INLINE TOAST
+     ========================================================= */
+  const toast = (function () {
+    const container = document.getElementById('toastContainer');
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+    function show(msg, type, opts) {
+      type = type || 'info';
+      opts = opts || {};
+      const el = document.createElement('div');
+      el.className = 'toast-item ' + type;
+      el.innerHTML = `
+        <div class="toast-accent"></div>
+        <div style="flex:1;min-width:0;">
+          ${opts.title ? `<p class="toast-title">${esc(opts.title)}</p>` : ''}
+          <p class="toast-msg">${esc(msg)}</p>
+        </div>
+      `;
+      container.appendChild(el);
+      requestAnimationFrame(() => el.classList.add('show'));
+      setTimeout(() => {
+        el.classList.remove('show');
+        setTimeout(() => el.remove(), 400);
+      }, opts.duration || 3000);
+    }
+    return {
+      success: (m, o) => show(m, 'success', o),
+      error:   (m, o) => show(m, 'error',   o),
+      warning: (m, o) => show(m, 'warning', o),
+      info:    (m, o) => show(m, 'info',    o)
+    };
+  })();
+
+  /* =========================================================
+     DEFAULT QUESTION BANK
+     ========================================================= */
+  const DEFAULT_QUESTIONS = [
+    { q: 'What animal says "meow"?', a: ['Dog', 'Cat', 'Cow', 'Duck'], c: 1 },
+    { q: 'What color is a banana?', a: ['Red', 'Blue', 'Yellow', 'Purple'], c: 2 },
+    { q: 'How many legs does a spider have?', a: ['4', '6', '8', '10'], c: 2 },
+    { q: 'Which one is a fruit?', a: ['Carrot', 'Apple', 'Potato', 'Onion'], c: 1 },
+    { q: 'What is the English word for "buku"?', a: ['Pen', 'Book', 'Bag', 'Table'], c: 1 },
+    { q: 'What color is grass?', a: ['Blue', 'Red', 'Green', 'Black'], c: 2 },
+    { q: 'Which animal can fly?', a: ['Fish', 'Bird', 'Cat', 'Dog'], c: 1 },
+    { q: 'What is 3 + 4?', a: ['6', '7', '8', '9'], c: 1 },
+    { q: 'What do we drink?', a: ['Bread', 'Water', 'Chair', 'Book'], c: 1 },
+    { q: 'Which one is a color?', a: ['Run', 'Pink', 'Jump', 'Sleep'], c: 1 },
+    { q: 'What is the English word for "kucing"?', a: ['Dog', 'Cat', 'Bird', 'Fish'], c: 1 },
+    { q: 'How many days in a week?', a: ['5', '6', '7', '8'], c: 2 },
+    { q: 'Which one is big?', a: ['Ant', 'Elephant', 'Mouse', 'Bee'], c: 1 },
+    { q: 'What do we use to write?', a: ['Spoon', 'Pencil', 'Shoe', 'Hat'], c: 1 },
+    { q: 'What is the English word for "merah"?', a: ['Blue', 'Green', 'Red', 'Yellow'], c: 2 },
+    { q: 'Which animal lives in water?', a: ['Lion', 'Fish', 'Tiger', 'Eagle'], c: 1 },
+    { q: 'What is 10 - 5?', a: ['3', '4', '5', '6'], c: 2 },
+    { q: 'Which one is sweet?', a: ['Lemon', 'Sugar', 'Salt', 'Chili'], c: 1 },
+    { q: 'What is the English word for "rumah"?', a: ['School', 'House', 'Market', 'Park'], c: 1 },
+    { q: 'How many months in a year?', a: ['10', '11', '12', '13'], c: 2 },
+    { q: 'Which is the biggest?', a: ['Sun', 'Moon', 'Star', 'Cloud'], c: 0 },
+    { q: 'What do bees make?', a: ['Milk', 'Honey', 'Bread', 'Juice'], c: 1 },
+    { q: 'What is the English word for "biru"?', a: ['Red', 'Blue', 'Green', 'Black'], c: 1 },
+    { q: 'Which one is a vehicle?', a: ['Chair', 'Car', 'Cup', 'Cat'], c: 1 }
+  ];
+
+  /* =========================================================
+     STATE
+     ========================================================= */
+  const state = {
+    player: { name: '', score: 0, correct: 0, wrong: 0, lives: DEFAULT_LIVES, lifelines: { teacher: true, audience: true } },
+    currentQuestion: null,
+    questions: [],
+    pointer: 0,
+    questionsPerSet: 5,
+    pointsPerQ: 200000,
+    cycle: 1,
+    timerDuration: 15,
+    timeLeft: 15,
+    timerId: null,
+    timerPaused: false,
+    answered: false,
+    gameActive: false,
+    currentRank: 1
+  };
+
+  /* =========================================================
+     RANK SYSTEM
+     ========================================================= */
+  const RANKS = [
+    { level: 1, title: 'Pemula',    icon: 'sparkles',     cls: 'rank-1' },
+    { level: 2, title: 'Pelajar',   icon: 'book-open',    cls: 'rank-2' },
+    { level: 3, title: 'Cerdas',    icon: 'brain',        cls: 'rank-3' },
+    { level: 4, title: 'Ahli',      icon: 'star',         cls: 'rank-4' },
+    { level: 5, title: 'MASTER',    icon: 'crown',        cls: 'rank-5' }
+  ];
+
+  function getRankForLevel(level) {
+    const N = state.questionsPerSet;
+    if (N <= 5) {
+      return RANKS[Math.min(RANKS.length - 1, Math.max(1, level))];
+    }
+    // Skala ke 5 rank berdasarkan N
+    const scale = Math.min(RANKS.length - 1, Math.max(1, Math.ceil((level / N) * 4)));
+    return RANKS[scale] || RANKS[0];
+  }
+
+  /* =========================================================
+     DOM
+     ========================================================= */
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+
+  const setupScreen = $('#setupScreen');
+  const gameScreen = $('#gameScreen');
+  const teacherPanel = $('#teacherPanel');
+  const winnerOverlay = $('#winnerOverlay');
+  const gameOverOverlay = $('#gameOverOverlay');
+  const askTeacherModal = $('#askTeacherModal');
+  const askAudienceModal = $('#askAudienceModal');
+
+  const answerBtns = $$('.answer-btn');
+  const timerRing = $('#timerRing');
+  const timerNumber = $('#timerNumber');
+  const RING_CIRC = 2 * Math.PI * 18;
+
+  const icons = () => window.lucide && window.lucide.createIcons();
+
+  /* =========================================================
+     FORMAT
+     ========================================================= */
+  const fmtPts = (n) => {
+    if (n >= 1000000) {
+      const v = n / 1000000;
+      return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + 'JT';
+    }
+    if (n >= 1000) {
+      const v = n / 1000;
+      return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + 'K';
+    }
+    return n.toString();
+  };
+  const fmtFull = (n) => n.toLocaleString('id-ID');
+
+  /* =========================================================
+     HISCORE
+     ========================================================= */
+  function getHiscore() {
+    try {
+      const raw = localStorage.getItem(HISCORE_KEY);
+      if (!raw) return { score: 0, name: '' };
+      const data = JSON.parse(raw);
+      return { score: data.score || 0, name: data.name || '' };
+    } catch (e) { return { score: 0, name: '' }; }
+  }
+  function setHiscore(score, name) {
+    try {
+      localStorage.setItem(HISCORE_KEY, JSON.stringify({ score, name, ts: Date.now() }));
+    } catch (e) {}
+  }
+
+  function displayHiscoreOnSetup() {
+    const hs = getHiscore();
+    const card = $('#hiscoreDisplay');
+    if (hs.score > 0) {
+      card.classList.remove('hidden');
+      $('#hiscoreValue').textContent = fmtFull(hs.score);
+      $('#hiscoreBy').textContent = hs.name ? 'oleh ' + hs.name : '';
+    } else {
+      card.classList.add('hidden');
+    }
+  }
+
+  /* =========================================================
+     SETUP SCREEN
+     ========================================================= */
+  let setupQCount = 5;
+  let setupTimer = 15;
+
+  function hl(btn, color) {
+    btn.classList.add('active');
+    if (color === 'gold') {
+      btn.style.background = 'linear-gradient(135deg, rgba(251,191,36,.35), rgba(245,158,11,.25))';
+      btn.style.borderColor = 'rgba(251,191,36,.9)';
+    } else {
+      btn.style.background = 'linear-gradient(135deg, rgba(14,165,233,.35), rgba(6,182,212,.25))';
+      btn.style.borderColor = 'rgba(56,189,248,.9)';
+    }
+  }
+  function unhl(btn) {
+    btn.classList.remove('active');
+    btn.style.background = '';
+    btn.style.borderColor = '';
+  }
+
+  function updatePreview() {
+    const per = TARGET_POINTS / setupQCount;
+    $('#previewPerSoal').textContent = fmtFull(per);
+    const g = document.querySelector('[data-givePoint]');
+    if (g) g.textContent = fmtFull(per);
+  }
+
+  $$('#setupQCount .qcount-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      $$('#setupQCount .qcount-btn').forEach(unhl);
+      hl(btn, 'gold');
+      setupQCount = Number(btn.dataset.value);
+      updatePreview();
+    });
+  });
+  const dq = document.querySelector('#setupQCount .qcount-btn.active');
+  if (dq) hl(dq, 'gold');
+
+  $$('#setupTimer .timer-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      $$('#setupTimer .timer-btn').forEach(unhl);
+      hl(btn, 'cyan');
+      setupTimer = Number(btn.dataset.value);
+    });
+  });
+  const dt = document.querySelector('#setupTimer .timer-btn.active');
+  if (dt) hl(dt, 'cyan');
+
+  updatePreview();
+  displayHiscoreOnSetup();
+
+  $('#setupCustomToggle').addEventListener('change', (e) => {
+    $('#customQPanel').classList.toggle('hidden', !e.target.checked);
+  });
+
+  $('#resetHiscoreBtn').addEventListener('click', () => {
+    if (!confirm('Reset high score? Tindakan tidak bisa dibatalkan.')) return;
+    try { localStorage.removeItem(HISCORE_KEY); } catch (e) {}
+    displayHiscoreOnSetup();
+    toast.info('High score direset.', { duration: 2000 });
+  });
+
+  /* =========================================================
+     START GAME
+     ========================================================= */
+  $('#startGameBtn').addEventListener('click', () => {
+    const name = ($('#setupPlayer').value || 'Petualang').trim().slice(0, 20);
+    state.player.name = name;
+    state.questionsPerSet = setupQCount;
+    state.pointsPerQ = TARGET_POINTS / setupQCount;
+    state.timerDuration = setupTimer;
+    state.timeLeft = setupTimer;
+
+    // Build pool
+    let pool = [];
+    const useCustom = $('#setupCustomToggle').checked;
+    if (useCustom) {
+      const raw = $('#setupCustomQ').value.trim();
+      if (raw) {
+        pool = raw.split('\n').map((line) => {
+          const parts = line.split('|').map((p) => p.trim());
+          if (parts.length < 6) return null;
+          const c = parseInt(parts[5], 10);
+          if (isNaN(c) || c < 0 || c > 3) return null;
+          return { q: parts[0], a: [parts[1], parts[2], parts[3], parts[4]], c };
+        }).filter(Boolean);
+      }
+    }
+    if (pool.length < state.questionsPerSet) {
+      pool = pool.concat(shuffle(DEFAULT_QUESTIONS.slice()));
+    }
+    pool = shuffle(pool).slice(0, state.questionsPerSet);
+    state.questions = pool;
+    state.pointer = 0;
+    state.cycle = 1;
+
+    state.player.score = 0;
+    state.player.correct = 0;
+    state.player.wrong = 0;
+    state.player.lives = DEFAULT_LIVES;
+    state.player.lifelines = { teacher: true, audience: true };
+    state.currentRank = 1;
+    state.gameActive = true;
+
+    $('#playerNameDisplay').textContent = name;
+    $('#playerScore').textContent = '0';
+    $('#tmPlayer').value = name;
+    $('#cycleDisplay').textContent = '1';
+    $('#cycleDisplaySm').textContent = '1';
+    updateHeartsUI();
+    renderLifelines();
+    updateRankUI();
+
+    buildLadder();
+
+    setupScreen.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    icons();
+
+    toast.success('Semoga beruntung, ' + name + '!', { title: '🏁 Mulai!', duration: 3000 });
+
+    setTimeout(() => nextQuestion(), 500);
+  });
+
+  /* =========================================================
+     LADDER
+     ========================================================= */
+  function buildLadder() {
+    const N = state.questionsPerSet;
+    let sizeCls = 'd-size-1';
+    if (N > 5 && N <= 10) sizeCls = 'd-size-2';
+    else if (N > 10 && N <= 15) sizeCls = 'd-size-3';
+    else if (N > 15) sizeCls = 'd-size-4';
+
+    const ladder = $('#ladder');
+    ladder.className = 'ladder ' + sizeCls;
+    ladder.innerHTML = '';
+    for (let i = 1; i <= N; i++) {
+      const pts = i * state.pointsPerQ;
+      const rung = document.createElement('div');
+      rung.className = 'rung';
+      if (i === N) rung.classList.add('final-level');
+      rung.dataset.level = i;
+      rung.innerHTML = `
+        <span class="rung-num">${i}</span>
+        <span class="rung-val">${fmtPts(pts)}<span class="rung-unit">Poin</span></span>
+      `;
+      ladder.appendChild(rung);
+    }
+    updateLadderUI();
+  }
+
+  function updateLadderUI(justLitLevel) {
+    const N = state.questionsPerSet;
+    const curLevel = Math.round(state.player.score / state.pointsPerQ);
+    const rungs = $$('#ladder .rung');
+    rungs.forEach((rung, i) => {
+      const level = i + 1;
+      rung.classList.remove('achieved', 'active-target');
+      if (level <= curLevel) {
+        rung.classList.add('achieved');
+      } else if (level === curLevel + 1 && curLevel < N) {
+        rung.classList.add('active-target');
+      }
+    });
+    if (justLitLevel) {
+      const rung = document.querySelector(`#ladder .rung[data-level="${justLitLevel}"]`);
+      if (rung) {
+        rung.classList.add('just-lit');
+        setTimeout(() => rung.classList.remove('just-lit'), 1300);
+      }
+    }
+  }
+
+  /* =========================================================
+     HEARTS
+     ========================================================= */
+  function updateHeartsUI(lostIndex) {
+    const hearts = $$('.heart');
+    hearts.forEach((h, i) => {
+      h.classList.remove('lost', 'just-lost');
+      if (i >= state.player.lives) {
+        h.classList.add('lost');
+      }
+    });
+    if (lostIndex != null && hearts[lostIndex]) {
+      hearts[lostIndex].classList.add('just-lost');
+      setTimeout(() => hearts[lostIndex].classList.remove('just-lost'), 900);
+    }
+  }
+
+  /* =========================================================
+     RANK
+     ========================================================= */
+  function updateRankUI() {
+    const lvl = Math.round(state.player.score / state.pointsPerQ);
+    const rankLvl = lvl === 0 ? 1 : Math.min(5, Math.max(1, Math.ceil((lvl / state.questionsPerSet) * 5)));
+    const prev = state.currentRank;
+    state.currentRank = rankLvl;
+    const rank = RANKS[rankLvl - 1];
+
+    const badge = $('#rankBadge');
+    badge.className = 'rank-badge ' + rank.cls;
+    const iconEl = badge.querySelector('i');
+    if (iconEl) {
+      iconEl.setAttribute('data-lucide', rank.icon);
+    }
+    $('#rankText').textContent = rank.title;
+    icons();
+
+    if (prev !== rankLvl && rankLvl > 1 && rankLvl > prev) {
+      toast.success('Rank Up! Kamu sekarang "' + rank.title + '"', {
+        title: '⭐ Rank Up',
+        duration: 2500
+      });
+    }
+  }
+
+  /* =========================================================
+     LIFELINES
+     ========================================================= */
+  function renderLifelines() {
+    const t = document.querySelector('[data-lifeline="teacher"]');
+    const a = document.querySelector('[data-lifeline="audience"]');
+    t.classList.toggle('used', !state.player.lifelines.teacher);
+    a.classList.toggle('used', !state.player.lifelines.audience);
+    t.disabled = !state.player.lifelines.teacher;
+    a.disabled = !state.player.lifelines.audience;
+  }
+
+  /* =========================================================
+     QUESTION FLOW
+     ========================================================= */
+  function nextQuestion() {
+    if (!state.gameActive) return;
+
+    if (state.player.score >= TARGET_POINTS) return endGame('win');
+
+    if (state.pointer >= state.questions.length) {
+      state.questions = shuffle(state.questions);
+      state.pointer = 0;
+      state.cycle++;
+      $('#cycleDisplay').textContent = String(state.cycle);
+      $('#cycleDisplaySm').textContent = String(state.cycle);
+      toast.info('Putaran ' + state.cycle + ' dimulai!', { duration: 2200, title: '🔄 Putaran Baru' });
+    }
+
+    state.currentQuestion = state.questions[state.pointer];
+    state.pointer++;
+    state.answered = false;
+    state.timerPaused = false;
+
+    const pos = ((state.pointer - 1) % state.questions.length) + 1;
+    $('#qCounterSmall').textContent = 'SOAL ' + pos + ' / ' + state.questionsPerSet;
+
+    const curLevel = Math.round(state.player.score / state.pointsPerQ) + 1;
+    $('#progressLabel').textContent = 'Level ' + Math.min(curLevel, state.questionsPerSet) + ' • ' + fmtPts(state.pointsPerQ) + ' poin';
+
+    $('#questionText').textContent = state.currentQuestion.q;
+    for (let i = 0; i < 4; i++) {
+      $('#answerText' + i).textContent = state.currentQuestion.a[i];
+    }
+    answerBtns.forEach((btn) => {
+      btn.classList.remove('correct', 'wrong', 'dimmed');
+      btn.disabled = false;
+    });
+
+    $('#feedbackText').innerHTML = '<i data-lucide="info" class="w-3 h-3 inline mr-1"></i> Pilih jawaban sebelum waktu habis';
+    $('#feedbackStrip').style.borderColor = 'rgba(99,102,241,.25)';
+    $('#feedbackStrip').style.background = 'rgba(0,0,0,.4)';
+    icons();
+
+    startTimer();
+  }
+
+  /* =========================================================
+     TIMER
+     ========================================================= */
+  function startTimer() {
+    stopTimer();
+    state.timeLeft = state.timerDuration;
+    renderTimer();
+    state.timerId = setInterval(() => {
+      if (state.timerPaused) return;
+      state.timeLeft--;
+      renderTimer();
+      if (state.timeLeft <= 0) {
+        stopTimer();
+        onTimeUp();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (state.timerId) clearInterval(state.timerId);
+    state.timerId = null;
+  }
+
+  function renderTimer() {
+    const pct = Math.max(0, state.timeLeft / state.timerDuration);
+    timerRing.style.strokeDasharray = String(RING_CIRC);
+    timerRing.style.strokeDashoffset = String(RING_CIRC * (1 - pct));
+    let color = '#fbbf24';
+    if (pct <= 0.25) color = '#ef4444';
+    else if (pct <= 0.5) color = '#f97316';
+    timerRing.setAttribute('stroke', color);
+    timerNumber.textContent = String(state.timeLeft);
+    timerNumber.parentElement.parentElement.classList.toggle('timer-danger', pct <= 0.25);
+  }
+
+  function onTimeUp() {
+    if (state.answered) return;
+    state.answered = true;
+    revealAnswer(-1);
+
+    const lostLife = loseLife();
+    $('#feedbackText').innerHTML = '<i data-lucide="clock" class="w-3 h-3 inline mr-1"></i> ⏰ Waktu habis! -1 nyawa';
+    $('#feedbackStrip').style.borderColor = 'rgba(239,68,68,.5)';
+    $('#feedbackStrip').style.background = 'rgba(239,68,68,.1)';
+    icons();
+
+    if (lostLife) {
+      // game over handled inside loseLife
+      return;
+    }
+
+    toast.warning('Waktu habis! -1 nyawa', { duration: 2000 });
+    setTimeout(() => advanceQuestion(), 1800);
+  }
+
+  /* =========================================================
+     ANSWER
+     ========================================================= */
+  answerBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!state.gameActive || state.answered || state.timerPaused) return;
+      handleAnswer(Number(btn.dataset.index));
+    });
+  });
+
+  function handleAnswer(selectedIndex) {
+    state.answered = true;
+    stopTimer();
+
+    const correctIndex = state.currentQuestion.c;
+    const isCorrect = selectedIndex === correctIndex;
+
+    if (isCorrect) {
+      revealAnswer(correctIndex);
+      answerBtns[selectedIndex].classList.add('correct');
+      answerBtns.forEach((b, i) => {
+        if (i !== selectedIndex) b.classList.add('dimmed');
+        b.disabled = true;
+      });
+
+      state.player.score += state.pointsPerQ;
+      state.player.correct++;
+      $('#playerScore').textContent = fmtFull(state.player.score);
+
+      const newLevel = Math.round(state.player.score / state.pointsPerQ);
+      updateLadderUI(newLevel);
+      updateRankUI();
+
+      $('#feedbackText').innerHTML = '<i data-lucide="check-circle-2" class="w-3 h-3 inline mr-1"></i> ✅ Benar! +' + fmtFull(state.pointsPerQ) + ' poin';
+      $('#feedbackStrip').style.borderColor = 'rgba(16,185,129,.6)';
+      $('#feedbackStrip').style.background = 'rgba(16,185,129,.12)';
+      icons();
+
+      fireConfetti(35);
+      toast.success('+' + fmtFull(state.pointsPerQ) + ' poin!', { title: '✅ Benar', duration: 1500 });
+
+      if (state.player.score >= TARGET_POINTS) {
+        setTimeout(() => endGame('win'), 1400);
+        return;
+      }
+    } else {
+      revealAnswer(correctIndex);
+      answerBtns[selectedIndex].classList.add('wrong');
+      answerBtns.forEach((b) => (b.disabled = true));
+
+      state.player.wrong++;
+      const lostLife = loseLife();
+
+      $('#feedbackText').innerHTML = '<i data-lucide="x-circle" class="w-3 h-3 inline mr-1"></i> ❌ Salah! Jawaban benar: ' + state.currentQuestion.a[correctIndex] + ' • -1 nyawa';
+      $('#feedbackStrip').style.borderColor = 'rgba(239,68,68,.5)';
+      $('#feedbackStrip').style.background = 'rgba(239,68,68,.1)';
+      icons();
+
+      if (lostLife) return;
+      toast.error('Jawaban salah! -1 nyawa', { duration: 1800 });
+    }
+
+    setTimeout(() => advanceQuestion(), 1800);
+  }
+
+  function revealAnswer(correctIdx) {
+    if (correctIdx >= 0) {
+      answerBtns[correctIdx].classList.add('correct');
+    }
+    answerBtns.forEach((b) => (b.disabled = true));
+  }
+
+  /* =========================================================
+     LOSE LIFE
+     ========================================================= */
+  function loseLife() {
+    const lostIndex = state.player.lives - 1;
+    state.player.lives = Math.max(0, state.player.lives - 1);
+    updateHeartsUI(lostIndex);
+
+    if (state.player.lives <= 0) {
+      state.gameActive = false;
+      stopTimer();
+      setTimeout(() => endGame('lose'), 900);
+      return true;
+    }
+    return false;
+  }
+
+  /* =========================================================
+     ADVANCE
+     ========================================================= */
+  function advanceQuestion() {
+    if (!state.gameActive) return;
+    if (state.player.score >= TARGET_POINTS) return endGame('win');
+    nextQuestion();
+  }
+
+  /* =========================================================
+     END GAME
+     ========================================================= */
+  function endGame(result) {
+    state.gameActive = false;
+    stopTimer();
+
+    const prevHiscore = getHiscore();
+
+    if (result === 'win') {
+      // WIN
+      $('#winnerName').textContent = state.player.name;
+      $('#winnerScore').textContent = fmtFull(state.player.score);
+      $('#winnerCorrect').textContent = state.player.correct;
+      $('#winnerWrong').textContent = state.player.wrong;
+      $('#winnerCycle').textContent = state.cycle;
+
+      const ticker = $('#winnerTicker');
+      let html = '';
+      for (let i = 0; i < 6; i++) {
+        html += `<span>🏆 ${state.player.name.toUpperCase()} JUTAWAN</span><span class="ticker-sep">★</span>`;
+      }
+      ticker.innerHTML = html;
+      ticker.style.animation = 'none';
+      void ticker.offsetWidth;
+      ticker.style.animation = '';
+
+      winnerOverlay.classList.remove('hidden');
+      icons();
+
+      fireConfetti(160);
+      setTimeout(() => fireConfetti(120), 400);
+      setTimeout(() => fireConfetti(100), 900);
+
+      // Save hiscore
+      if (state.player.score > prevHiscore.score) {
+        setHiscore(state.player.score, state.player.name);
+      }
+
+      toast.success(state.player.name + ' mencapai 1 JUTA poin!', {
+        title: '🏆 JUTAWAN BARU!',
+        duration: 6000
+      });
+    } else {
+      // LOSE
+      $('#gameOverScore').textContent = fmtFull(state.player.score);
+      $('#gameOverCorrect').textContent = state.player.correct;
+      $('#gameOverWrong').textContent = state.player.wrong;
+      $('#gameOverCycle').textContent = state.cycle;
+
+      const isNewRecord = state.player.score > prevHiscore.score;
+      const banner = $('#newHiscoreBanner');
+      if (isNewRecord && state.player.score > 0) {
+        banner.classList.remove('hidden');
+        $('#prevHiscore').textContent = fmtFull(prevHiscore.score);
+        setHiscore(state.player.score, state.player.name);
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      gameOverOverlay.classList.remove('hidden');
+      icons();
+
+      toast.error('Nyawa habis! Coba lagi ya.', { title: '💔 Game Over', duration: 4000 });
+    }
+  }
+
+  /* =========================================================
+     LIFELINES
+     ========================================================= */
+  document.querySelectorAll('.lifeline[data-lifeline]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!state.gameActive || state.answered) return;
+      const type = btn.dataset.lifeline;
+      if (!state.player.lifelines[type]) return;
+
+      state.player.lifelines[type] = false;
+      renderLifelines();
+
+      if (type === 'teacher') pauseForTeacher();
+      else if (type === 'audience') showAudiencePoll();
+    });
+  });
+
+  function pauseForTeacher() {
+    state.timerPaused = true;
+    askTeacherModal.classList.remove('hidden');
+    icons();
+    toast.info('Timer dijeda. Diskusikan dengan guru.', { duration: 2500 });
+  }
+
+  $('#closeAskTeacher').addEventListener('click', () => {
+    askTeacherModal.classList.add('hidden');
+    state.timerPaused = false;
+  });
+
+  function showAudiencePoll() {
+    state.timerPaused = true;
+    const correctIdx = state.currentQuestion.c;
+    const correctPct = 38 + Math.floor(Math.random() * 18);
+    const remaining = 100 - correctPct;
+    const dist = [0, 0, 0, 0];
+    dist[correctIdx] = correctPct;
+    const others = [0, 1, 2, 3].filter((i) => i !== correctIdx);
+    let left = remaining;
+    const weights = others.map(() => Math.random() + 0.2);
+    const wSum = weights.reduce((a, b) => a + b, 0);
+    others.forEach((i, k) => {
+      if (k === others.length - 1) dist[i] = left;
+      else {
+        const v = Math.round((weights[k] / wSum) * remaining);
+        dist[i] = v;
+        left -= v;
+      }
+    });
+
+    const pollResults = $('#pollResults');
+    pollResults.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    for (let i = 0; i < 4; i++) {
+      const row = document.createElement('div');
+      row.innerHTML = `
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="w-6 h-6 rounded bg-gradient-to-br from-indigo-500 to-indigo-700 text-white text-[10px] font-black flex items-center justify-center">${letters[i]}</span>
+          <span class="text-xs text-slate-300 flex-1 truncate">${state.currentQuestion.a[i]}</span>
+          <span class="text-xs font-black text-amber-300 tabular-nums">${dist[i]}%</span>
+        </div>
+        <div class="poll-bar-track"><div class="poll-bar-fill" data-width="${dist[i]}%"></div></div>
+      `;
+      pollResults.appendChild(row);
+    }
+
+    askAudienceModal.classList.remove('hidden');
+    icons();
+    setTimeout(() => {
+      pollResults.querySelectorAll('.poll-bar-fill').forEach((bar) => {
+        bar.style.width = bar.dataset.width;
+      });
+    }, 100);
+    toast.info('Hasil polling audiens ditampilkan.', { duration: 2500 });
+  }
+
+  $('#closeAskAudience').addEventListener('click', () => {
+    askAudienceModal.classList.add('hidden');
+    state.timerPaused = false;
+  });
+
+  /* =========================================================
+     TEACHER MODE
+     ========================================================= */
+  $('#teacherModeBtn').addEventListener('click', () => {
+    teacherPanel.classList.toggle('hidden');
+    icons();
+  });
+  $('#closeTeacher').addEventListener('click', () => teacherPanel.classList.add('hidden'));
+
+  $('#tmPlayer').addEventListener('input', (e) => {
+    const v = e.target.value.trim().slice(0, 20) || 'Petualang';
+    state.player.name = v;
+    $('#playerNameDisplay').textContent = v;
+  });
+
+  $$('.tm-timer-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      $$('.tm-timer-btn').forEach(unhl);
+      hl(btn, 'gold');
+      state.timerDuration = Number(btn.dataset.value);
+      toast.info('Timer diubah ke ' + state.timerDuration + 's', { duration: 1500 });
+    });
+  });
+  const dtb = document.querySelector('.tm-timer-btn.active');
+  if (dtb) hl(dtb, 'gold');
+
+  $$('.tm-lives-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      $$('.tm-lives-btn').forEach(unhl);
+      hl(btn, 'gold');
+      state.player.lives = Number(btn.dataset.value);
+      updateHeartsUI();
+      toast.info('Nyawa diubah ke ' + state.player.lives, { duration: 1500 });
+    });
+  });
+  const dlb = document.querySelector('.tm-lives-btn.active');
+  if (dlb) hl(dlb, 'gold');
+
+  $('#tmSkip').addEventListener('click', () => {
+    if (!state.gameActive || state.answered) return;
+    state.answered = true;
+    stopTimer();
+    revealAnswer(state.currentQuestion.c);
+    toast.info('Soal di-skip oleh guru.', { duration: 1500 });
+    setTimeout(() => advanceQuestion(), 1000);
+  });
+
+  $('#tmForceEnd').addEventListener('click', () => {
+    if (!state.gameActive) return;
+    if (!confirm('Akhiri pertandingan sekarang?')) return;
+    endGame('lose');
+  });
+
+  $('#tmGivePoint').addEventListener('click', () => {
+    if (!state.gameActive) return;
+    state.player.score = Math.min(TARGET_POINTS, state.player.score + state.pointsPerQ);
+    state.player.correct++;
+    $('#playerScore').textContent = fmtFull(state.player.score);
+    updateLadderUI(Math.round(state.player.score / state.pointsPerQ));
+    updateRankUI();
+    toast.success('+' + fmtFull(state.pointsPerQ) + ' poin', { duration: 1500 });
+    if (state.player.score >= TARGET_POINTS) setTimeout(() => endGame('win'), 800);
+  });
+
+  $('#tmAddLife').addEventListener('click', () => {
+    if (!state.gameActive) return;
+    state.player.lives = Math.min(5, state.player.lives + 1);
+    updateHeartsUI();
+    toast.success('+1 nyawa', { duration: 1500 });
+  });
+
+  /* =========================================================
+     RESTART / REPLAY
+     ========================================================= */
+  $('#restartBtn').addEventListener('click', () => {
+    if (!confirm('Reset permainan? Semua poin akan dihapus.')) return;
+    location.reload();
+  });
+
+  $('#playAgainBtn').addEventListener('click', () => {
+    winnerOverlay.classList.add('hidden');
+    resetForReplay();
+  });
+
+  $('#gameOverRetry').addEventListener('click', () => {
+    gameOverOverlay.classList.add('hidden');
+    resetForReplay();
+  });
+
+  $('#newSetupBtn').addEventListener('click', () => location.reload());
+  $('#gameOverSetup').addEventListener('click', () => location.reload());
+
+  function resetForReplay() {
+    state.player.score = 0;
+    state.player.correct = 0;
+    state.player.wrong = 0;
+    state.player.lives = DEFAULT_LIVES;
+    state.player.lifelines = { teacher: true, audience: true };
+    state.pointer = 0;
+    state.cycle = 1;
+    state.gameActive = true;
+    state.questions = shuffle(state.questions);
+
+    $('#playerScore').textContent = '0';
+    $('#cycleDisplay').textContent = '1';
+    $('#cycleDisplaySm').textContent = '1';
+
+    updateHeartsUI();
+    renderLifelines();
+    updateRankUI();
+    buildLadder();
+
+    setTimeout(() => nextQuestion(), 400);
+  }
+
+  /* =========================================================
+     CONFETTI
+     ========================================================= */
+  function fireConfetti(count) {
+    const colors = ['#fbbf24', '#f59e0b', '#fde68a', '#0ea5e9', '#6366f1', '#ec4899', '#10b981'];
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.animationDuration = (2.4 + Math.random() * 2) + 's';
+      el.style.animationDelay = (Math.random() * 0.4) + 's';
+      el.style.width = (6 + Math.random() * 10) + 'px';
+      el.style.height = (8 + Math.random() * 12) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }
+  }
+
+  /* =========================================================
+     UTIL
+     ========================================================= */
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* =========================================================
+     BOOT
+     ========================================================= */
+  function boot() { icons(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+
+})();
+</script>
+</body>
+</html>

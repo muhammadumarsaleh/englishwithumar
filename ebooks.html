@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Katalog E-Book &amp; Bahan Ajar — EduSpark Studio Pro</title>
+<meta name="description" content="Katalog lengkap e-book, flashcard, worksheet, dan modul ajar Bahasa Inggris untuk anak TK & SD. Beli langsung via Lynk.id." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        },
+        colors: {
+          spark: {
+            50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',
+            500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81'
+          },
+          ink: { 900:'#0b1020', 800:'#151b33', 700:'#26304f', 600:'#3b4664' }
+        },
+        boxShadow: {
+          glass: '0 10px 40px -14px rgba(15,23,42,.28)',
+          soft: '0 18px 45px -18px rgba(79,70,229,.55)',
+          card: '0 24px 60px -30px rgba(15,23,42,.35)'
+        },
+        keyframes: {
+          drift: {
+            '0%':   { transform: 'translate3d(0,0,0) scale(1)' },
+            '100%': { transform: 'translate3d(30px,-40px,0) scale(1.12)' }
+          },
+          floaty: {
+            '0%,100%': { transform: 'translateY(0)' },
+            '50%':     { transform: 'translateY(-14px)' }
+          }
+        },
+        animation: {
+          drift: 'drift 16s ease-in-out infinite alternate',
+          floaty: 'floaty 6s ease-in-out infinite'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<style>
+  :root { color-scheme: light; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background:#f7f8fc; color:#151b33; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4,.font-display { font-family: 'Outfit', system-ui, sans-serif; }
+
+  .mesh-bg {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(1100px 560px at 50% -12%, #eef2ff 0%, rgba(238,242,255,0) 62%),
+      radial-gradient(900px 520px at 100% 0%, #ecfeff 0%, rgba(236,254,255,0) 60%),
+      #f7f8fc;
+  }
+  .blob { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: .5; }
+
+  .glass {
+    background: rgba(255,255,255,.62);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    border: 1px solid rgba(255,255,255,.75);
+  }
+  .glass-strong {
+    background: rgba(255,255,255,.82);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.85);
+  }
+  .gradient-text {
+    background: linear-gradient(100deg,#4f46e5 0%,#0ea5e9 45%,#8b5cf6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .nav-link {
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.55rem .9rem; border-radius:.75rem;
+    font-size:.875rem; font-weight:600; color:#3b4664;
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
+  }
+  .nav-link:hover { background: rgba(255,255,255,.9); color:#4f46e5; transform: translateY(-1px); }
+  .nav-link.is-active { background: linear-gradient(135deg,#4f46e5,#0ea5e9); color:#fff; box-shadow: 0 12px 28px -14px rgba(79,70,229,.9); }
+  .mobile-link { display:block; padding:.7rem .9rem; border-radius:.75rem; font-weight:600; font-size:.9rem; color:#26304f; }
+  .mobile-link:hover { background: rgba(99,102,241,.1); color:#4f46e5; }
+
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .75s cubic-bezier(.2,.8,.2,1), transform .75s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* Category chips */
+  .chip {
+    display:inline-flex; align-items:center; gap:.45rem;
+    padding:.5rem 1rem; border-radius:999px;
+    font-size:.78rem; font-weight:700; letter-spacing:.01em;
+    background: rgba(255,255,255,.75); color:#3b4664;
+    border: 1px solid rgba(226,232,240,.9);
+    backdrop-filter: blur(10px);
+    transition: all .25s cubic-bezier(.2,.8,.2,1);
+    cursor:pointer;
+  }
+  .chip:hover { transform: translateY(-2px); color:#4f46e5; border-color:#c7d2fe; }
+  .chip.is-active {
+    background: linear-gradient(135deg,#4f46e5,#0ea5e9);
+    color:#fff; border-color: transparent;
+    box-shadow: 0 14px 30px -14px rgba(79,70,229,.85);
+  }
+
+  /* Product card */
+  .product { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s cubic-bezier(.2,.8,.2,1); }
+  .product:hover { transform: translateY(-6px); box-shadow: 0 32px 70px -34px rgba(15,23,42,.45); }
+  .product:hover .product-img { transform: scale(1.08); }
+
+  .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(#a5b4fc,#67e8f9); border-radius: 999px; border: 3px solid #f7f8fc; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(#6366f1,#06b6d4); }
+</style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- ====== AMBIENT BG ====== -->
+<div class="mesh-bg" aria-hidden="true">
+  <span class="blob bg-indigo-400 animate-drift" style="width:520px;height:520px;top:-180px;left:-140px;"></span>
+  <span class="blob bg-cyan-300 animate-drift" style="width:460px;height:460px;top:14%;right:-160px;animation-delay:-4s;"></span>
+  <span class="blob bg-fuchsia-300 animate-drift" style="width:420px;height:420px;bottom:-160px;left:22%;animation-delay:-8s;"></span>
+</div>
+
+<!-- ====== NAVBAR ====== -->
+<header class="sticky top-0 z-50">
+  <div class="mx-auto max-w-7xl px-4 pt-4 sm:px-6">
+    <nav class="glass flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 shadow-glass sm:px-4">
+      <a href="index.html" class="group flex items-center gap-3">
+        <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-spark-600 via-spark-500 to-cyan-500 text-white shadow-soft transition-transform duration-300 group-hover:scale-105">
+          <i data-lucide="sparkles" class="h-5 w-5"></i>
+        </span>
+        <span class="leading-tight">
+          <span class="block font-display text-[15px] font-extrabold tracking-tight text-ink-900">EduSpark Studio <span class="text-spark-600">Pro</span></span>
+          <span class="hidden text-[10px] font-semibold uppercase tracking-[.2em] text-slate-400 sm:block">EdTech &amp; Digital Learning</span>
+        </span>
+      </a>
+
+      <ul class="hidden items-center gap-1 lg:flex">
+        <li><a class="nav-link" href="index.html">Beranda</a></li>
+        <li><a class="nav-link is-active" href="ebooks.html">E-Book</a></li>
+        <li><a class="nav-link" href="games.html">Game Edukasi</a></li>
+        <li><a class="nav-link" href="index.html#portofolio">Portofolio</a></li>
+        <li><a class="nav-link" href="admin.html">Admin</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <button type="button" data-cart-open class="relative grid h-10 w-10 place-items-center rounded-xl text-slate-600 ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:bg-white hover:text-spark-600" aria-label="Keranjang">
+          <i data-lucide="shopping-bag" class="h-[18px] w-[18px]"></i>
+          <span data-cart-count class="absolute -right-1 -top-1 h-5 min-w-[20px] place-items-center rounded-full bg-spark-600 px-1 text-[10px] font-bold text-white" style="display:none;">0</span>
+        </button>
+        <a href="games.html" class="hidden rounded-xl bg-gradient-to-r from-spark-600 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-0.5 sm:inline-flex">Coba Game</a>
+        <button data-nav-toggle class="grid h-10 w-10 place-items-center rounded-xl text-slate-600 ring-1 ring-slate-200/80 transition hover:bg-white lg:hidden" aria-label="Buka menu">
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </nav>
+
+    <div data-nav-menu class="glass mt-2 hidden rounded-2xl p-2 shadow-glass lg:hidden">
+      <a class="mobile-link" href="index.html">Beranda</a>
+      <a class="mobile-link" href="ebooks.html">Katalog E-Book</a>
+      <a class="mobile-link" href="games.html">Game Edukasi</a>
+      <a class="mobile-link" href="index.html#portofolio">Portofolio</a>
+      <a class="mobile-link" href="admin.html">Dashboard Admin</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ====== PAGE HEADER ====== -->
+  <section class="mx-auto max-w-7xl px-4 pb-10 pt-12 sm:px-6 lg:pt-16">
+    <div class="reveal grid items-end gap-8 lg:grid-cols-[1.3fr_.7fr]">
+      <div>
+        <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400">
+          <a href="index.html" class="transition hover:text-spark-600">Beranda</a>
+          <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i>
+          <span class="text-spark-600">Katalog E-Book</span>
+        </nav>
+
+        <span class="mt-5 inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-spark-700 ring-1 ring-spark-100 backdrop-blur">
+          <i data-lucide="library" class="h-3.5 w-3.5"></i> Bahan Ajar Digital
+        </span>
+
+        <h1 class="mt-4 font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-ink-900 sm:text-5xl">
+          Katalog <span class="gradient-text">E-Book &amp; Worksheet</span><br class="hidden sm:block" />
+          Bahasa Inggris Anak.
+        </h1>
+        <p class="mt-5 max-w-2xl text-[15px] leading-relaxed text-slate-600">
+          Semua produk berupa file digital (PDF/PNG) yang bisa langsung diunduh setelah pembelian.
+          Pembayaran &amp; pengiriman otomatis melalui <strong class="font-semibold text-ink-800">Lynk.id</strong> — aman, cepat, tanpa perlu daftar akun di sini.
+        </p>
+      </div>
+
+      <!-- Search + Stats -->
+      <div class="reveal glass-strong rounded-3xl p-5 shadow-card">
+        <label class="relative block">
+          <i data-lucide="search" class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Cari e-book, worksheet, flashcard…"
+            class="w-full rounded-2xl border border-slate-200 bg-white/90 py-3 pl-11 pr-4 text-sm font-medium text-ink-800 placeholder:text-slate-400 outline-none transition focus:border-spark-400 focus:ring-4 focus:ring-spark-100" />
+        </label>
+        <div class="mt-4 grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p class="font-display text-xl font-extrabold text-ink-900" id="statTotal">48</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Produk</p>
+          </div>
+          <div>
+            <p class="font-display text-xl font-extrabold text-ink-900">9.2k</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Unduhan</p>
+          </div>
+          <div>
+            <p class="font-display text-xl font-extrabold text-ink-900">4.9★</p>
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Rating</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FILTER & CATALOG ====== -->
+  <section id="katalog" class="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+    <!-- Chips -->
+    <div class="reveal glass sticky top-24 z-30 flex flex-wrap items-center gap-2 rounded-2xl p-3 shadow-glass">
+      <span class="ml-1 mr-2 hidden text-[11px] font-bold uppercase tracking-wider text-slate-400 sm:inline">Filter:</span>
+      <button type="button" class="chip is-active" data-filter="all"><i data-lucide="layers" class="h-3.5 w-3.5"></i> Semua</button>
+      <button type="button" class="chip" data-filter="flashcard"><i data-lucide="layers-3" class="h-3.5 w-3.5"></i> Flashcard</button>
+      <button type="button" class="chip" data-filter="worksheet"><i data-lucide="pencil-line" class="h-3.5 w-3.5"></i> Worksheet</button>
+      <button type="button" class="chip" data-filter="storybook"><i data-lucide="book-heart" class="h-3.5 w-3.5"></i> Buku Cerita</button>
+      <button type="button" class="chip" data-filter="module"><i data-lucide="graduation-cap" class="h-3.5 w-3.5"></i> Modul Guru</button>
+      <span class="ml-auto hidden text-xs font-semibold text-slate-500 sm:inline"><span id="resultCount">12</span> produk ditemukan</span>
+    </div>
+
+    <!-- Grid -->
+    <div id="productGrid" class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="mt-10 hidden rounded-3xl border border-dashed border-slate-300 bg-white/60 py-20 text-center backdrop-blur">
+      <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">
+        <i data-lucide="search-x" class="h-6 w-6"></i>
+      </span>
+      <h3 class="mt-4 font-display text-lg font-bold text-ink-900">Tidak ada produk ditemukan</h3>
+      <p class="mt-1 text-sm text-slate-500">Coba kata kunci lain atau ubah filter kategori.</p>
+    </div>
+  </section>
+
+  <!-- ====== BUNDLE PACKAGES ====== -->
+  <section class="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <span class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-spark-700 ring-1 ring-spark-100">
+        <i data-lucide="package" class="h-3.5 w-3.5"></i> Paket Hemat
+      </span>
+      <h2 class="mt-5 font-display text-3xl font-extrabold tracking-tight text-ink-900 sm:text-4xl">Bundling lebih untung</h2>
+      <p class="mt-4 text-[15px] leading-relaxed text-slate-600">Gabungkan beberapa produk sekaligus dan hemat hingga 45%.</p>
+    </div>
+
+    <div class="mt-12 grid gap-6 lg:grid-cols-3">
+      <!-- Bundle 1 -->
+      <div class="reveal relative overflow-hidden rounded-3xl bg-white/75 p-7 shadow-glass ring-1 ring-white/70 backdrop-blur-xl transition hover:-translate-y-2 hover:shadow-card">
+        <div class="flex items-center justify-between">
+          <span class="grid h-11 w-11 place-items-center rounded-2xl bg-indigo-100 text-indigo-600"><i data-lucide="book-open" class="h-5 w-5"></i></span>
+          <span class="rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700">Hemat 25%</span>
+        </div>
+        <h3 class="mt-5 font-display text-xl font-bold text-ink-900">Starter Pack TK</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-slate-600">Flashcard alfabet + worksheet tracing + 1 buku cerita bergambar.</p>
+        <ul class="mt-4 space-y-2 text-[13px] text-slate-600">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-emerald-500"></i> 3 produk lengkap</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-emerald-500"></i> Akses selamanya</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-emerald-500"></i> Free update 1 tahun</li>
+        </ul>
+        <div class="mt-6 flex items-end justify-between">
+          <div>
+            <p class="text-xs text-slate-400 line-through">Rp 149.000</p>
+            <p class="font-display text-2xl font-extrabold text-ink-900">Rp 112.000</p>
+          </div>
+          <a href="https://lynk.id/edusparkstudio" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-spark-600 to-cyan-500 px-4 py-2.5 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+            Beli <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Bundle 2 (featured) -->
+      <div class="reveal relative overflow-hidden rounded-3xl bg-gradient-to-br from-spark-700 via-spark-600 to-cyan-600 p-7 shadow-card ring-1 ring-white/30">
+        <div class="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-3xl"></div>
+        <span class="absolute right-5 top-5 rounded-full bg-white/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">Paling Populer</span>
+
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 text-white ring-1 ring-white/30"><i data-lucide="crown" class="h-5 w-5"></i></span>
+        <h3 class="mt-5 font-display text-xl font-bold text-white">Master Bundle SD</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-white/80">Semua worksheet, modul guru, dan buku cerita untuk kelas 1–3 SD.</p>
+        <ul class="mt-4 space-y-2 text-[13px] text-white/90">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-cyan-200"></i> 12 produk lengkap</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-cyan-200"></i> Bonus game interaktif</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-cyan-200"></i> Grup konsultasi guru</li>
+        </ul>
+        <div class="mt-6 flex items-end justify-between">
+          <div>
+            <p class="text-xs text-white/50 line-through">Rp 599.000</p>
+            <p class="font-display text-2xl font-extrabold text-white">Rp 329.000</p>
+          </div>
+          <a href="https://lynk.id/edusparkstudio" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-sm font-bold text-spark-700 shadow-lg transition hover:-translate-y-0.5">
+            Beli <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Bundle 3 -->
+      <div class="reveal relative overflow-hidden rounded-3xl bg-white/75 p-7 shadow-glass ring-1 ring-white/70 backdrop-blur-xl transition hover:-translate-y-2 hover:shadow-card">
+        <div class="flex items-center justify-between">
+          <span class="grid h-11 w-11 place-items-center rounded-2xl bg-amber-100 text-amber-600"><i data-lucide="sparkles" class="h-5 w-5"></i></span>
+          <span class="rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700">Hemat 45%</span>
+        </div>
+        <h3 class="mt-5 font-display text-xl font-bold text-ink-900">Ultimate All-Access</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-slate-600">Akses seluruh katalog e-book + semua game edukasi seumur hidup.</p>
+        <ul class="mt-4 space-y-2 text-[13px] text-slate-600">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-emerald-500"></i> 48+ produk</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-emerald-500"></i> Semua game terbuka</li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="h-4 w-4 text-emerald-500"></i> Prioritas support</li>
+        </ul>
+        <div class="mt-6 flex items-end justify-between">
+          <div>
+            <p class="text-xs text-slate-400 line-through">Rp 1.299.000</p>
+            <p class="font-display text-2xl font-extrabold text-ink-900">Rp 699.000</p>
+          </div>
+          <a href="https://lynk.id/edusparkstudio" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-spark-600 to-cyan-500 px-4 py-2.5 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+            Beli <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FAQ ====== -->
+  <section class="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <span class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-spark-700 ring-1 ring-spark-100">
+        <i data-lucide="help-circle" class="h-3.5 w-3.5"></i> FAQ
+      </span>
+      <h2 class="mt-5 font-display text-3xl font-extrabold tracking-tight text-ink-900 sm:text-4xl">Pertanyaan yang sering diajukan</h2>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-3xl space-y-3">
+      <details class="group glass rounded-2xl p-5 shadow-glass transition open:shadow-card">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4">
+          <span class="font-display text-[15px] font-bold text-ink-900">Bagaimana cara menerima file setelah pembelian?</span>
+          <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-slate-600">
+          Setelah pembayaran dikonfirmasi via Lynk.id, Anda akan menerima email berisi tautan unduhan otomatis. Tautan berlaku selamanya dan bisa diunduh berulang.
+        </p>
+      </details>
+
+      <details class="group glass rounded-2xl p-5 shadow-glass transition open:shadow-card">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4">
+          <span class="font-display text-[15px] font-bold text-ink-900">Apakah file bisa dicetak berulang kali?</span>
+          <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-slate-600">
+          Ya. Lisensi berlaku untuk penggunaan pribadi / satu kelas. Untuk penggunaan sekolah dengan banyak kelas, silakan hubungi kami untuk lisensi institusi.
+        </p>
+      </details>
+
+      <details class="group glass rounded-2xl p-5 shadow-glass transition open:shadow-card">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4">
+          <span class="font-display text-[15px] font-bold text-ink-900">Metode pembayaran apa saja yang tersedia?</span>
+          <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-slate-600">
+          Semua metode yang tersedia di Lynk.id: transfer bank, e-wallet (GoPay, OVO, Dana, ShopeePay), QRIS, dan kartu kredit/debit.
+        </p>
+      </details>
+
+      <details class="group glass rounded-2xl p-5 shadow-glass transition open:shadow-card">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-4">
+          <span class="font-display text-[15px] font-bold text-ink-900">Apakah ada garansi jika file rusak?</span>
+          <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180"></i>
+        </summary>
+        <p class="mt-3 text-[14px] leading-relaxed text-slate-600">
+          Tentu. Jika file tidak bisa dibuka atau rusak, hubungi kami di hello@edusparkstudio.id dan kami akan kirim ulang dalam 1x24 jam.
+        </p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<!-- ====== FOOTER ====== -->
+<footer class="border-t border-white/60 bg-white/50 backdrop-blur-xl">
+  <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6">
+    <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div>
+        <a href="index.html" class="flex items-center gap-3">
+          <span class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-spark-600 to-cyan-500 text-white shadow-soft">
+            <i data-lucide="sparkles" class="h-5 w-5"></i>
+          </span>
+          <span class="font-display text-base font-extrabold tracking-tight text-ink-900">EduSpark Studio <span class="text-spark-600">Pro</span></span>
+        </a>
+        <p class="mt-4 max-w-xs text-[13px] leading-relaxed text-slate-500">
+          Platform portofolio, bahan ajar digital, dan game edukasi Bahasa Inggris untuk anak TK &amp; SD.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-display text-sm font-bold uppercase tracking-wider text-ink-900">Navigasi</h4>
+        <ul class="mt-4 space-y-2.5 text-[13px] text-slate-500">
+          <li><a href="index.html" class="transition hover:text-spark-600">Beranda</a></li>
+          <li><a href="ebooks.html" class="transition hover:text-spark-600">Katalog E-Book</a></li>
+          <li><a href="games.html" class="transition hover:text-spark-600">Game Edukasi</a></li>
+          <li><a href="admin.html" class="transition hover:text-spark-600">Portal Admin</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-display text-sm font-bold uppercase tracking-wider text-ink-900">Bantuan</h4>
+        <ul class="mt-4 space-y-2.5 text-[13px] text-slate-500">
+          <li><a href="#katalog" class="transition hover:text-spark-600">Cara Beli</a></li>
+          <li><a href="#" class="transition hover:text-spark-600">Syarat &amp; Ketentuan</a></li>
+          <li><a href="#" class="transition hover:text-spark-600">Kebijakan Privasi</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-display text-sm font-bold uppercase tracking-wider text-ink-900">Kontak</h4>
+        <ul class="mt-4 space-y-2.5 text-[13px] text-slate-500">
+          <li class="flex items-center gap-2"><i data-lucide="mail" class="h-3.5 w-3.5"></i> hello@edusparkstudio.id</li>
+          <li class="flex items-center gap-2"><i data-lucide="phone" class="h-3.5 w-3.5"></i> +62 812-3456-7890</li>
+          <li class="flex items-center gap-2"><i data-lucide="map-pin" class="h-3.5 w-3.5"></i> Yogyakarta, Indonesia</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-200/70 pt-6 sm:flex-row">
+      <p class="text-[12px] text-slate-400">© <span data-year>2025</span> EduSpark Studio Pro. Seluruh hak cipta dilindungi.</p>
+      <p class="text-[12px] text-slate-400">Dibuat dengan ❤️ untuk pendidikan anak Indonesia.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== CART DRAWER ====== -->
+<div id="cartOverlay" class="fixed inset-0 z-[80] hidden bg-ink-900/40 backdrop-blur-sm"></div>
+<aside id="cartDrawer" class="fixed right-0 top-0 z-[90] hidden h-full w-full max-w-md translate-x-full flex-col bg-white/95 shadow-2xl backdrop-blur-xl transition-transform duration-300">
+  <div class="flex items-center justify-between border-b border-slate-200/70 px-5 py-4">
+    <div class="flex items-center gap-2">
+      <i data-lucide="shopping-bag" class="h-5 w-5 text-spark-600"></i>
+      <h3 class="font-display text-lg font-extrabold text-ink-900">Keranjang</h3>
+    </div>
+    <button type="button" data-cart-close class="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100">
+      <i data-lucide="x" class="h-4 w-4"></i>
+    </button>
+  </div>
+
+  <div id="cartItems" class="flex-1 overflow-y-auto px-5 py-4"></div>
+
+  <div class="border-t border-slate-200/70 px-5 py-4">
+    <div class="flex items-center justify-between text-sm">
+      <span class="font-semibold text-slate-500">Total</span>
+      <span id="cartTotal" class="font-display text-xl font-extrabold text-ink-900">Rp 0</span>
+    </div>
+    <a href="https://lynk.id/edusparkstudio" target="_blank" rel="noopener"
+       class="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-spark-600 to-cyan-500 px-5 py-3.5 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+      <i data-lucide="external-link" class="h-4 w-4"></i> Checkout di Lynk.id
+    </a>
+    <p class="mt-3 text-center text-[11px] text-slate-400">Pembayaran diproses aman oleh Lynk.id</p>
+  </div>
+</aside>
+
+<script src="js/app.js"></script>
+<script>
+  /* =========================================================
+     KATALOG PRODUK — data client-side (tanpa backend)
+     ========================================================= */
+  const PRODUCTS = [
+    {
+      id: 'fc-001',
+      title: 'Flashcard Alfabet A–Z Bergambar',
+      category: 'flashcard',
+      price: 39000,
+      oldPrice: 59000,
+      rating: 4.9,
+      sold: 1240,
+      badge: 'Best Seller',
+      desc: '26 kartu alfabet dengan foto HD & pelafalan phonics untuk usia 3–6 tahun.',
+      img: 'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=800&q=80',
+      fallback: 'flashcard-alphabet',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'fc-002',
+      title: 'Flashcard Hewan & Habitat',
+      category: 'flashcard',
+      price: 45000,
+      oldPrice: null,
+      rating: 4.8,
+      sold: 890,
+      badge: null,
+      desc: '40 kartu hewan dari berbagai habitat, lengkap dengan nama Inggris & Indonesia.',
+      img: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?auto=format&fit=crop&w=800&q=80',
+      fallback: 'flashcard-animals',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'fc-003',
+      title: 'Flashcard Buah & Sayur',
+      category: 'flashcard',
+      price: 39000,
+      oldPrice: 49000,
+      rating: 4.7,
+      sold: 620,
+      badge: null,
+      desc: 'Kartu warna-warni buah & sayur tropis untuk melatih kosakata harian.',
+      img: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=800&q=80',
+      fallback: 'flashcard-fruits',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'ws-001',
+      title: 'Worksheet Tracing Letters',
+      category: 'worksheet',
+      price: 49000,
+      oldPrice: 79000,
+      rating: 4.9,
+      sold: 1580,
+      badge: 'Populer',
+      desc: '80 halaman latihan menulis huruf besar & kecil, garis putus-putus untuk pemula.',
+      img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80',
+      fallback: 'worksheet-tracing',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'ws-002',
+      title: 'Worksheet Numbers 1–20',
+      category: 'worksheet',
+      price: 45000,
+      oldPrice: null,
+      rating: 4.8,
+      sold: 940,
+      badge: null,
+      desc: 'Belajar angka & berhitung dalam Bahasa Inggris dengan aktivitas mewarnai.',
+      img: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80',
+      fallback: 'worksheet-numbers',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'ws-003',
+      title: 'Worksheet Color & Shape',
+      category: 'worksheet',
+      price: 42000,
+      oldPrice: 55000,
+      rating: 4.7,
+      sold: 710,
+      badge: null,
+      desc: 'Mengenal warna dan bentuk geometri dalam Bahasa Inggris lewat permainan.',
+      img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80',
+      fallback: 'worksheet-color',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'ws-004',
+      title: 'Worksheet Daily Routine',
+      category: 'worksheet',
+      price: 55000,
+      oldPrice: null,
+      rating: 4.9,
+      sold: 480,
+      badge: 'Baru',
+      desc: 'Kosakata aktivitas harian (bangun, mandi, makan) dengan gambar realistis.',
+      img: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+      fallback: 'worksheet-routine',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'sb-001',
+      title: 'Buku Cerita: The Brave Little Cat',
+      category: 'storybook',
+      price: 65000,
+      oldPrice: 89000,
+      rating: 5.0,
+      sold: 320,
+      badge: 'Favorit',
+      desc: 'Cerita bilingual 24 halaman dengan ilustrasi foto-realistis dan moral cerita.',
+      img: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80',
+      fallback: 'story-cat',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'sb-002',
+      title: 'Buku Cerita: My First Day at School',
+      category: 'storybook',
+      price: 59000,
+      oldPrice: null,
+      rating: 4.8,
+      sold: 410,
+      badge: null,
+      desc: 'Kisah hari pertama sekolah yang membantu anak mengatasi rasa gugup.',
+      img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80',
+      fallback: 'story-school',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'sb-003',
+      title: 'Buku Cerita: Goodnight Forest',
+      category: 'storybook',
+      price: 59000,
+      oldPrice: 69000,
+      rating: 4.9,
+      sold: 280,
+      badge: null,
+      desc: 'Cerita pengantar tidur dengan kosakata hewan hutan dalam Bahasa Inggris.',
+      img: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=80',
+      fallback: 'story-forest',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'md-001',
+      title: 'Modul Guru: Lesson Plan 12 Pekan',
+      category: 'module',
+      price: 149000,
+      oldPrice: 199000,
+      rating: 5.0,
+      sold: 210,
+      badge: 'Premium',
+      desc: 'Rencana pembelajaran 12 pekan lengkap dengan asesmen & rubrik penilaian.',
+      img: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80',
+      fallback: 'module-lesson',
+      lynk: 'https://lynk.id/edusparkstudio'
+    },
+    {
+      id: 'md-002',
+      title: 'Modul Guru: Phonics & Pronunciation',
+      category: 'module',
+      price: 129000,
+      oldPrice: null,
+      rating: 4.9,
+      sold: 180,
+      badge: null,
+      desc: 'Panduan mengajar phonics untuk guru TK & SD, termasuk audio pelafalan.',
+      img: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80',
+      fallback: 'module-phonics',
+      lynk: 'https://lynk.id/edusparkstudio'
+    }
+  ];
+
+  const CATEGORY_LABEL = {
+    flashcard: 'Flashcard',
+    worksheet: 'Worksheet',
+    storybook: 'Buku Cerita',
+    module: 'Modul Guru'
+  };
+
+  const CATEGORY_COLOR = {
+    flashcard: 'bg-indigo-100 text-indigo-700',
+    worksheet: 'bg-cyan-100 text-cyan-700',
+    storybook: 'bg-rose-100 text-rose-700',
+    module: 'bg-amber-100 text-amber-700'
+  };
+
+  const grid = document.getElementById('productGrid');
+  const emptyState = document.getElementById('emptyState');
+  const resultCount = document.getElementById('resultCount');
+  const statTotal = document.getElementById('statTotal');
+  const searchInput = document.getElementById('searchInput');
+  const chips = document.querySelectorAll('.chip[data-filter]');
+
+  let activeFilter = 'all';
+  let activeQuery = '';
+
+  const formatRupiah = (n) => 'Rp ' + n.toLocaleString('id-ID');
+
+  const escapeHtml = (s) =>
+    String(s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+  function renderProducts() {
+    const q = activeQuery.trim().toLowerCase();
+
+    const filtered = PRODUCTS.filter((p) => {
+      const matchCat = activeFilter === 'all' || p.category === activeFilter;
+      const matchQ =
+        !q ||
+        p.title.toLowerCase().includes(q) ||
+        p.desc.toLowerCase().includes(q) ||
+        CATEGORY_LABEL[p.category].toLowerCase().includes(q);
+      return matchCat && matchQ;
+    });
+
+    resultCount.textContent = filtered.length;
+    if (statTotal) statTotal.textContent = PRODUCTS.length;
+
+    if (!filtered.length) {
+      grid.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+    emptyState.classList.add('hidden');
+
+    grid.innerHTML = filtered.map((p) => `
+      <article class="product reveal glass rounded-3xl overflow-hidden shadow-glass ring-1 ring-white/70 flex flex-col" data-id="${p.id}">
+        <div class="relative h-52 overflow-hidden">
+          <img
+            src="${p.img}"
+            onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.fallback}/800/600';"
+            alt="${escapeHtml(p.title)}"
+            class="product-img h-full w-full object-cover transition-transform duration-700" loading="lazy" />
+          <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-900/40 via-transparent to-transparent"></div>
+
+          <span class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${CATEGORY_COLOR[p.category]} shadow-sm">
+            ${CATEGORY_LABEL[p.category]}
+          </span>
+
+          ${p.badge ? `<span class="absolute right-3 top-3 rounded-full bg-gradient-to-r from-spark-600 to-cyan-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft">${escapeHtml(p.badge)}</span>` : ''}
+        </div>
+
+        <div class="flex flex-1 flex-col p-5">
+          <h3 class="font-display text-[15px] font-bold leading-snug text-ink-900 line-clamp-2">${escapeHtml(p.title)}</h3>
+
+          <div class="mt-2 flex items-center gap-3 text-[11px] font-semibold text-slate-500">
+            <span class="inline-flex items-center gap-1 text-amber-500">
+              <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i> ${p.rating.toFixed(1)}
+            </span>
+            <span class="text-slate-300">•</span>
+            <span>${p.sold.toLocaleString('id-ID')} terjual</span>
+          </div>
+
+          <p class="mt-3 text-[12.5px] leading-relaxed text-slate-500 line-clamp-2">${escapeHtml(p.desc)}</p>
+
+          <div class="mt-auto pt-5">
+            <div class="flex items-end justify-between gap-2">
+              <div>
+                ${p.oldPrice ? `<p class="text-[11px] font-medium text-slate-400 line-through">${formatRupiah(p.oldPrice)}</p>` : `<p class="text-[11px] font-medium text-transparent select-none">.</p>`}
+                <p class="font-display text-lg font-extrabold text-ink-900">${formatRupiah(p.price)}</p>
+              </div>
+            </div>
+
+            <div class="mt-3 flex gap-2">
+              <a href="${p.lynk}" target="_blank" rel="noopener"
+                 class="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-spark-600 to-cyan-500 px-3 py-2.5 text-[12.5px] font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+                <i data-lucide="external-link" class="h-3.5 w-3.5"></i> Beli di Lynk.id
+              </a>
+              <button type="button" data-add-to-cart="${p.id}"
+                 class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-slate-500 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-spark-600 hover:ring-spark-300"
+                 aria-label="Tambah ke keranjang" title="Tambah ke keranjang">
+                <i data-lucide="plus" class="h-4 w-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    // Refresh icons + reveal animation
+    if (window.lucide) lucide.createIcons();
+    requestAnimationFrame(() => {
+      grid.querySelectorAll('.reveal').forEach((el, i) => {
+        setTimeout(() => el.classList.add('in'), i * 30);
+      });
+    });
+  }
+
+  // Chip clicks
+  chips.forEach((chip) => {
+    chip.addEventListener('click', () => {
+      chips.forEach((c) => c.classList.remove('is-active'));
+      chip.classList.add('is-active');
+      activeFilter = chip.dataset.filter;
+      renderProducts();
+    });
+  });
+
+  // Search
+  if (searchInput) {
+    let t;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        activeQuery = e.target.value;
+        renderProducts();
+      }, 120);
+    });
+  }
+
+  // ====== KERANJANG ======
+  const cartOverlay = document.getElementById('cartOverlay');
+  const cartDrawer = document.getElementById('cartDrawer');
+  const cartItems = document.getElementById('cartItems');
+  const cartTotal = document.getElementById('cartTotal');
+
+  function openCart() {
+    cartOverlay.classList.remove('hidden');
+    cartDrawer.classList.remove('hidden');
+    requestAnimationFrame(() => cartDrawer.classList.remove('translate-x-full'));
+    renderCart();
+  }
+  function closeCart() {
+    cartDrawer.classList.add('translate-x-full');
+    setTimeout(() => {
+      cartOverlay.classList.add('hidden');
+      cartDrawer.classList.add('hidden');
+    }, 280);
+  }
+
+  document.querySelectorAll('[data-cart-open]').forEach((b) => b.addEventListener('click', openCart));
+  document.querySelectorAll('[data-cart-close]').forEach((b) => b.addEventListener('click', closeCart));
+  cartOverlay.addEventListener('click', closeCart);
+
+  function renderCart() {
+    const cart = (window.EduSpark && EduSpark.getCart) ? EduSpark.getCart() : [];
+    if (!cart.length) {
+      cartItems.innerHTML = `
+        <div class="flex h-full flex-col items-center justify-center py-20 text-center">
+          <span class="grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">
+            <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+          </span>
+          <h4 class="mt-4 font-display text-base font-bold text-ink-900">Keranjang kosong</h4>
+          <p class="mt-1 max-w-[220px] text-[13px] text-slate-500">Tambahkan produk favoritmu untuk melihatnya di sini.</p>
+        </div>`;
+      cartTotal.textContent = 'Rp 0';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    let total = 0;
+    cartItems.innerHTML = cart.map((item) => {
+      const p = PRODUCTS.find((x) => x.id === item.id) || item;
+      const subtotal = p.price * item.qty;
+      total += subtotal;
+      return `
+        <div class="mb-3 flex gap-3 rounded-2xl border border-slate-200/70 bg-white p-3">
+          <img src="${p.img}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.fallback || 'cart'}/200/200';"
+               alt="" class="h-16 w-16 shrink-0 rounded-xl object-cover" />
+          <div class="min-w-0 flex-1">
+            <p class="line-clamp-2 text-[13px] font-bold text-ink-900">${escapeHtml(p.title)}</p>
+            <p class="mt-0.5 text-[12px] font-semibold text-spark-600">${formatRupiah(p.price)}</p>
+            <div class="mt-2 flex items-center gap-2">
+              <button type="button" data-qty="dec" data-id="${p.id}" class="grid h-7 w-7 place-items-center rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">
+                <i data-lucide="minus" class="h-3 w-3"></i>
+              </button>
+              <span class="min-w-[24px] text-center text-[13px] font-bold text-ink-900">${item.qty}</span>
+              <button type="button" data-qty="inc" data-id="${p.id}" class="grid h-7 w-7 place-items-center rounded-lg bg-slate-100 text-slate-600 transition hover:bg-slate-200">
+                <i data-lucide="plus" class="h-3 w-3"></i>
+              </button>
+              <button type="button" data-qty="del" data-id="${p.id}" class="ml-auto grid h-7 w-7 place-items-center rounded-lg text-slate-400 transition hover:bg-rose-50 hover:text-rose-500">
+                <i data-lucide="trash-2" class="h-3.5 w-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    cartTotal.textContent = formatRupiah(total);
+    if (window.lucide) lucide.createIcons();
+  }
+
+  // Qty & delete (event delegation)
+  cartDrawer.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-qty]');
+    if (!btn) return;
+    const { qty, id } = btn.dataset;
+    if (window.EduSpark) {
+      if (qty === 'inc') EduSpark.updateQty(id, +1);
+      if (qty === 'dec') EduSpark.updateQty(id, -1);
+      if (qty === 'del') EduSpark.removeFromCart(id);
+      renderCart();
+    }
+  });
+
+  // Add to cart (event delegation di grid)
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-add-to-cart]');
+    if (!btn) return;
+    const id = btn.dataset.addToCart;
+    const product = PRODUCTS.find((p) => p.id === id);
+    if (!product) return;
+    if (window.EduSpark && EduSpark.addToCart) {
+      EduSpark.addToCart(product, 1);
+      btn.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i>';
+      btn.classList.add('text-emerald-600', 'ring-emerald-300');
+      if (window.lucide) lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = '<i data-lucide="plus" class="h-4 w-4"></i>';
+        btn.classList.remove('text-emerald-600', 'ring-emerald-300');
+        if (window.lucide) lucide.createIcons();
+      }, 1100);
+    }
+  });
+
+  // Init
+  renderProducts();
+</script>
+</body>
+</html>

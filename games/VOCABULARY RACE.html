@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🏎 Translation Race - Asynchronous Edition</title>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        :root {
+            --p1-color: #ec4899;
+            --p1-light: #fbcfe8;
+            --p2-color: #3b82f6;
+            --p2-light: #bfdbfe;
+            --accent: #fbbf24;
+            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation; /* Multi-touch Optimization */
+        }
+
+        body {
+            background: var(--bg-grad);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 1050px;
+            height: 680px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 2px rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Titles & Buttons */
+        .title {
+            font-size: 3rem;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 8px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-teacher {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 8px 15px -3px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Setup Form */
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 20px;
+        }
+
+        .form-card {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 16px;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .form-card label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #94a3b8;
+        }
+
+        .form-card input, .form-card select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .vehicle-selector {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .vehicle-opt {
+            font-size: 1.6rem;
+            padding: 6px 10px;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #0f172a;
+            transition: 0.2s;
+        }
+
+        .vehicle-opt.selected {
+            border-color: var(--accent);
+            background: #334155;
+            transform: scale(1.1);
+        }
+
+        /* Race Track */
+        .race-track-area {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 16px 24px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .lane {
+            position: relative;
+            height: 48px;
+            background: #1e293b;
+            border-radius: 24px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            border: 2px dashed #475569;
+        }
+
+        .car {
+            position: absolute;
+            font-size: 2rem;
+            transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            left: 2%;
+            z-index: 2;
+            transform: scaleX(-1); /* Arah mobil menghadap kanan */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+        }
+
+        .finish-line {
+            position: absolute;
+            right: 16px;
+            font-size: 1.4rem;
+        }
+
+        .player-tag {
+            position: absolute;
+            left: 12px;
+            top: -10px;
+            font-size: 0.75rem;
+            background: #0f172a;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            border: 1px solid #475569;
+        }
+
+        /* Split Arena */
+        .split-arena {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+        }
+
+        .player-card {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border: 3px solid transparent;
+            position: relative;
+        }
+
+        .player-card.p1-card { border-color: rgba(236, 72, 153, 0.4); }
+        .player-card.p2-card { border-color: rgba(59, 130, 246, 0.4); }
+
+        .p-header-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .p-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .p1-card .p-name { color: var(--p1-color); }
+        .p2-card .p-name { color: var(--p2-color); }
+
+        .p-progress {
+            font-size: 0.85rem;
+            background: #334155;
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .target-word {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin: 12px 0;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .opt-btn {
+            background: #334155;
+            color: white;
+            border: 2px solid #475569;
+            padding: 16px 8px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            touch-action: manipulation;
+        }
+
+        .opt-btn:active {
+            transform: scale(0.95);
+        }
+
+        .opt-btn.correct {
+            background: var(--correct) !important;
+            border-color: #16a34a !important;
+        }
+
+        .opt-btn.wrong {
+            background: var(--wrong) !important;
+            border-color: #dc2626 !important;
+        }
+
+        /* Countdown Overlay */
+        .countdown-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 7rem;
+            font-weight: 900;
+            color: var(--accent);
+            z-index: 100;
+        }
+
+        /* Teacher Mode */
+        .teacher-box {
+            width: 100%;
+            max-width: 650px;
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 20px;
+            border: 2px solid #334155;
+        }
+
+        .teacher-box textarea {
+            width: 100%;
+            height: 150px;
+            background: #1e293b;
+            color: #fff;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 1rem;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .review-list {
+            width: 100%;
+            max-width: 500px;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 16px 0;
+            border: 1px solid #334155;
+        }
+
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- Countdown Overlay -->
+    <div id="countdown" class="countdown-overlay" style="display: none;">3</div>
+
+    <!-- 1. Home Screen -->
+    <div id="screen-home" class="screen active">
+        <h1 class="title">🏎️ TRANSLATION RACE</h1>
+        <p class="subtitle">Adipacu kecepatan & ketepatan terjemahan!</p>
+        <div class="btn-group">
+            <button class="btn" onclick="setupGame('2P')">👥 2 PLAYERS (VS)</button>
+            <button class="btn" onclick="setupGame('VS_CPU')">🤖 VS COMPUTER</button>
+            <button class="btn btn-teacher" onclick="openTeacherMode()">⚙️ TEACHER MODE (SOAL)</button>
+        </div>
+    </div>
+
+    <!-- 2. Setup Screen -->
+    <div id="screen-setup" class="screen">
+        <h2 style="margin-bottom: 20px; color: var(--accent);">PILIH PEMAIN & MATERI</h2>
+        
+        <div class="setup-grid">
+            <div class="form-card">
+                <label style="color: var(--p1-color);">PLAYER 1</label>
+                <input type="text" id="p1-name" value="Ayra">
+                <div class="vehicle-selector" id="p1-vehicles">
+                    <span class="vehicle-opt selected" onclick="selectVehicle(1, '🏎️')">🏎️</span>
+                    <span class="vehicle-opt" onclick="selectVehicle(1, '🚗')">🚗</span>
+                    <span class="vehicle-opt" onclick="selectVehicle(1, '🚓')">🚓</span>
+                </div>
+            </div>
+
+            <div class="form-card" id="p2-setup-group">
+                <label style="color: var(--p2-color);">PLAYER 2</label>
+                <input type="text" id="p2-name" value="Naura">
+                <div class="vehicle-selector" id="p2-vehicles">
+                    <span class="vehicle-opt selected" onclick="selectVehicle(2, '🚙')">🚙</span>
+                    <span class="vehicle-opt" onclick="selectVehicle(2, '🚕')">🚕</span>
+                    <span class="vehicle-opt" onclick="selectVehicle(2, '🚚')">🚚</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-card" style="width: 100%; max-width: 700px; margin-bottom: 20px;">
+            <label>TOPIK VOCABULARY</label>
+            <select id="topic-select">
+                <option value="animals">🐶 Animals (Hewan)</option>
+                <option value="food">🍎 Food (Makanan)</option>
+                <option value="places">🏠 Places (Tempat)</option>
+                <option value="custom" id="custom-topic-opt" style="display:none;">⭐ Custom Mr. Umar's Lesson</option>
+                <option value="random">🎲 Random (Campuran)</option>
+            </select>
+        </div>
+
+        <button class="btn" style="width: 100%; max-width: 350px;" onclick="startRace()">MULAI BALAPAN 🏁</button>
+    </div>
+
+    <!-- 3. Teacher Mode Screen -->
+    <div id="screen-teacher" class="screen">
+        <h2 style="color: #10b981; margin-bottom: 12px;">⚙ TEACHER MODE - BULK INPUT SOAL</h2>
+        <div class="teacher-box">
+            <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 8px;">
+                Masukkan kata dalam format: <code>Bahasa Indonesia, English</code> (Satu kata per baris).
+            </p>
+            <textarea id="bulk-input" placeholder="contoh:&#10;kelinci, rabbit&#10;sapi, cow&#10;ikan, fish&#10;kucing, cat"></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-teacher" style="flex: 1;" onclick="saveCustomVocab()">SIMPAN MATERI</button>
+                <button class="btn" style="background: #475569; flex: 1;" onclick="showScreen('screen-home')">BATAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Gameplay Screen -->
+    <div id="screen-game" class="screen" style="padding: 0;">
+        <div class="race-track-area">
+            <div class="lane">
+                <span class="player-tag" id="tag-p1" style="color: var(--p1-color);">AYRA</span>
+                <div class="car" id="car-p1">🏎️</div>
+                <div class="finish-line">🏁</div>
+            </div>
+            <div class="lane">
+                <span class="player-tag" id="tag-p2" style="color: var(--p2-color);">NAURA</span>
+                <div class="car" id="car-p2">🚙</div>
+                <div class="finish-line">🏁</div>
+            </div>
+        </div>
+
+        <!-- ASYNCHRONOUS SPLIT SCREEN -->
+        <div class="split-arena">
+            <!-- Left Side: Player 1 -->
+            <div class="player-card p1-card">
+                <div class="p-header-bar">
+                    <span class="p-name" id="p1-card-name">AYRA</span>
+                    <span class="p-progress" id="p1-progress">0 / 10</span>
+                </div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">TERJEMAHKAN KATA INI:</div>
+                <div class="target-word" id="p1-target-word">-</div>
+                <div class="options-grid" id="p1-options"></div>
+            </div>
+
+            <!-- Right Side: Player 2 / Bot -->
+            <div class="player-card p2-card">
+                <div class="p-header-bar">
+                    <span class="p-name" id="p2-card-name">NAURA</span>
+                    <span class="p-progress" id="p2-progress">0 / 10</span>
+                </div>
+                <div style="font-size: 0.75rem; color: #94a3b8;">TERJEMAHKAN KATA INI:</div>
+                <div class="target-word" id="p2-target-word">-</div>
+                <div class="options-grid" id="p2-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Result Screen -->
+    <div id="screen-result" class="screen">
+        <h1 class="title" id="winner-title">🏆 AYRA WINS!</h1>
+        <p class="subtitle" id="winner-subtitle">Pembalap tercepat sampai di garis finish!</p>
+        <div class="review-list" id="review-list"></div>
+        <div class="btn-group">
+            <button class="btn" onclick="showScreen('screen-home')">🏠 MENU UTAMA</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Audio Synth
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+        } else if (type === 'wrong') {
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(174.61, audioCtx.currentTime + 0.08); 
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+        } else if (type === 'beep') {
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+    }
+
+    // Datasets
+    let vocabData = {
+        animals: [
+            { id_word: "Kelinci", en: "rabbit" }, { id_word: "Sapi", en: "cow" },
+            { id_word: "Ikan", en: "fish" }, { id_word: "Kucing", en: "cat" },
+            { id_word: "Anjing", en: "dog" }, { id_word: "Burung", en: "bird" },
+            { id_word: "Gajah", en: "elephant" }, { id_word: "Harimau", en: "tiger" },
+            { id_word: "Singa", en: "lion" }, { id_word: "Kuda", en: "horse" }
+        ],
+        food: [
+            { id_word: "Apel", en: "apple" }, { id_word: "Nasi", en: "rice" },
+            { id_word: "Roti", en: "bread" }, { id_word: "Susu", en: "milk" },
+            { id_word: "Telur", en: "egg" }, { id_word: "Keju", en: "cheese" },
+            { id_word: "Kue", en: "cake" }, { id_word: "Pisang", en: "banana" }
+        ],
+        places: [
+            { id_word: "Rumah", en: "house" }, { id_word: "Sekolah", en: "school" },
+            { id_word: "Pasar", en: "market" }, { id_word: "Rumah Sakit", en: "hospital" },
+            { id_word: "Taman", en: "park" }, { id_word: "Perpustakaan", en: "library" },
+            { id_word: "Bank", en: "bank" }, { id_word: "Bandara", en: "airport" }
+        ],
+        custom: []
+    };
+
+    let gameMode = '2P';
+    let TOTAL_SOAL = 10;
+    let isGameActive = false;
+    let cpuTimeout = null;
+
+    // Setiap Pemain Punya Status & Index Soal Terpisah (Asynchronous)
+    let players = [
+        { id: 1, name: "Ayra", vehicle: "🏎️", pos: 0, qIndex: 0, questions: [], isLocked: false },
+        { id: 2, name: "Naura", vehicle: "🚙", pos: 0, qIndex: 0, questions: [], isLocked: false }
+    ];
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function setupGame(mode) {
+        gameMode = mode;
+        const p2Group = document.getElementById('p2-setup-group');
+        if (mode === 'VS_CPU') {
+            p2Group.style.display = 'none';
+            players[1].name = "Bot CPU 🤖";
+            players[1].vehicle = "🤖";
+        } else {
+            p2Group.style.display = 'block';
+            players[1].name = "Naura";
+            players[1].vehicle = "🚙";
+        }
+        showScreen('screen-setup');
+    }
+
+    function selectVehicle(pNum, symbol) {
+        players[pNum - 1].vehicle = symbol;
+        const container = document.getElementById(`p${pNum}-vehicles`);
+        container.querySelectorAll('.vehicle-opt').forEach(opt => {
+            opt.classList.toggle('selected', opt.innerText === symbol);
+        });
+    }
+
+    function openTeacherMode() {
+        showScreen('screen-teacher');
+    }
+
+    function saveCustomVocab() {
+        const text = document.getElementById('bulk-input').value.trim();
+        if (!text) return alert("Silakan masukkan setidaknya satu kata!");
+
+        const lines = text.split('\n');
+        const parsed = [];
+        lines.forEach(line => {
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+                parsed.push({
+                    id_word: parts[0].trim(),
+                    en: parts[1].trim().toLowerCase()
+                });
+            }
+        });
+
+        if (parsed.length < 4) return alert("Minimal masukkan 4 kata!");
+
+        vocabData.custom = parsed;
+        const customOpt = document.getElementById('custom-topic-opt');
+        customOpt.style.display = 'block';
+        customOpt.selected = true;
+        alert(`Berhasil menyimpan ${parsed.length} kata!`);
+        showScreen('screen-home');
+    }
+
+    function prepareQuestions(topic) {
+        let pool = [];
+        if (topic === 'random') {
+            pool = [...vocabData.animals, ...vocabData.food, ...vocabData.places, ...vocabData.custom];
+        } else {
+            pool = [...vocabData[topic]];
+        }
+        pool.sort(() => Math.random() - 0.5);
+        return pool.slice(0, TOTAL_SOAL);
+    }
+
+    function startRace() {
+        players[0].name = document.getElementById('p1-name').value || "Player 1";
+        if (gameMode === '2P') {
+            players[1].name = document.getElementById('p2-name').value || "Player 2";
+        }
+
+        const topic = document.getElementById('topic-select').value;
+
+        // Siapkan Set Soal Terpisah yang diacak untuk masing-masing Player
+        players[0].questions = prepareQuestions(topic);
+        players[1].questions = prepareQuestions(topic);
+
+        players[0].pos = 0; players[0].qIndex = 0; players[0].isLocked = false;
+        players[1].pos = 0; players[1].qIndex = 0; players[1].isLocked = false;
+
+        document.getElementById('tag-p1').innerText = players[0].name;
+        document.getElementById('tag-p2').innerText = players[1].name;
+        document.getElementById('p1-card-name').innerText = players[0].name;
+        document.getElementById('p2-card-name').innerText = players[1].name;
+
+        document.getElementById('car-p1').innerText = players[0].vehicle;
+        document.getElementById('car-p2').innerText = players[1].vehicle;
+        updateCarPositions();
+
+        showScreen('screen-game');
+        runCountdown(() => {
+            isGameActive = true;
+            loadPlayerQuestion(1);
+            loadPlayerQuestion(2);
+            if (gameMode === 'VS_CPU') triggerCpuMove();
+        });
+    }
+
+    function runCountdown(callback) {
+        const overlay = document.getElementById('countdown');
+        overlay.style.display = 'flex';
+        let count = 3;
+        overlay.innerText = count;
+        playSound('beep');
+
+        const interval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                overlay.innerText = count;
+                playSound('beep');
+            } else if (count === 0) {
+                overlay.innerText = "GO! 🏁";
+                playSound('beep');
+            } else {
+                clearInterval(interval);
+                overlay.style.display = 'none';
+                callback();
+            }
+        }, 800);
+    }
+
+    function updateCarPositions() {
+        const p1Left = 2 + (players[0].pos / TOTAL_SOAL) * 83;
+        const p2Left = 2 + (players[1].pos / TOTAL_SOAL) * 83;
+        document.getElementById('car-p1').style.left = `${p1Left}%`;
+        document.getElementById('car-p2').style.left = `${p2Left}%`;
+    }
+
+    // Memuat soal secara mandiri per Player
+    function loadPlayerQuestion(pNum) {
+        if (!isGameActive) return;
+
+        const p = players[pNum - 1];
+        document.getElementById(`p${pNum}-progress`).innerText = `${p.qIndex} / ${TOTAL_SOAL}`;
+
+        // Jika player sudah menyelesaikan semua soal
+        if (p.qIndex >= p.questions.length) {
+            document.getElementById(`p${pNum}-target-word`).innerText = "FINISH! 🏁";
+            document.getElementById(`p${pNum}-options`).innerHTML = '<p style="grid-column: span 2; text-align:center;">Menunggu lawan...</p>';
+            checkRaceEnd();
+            return;
+        }
+
+        p.isLocked = false;
+        const q = p.questions[p.qIndex];
+        document.getElementById(`p${pNum}-target-word`).innerText = q.id_word;
+
+        // Buat opsi pilihan ganda
+        let allEn = [...vocabData.animals, ...vocabData.food, ...vocabData.places, ...vocabData.custom].map(i => i.en);
+        allEn = Array.from(new Set(allEn)).filter(w => w !== q.en);
+        allEn.sort(() => Math.random() - 0.5);
+
+        const options = [q.en, allEn[0], allEn[1], allEn[2]].sort(() => Math.random() - 0.5);
+
+        const container = document.getElementById(`p${pNum}-options`);
+        container.innerHTML = '';
+
+        options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt.toUpperCase();
+
+            // Event Multi-touch Support via pointerdown
+            btn.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                handleAnswer(pNum, opt, q.en, btn);
+            });
+
+            container.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(pNum, selectedOpt, correctEn, clickedBtn) {
+        if (!isGameActive) return;
+        const p = players[pNum - 1];
+        if (p.isLocked) return;
+
+        p.isLocked = true;
+        const isCorrect = selectedOpt.toLowerCase() === correctEn.toLowerCase();
+
+        if (isCorrect) {
+            playSound('correct');
+            clickedBtn.classList.add('correct');
+            p.pos += 1;
+            updateCarPositions();
+        } else {
+            playSound('wrong');
+            clickedBtn.classList.add('wrong');
+        }
+
+        p.qIndex += 1;
+
+        // Pindah ke soal berikutnya milik player ini secara INSTAN
+        setTimeout(() => {
+            if (p.pos >= TOTAL_SOAL) {
+                endGame(p); // Pemenang langsung finish duluan!
+            } else {
+                loadPlayerQuestion(pNum);
+            }
+        }, 300);
+    }
+
+    // AI Bot independen
+    function triggerCpuMove() {
+        if (!isGameActive || gameMode !== 'VS_CPU') return;
+        
+        const delay = 1200 + Math.random() * 1500;
+        cpuTimeout = setTimeout(() => {
+            if (!isGameActive) return;
+            const p2 = players[1];
+            if (p2.qIndex < p2.questions.length && !p2.isLocked) {
+                const q = p2.questions[p2.qIndex];
+                const isCorrect = Math.random() > 0.3; // Bot accuracy
+                const chosen = isCorrect ? q.en : "wrong_ans";
+                
+                p2.isLocked = true;
+                if (isCorrect) {
+                    p2.pos += 1;
+                    updateCarPositions();
+                }
+                p2.qIndex += 1;
+
+                if (p2.pos >= TOTAL_SOAL) {
+                    endGame(p2);
+                } else {
+                    loadPlayerQuestion(2);
+                    triggerCpuMove();
+                }
+            }
+        }, delay);
+    }
+
+    function checkRaceEnd() {
+        if (players[0].qIndex >= TOTAL_SOAL && players[1].qIndex >= TOTAL_SOAL) {
+            let winner = players[0].pos > players[1].pos ? players[0] : (players[1].pos > players[0].pos ? players[1] : null);
+            endGame(winner);
+        }
+    }
+
+    function endGame(winner) {
+        if (!isGameActive) return;
+        isGameActive = false;
+        clearTimeout(cpuTimeout);
+
+        if (winner) {
+            document.getElementById('winner-title').innerText = `🏆 ${winner.name.toUpperCase()} WINS!`;
+            document.getElementById('winner-subtitle').innerText = `Pembalap tercepat dan paling akurat sampai di garis finish!`;
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        } else {
+            document.getElementById('winner-title').innerText = `🤝 BALAPAN SERI!`;
+            document.getElementById('winner-subtitle').innerText = `Kedua pemain memiliki skor yang sama!`;
+        }
+
+        showScreen('screen-result');
+    }
+</script>
+</body>
+</html>

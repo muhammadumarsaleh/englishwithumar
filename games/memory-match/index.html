@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Memory Match — Game Edukasi EduSpark</title>
+<meta name="description" content="Game mencocokkan kartu hewan & kosakata Bahasa Inggris untuk anak TK & SD." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif']
+        },
+        colors: {
+          spark: {
+            50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',
+            500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81'
+          },
+          ink: { 900:'#0b1020', 800:'#151b33', 700:'#26304f', 600:'#3b4664' }
+        },
+        boxShadow: {
+          glass: '0 10px 40px -14px rgba(15,23,42,.28)',
+          soft: '0 18px 45px -18px rgba(79,70,229,.55)',
+          card: '0 24px 60px -30px rgba(15,23,42,.35)'
+        },
+        keyframes: {
+          drift: {
+            '0%':   { transform: 'translate3d(0,0,0) scale(1)' },
+            '100%': { transform: 'translate3d(30px,-40px,0) scale(1.12)' }
+          },
+          pop: {
+            '0%':   { transform: 'scale(.85)', opacity: '0' },
+            '60%':  { transform: 'scale(1.04)' },
+            '100%': { transform: 'scale(1)', opacity: '1' }
+          },
+          shake: {
+            '0%,100%': { transform: 'translateX(0)' },
+            '25%':     { transform: 'translateX(-5px)' },
+            '75%':     { transform: 'translateX(5px)' }
+          }
+        },
+        animation: {
+          drift: 'drift 16s ease-in-out infinite alternate',
+          pop: 'pop .45s cubic-bezier(.2,.8,.2,1) both',
+          shake: 'shake .4s ease-in-out'
+        }
+      }
+    }
+  }
+</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<style>
+  :root { color-scheme: light; }
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background:#f7f8fc; color:#151b33; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4,.font-display { font-family: 'Outfit', system-ui, sans-serif; }
+
+  .mesh-bg {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(1100px 560px at 50% -12%, #eef2ff 0%, rgba(238,242,255,0) 62%),
+      radial-gradient(900px 520px at 100% 0%, #ecfeff 0%, rgba(236,254,255,0) 60%),
+      #f7f8fc;
+  }
+  .blob { position: absolute; border-radius: 9999px; filter: blur(90px); opacity: .5; }
+
+  .glass {
+    background: rgba(255,255,255,.62);
+    backdrop-filter: blur(18px) saturate(170%);
+    -webkit-backdrop-filter: blur(18px) saturate(170%);
+    border: 1px solid rgba(255,255,255,.75);
+  }
+  .glass-strong {
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.9);
+  }
+  .gradient-text {
+    background: linear-gradient(100deg,#4f46e5 0%,#0ea5e9 45%,#8b5cf6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ====== CARD FLIP 3D ====== */
+  .card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    perspective: 1000px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-inner {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.4,.2,.2,1);
+    border-radius: 1.25rem;
+  }
+  .card.flipped .card-inner,
+  .card.matched .card-inner {
+    transform: rotateY(180deg);
+  }
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* FRONT (face down) */
+  .card-front {
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,255,255,.28), transparent 55%),
+      linear-gradient(135deg, #4f46e5 0%, #6366f1 45%, #0ea5e9 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.28),
+      0 14px 30px -18px rgba(79,70,229,.85);
+  }
+  .card-front::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: .9rem;
+    border: 1px dashed rgba(255,255,255,.35);
+    pointer-events: none;
+  }
+  .card:hover:not(.flipped):not(.matched) .card-front {
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.45),
+      0 22px 44px -20px rgba(79,70,229,.95);
+  }
+
+  /* BACK (face up) */
+  .card-back {
+    transform: rotateY(180deg);
+    background: rgba(255,255,255,.95);
+    box-shadow:
+      inset 0 0 0 1px rgba(226,232,240,.9),
+      0 20px 40px -22px rgba(15,23,42,.35);
+  }
+  .card.animal .card-back { background: linear-gradient(155deg, #fff7ed, #ffedd5); }
+  .card.word .card-back   { background: linear-gradient(155deg, #eef2ff, #e0e7ff); }
+
+  /* MATCHED state */
+  .card.matched .card-inner {
+    animation: matchedPulse .55s ease;
+  }
+  .card.matched .card-back {
+    box-shadow:
+      inset 0 0 0 2.5px rgba(16,185,129,.9),
+      0 20px 44px -20px rgba(16,185,129,.6);
+  }
+  @keyframes matchedPulse {
+    0%   { transform: rotateY(180deg) scale(1); }
+    40%  { transform: rotateY(180deg) scale(1.06); }
+    100% { transform: rotateY(180deg) scale(1); }
+  }
+
+  /* wrong pick shake */
+  .card.wrong .card-inner { animation: shake .4s ease-in-out; }
+
+  /* Grid gaps smaller on mobile */
+  .board { display: grid; gap: .75rem; }
+  @media (min-width: 640px) { .board { gap: 1rem; } }
+
+  /* Hide emoji rendering inconsistencies */
+  .animal-emoji {
+    font-size: clamp(2rem, 8vw, 3.4rem);
+    line-height: 1;
+    filter: drop-shadow(0 6px 8px rgba(0,0,0,.12));
+    user-select: none;
+  }
+  .animal-word {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    color: #1e293b;
+    font-size: clamp(0.95rem, 3.4vw, 1.4rem);
+    letter-spacing: -.02em;
+    text-align: center;
+    padding: 0 .4rem;
+    line-height: 1.15;
+    word-break: break-word;
+  }
+
+  /* Confetti */
+  .confetti {
+    position: fixed;
+    top: -12px;
+    width: 10px; height: 14px;
+    opacity: .95;
+    pointer-events: none;
+    z-index: 200;
+    animation: fall linear forwards;
+    border-radius: 2px;
+  }
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(#a5b4fc,#67e8f9); border-radius: 999px; border: 3px solid #f7f8fc; }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(#6366f1,#06b6d4); }
+</style>
+</head>
+<body class="font-sans antialiased">
+
+<!-- ====== AMBIENT BG ====== -->
+<div class="mesh-bg" aria-hidden="true">
+  <span class="blob bg-indigo-400 animate-drift" style="width:520px;height:520px;top:-180px;left:-140px;"></span>
+  <span class="blob bg-cyan-300 animate-drift" style="width:460px;height:460px;top:14%;right:-160px;animation-delay:-4s;"></span>
+  <span class="blob bg-amber-200 animate-drift" style="width:380px;height:380px;bottom:-160px;left:30%;animation-delay:-8s;"></span>
+</div>
+
+<!-- ====== NAVBAR ====== -->
+<header class="sticky top-0 z-50">
+  <div class="mx-auto max-w-6xl px-4 pt-4 sm:px-6">
+    <nav class="glass flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 shadow-glass sm:px-4">
+      <a href="../../games.html" class="group flex items-center gap-3">
+        <span class="grid h-10 w-10 place-items-center rounded-xl bg-white text-spark-600 shadow-soft ring-1 ring-slate-200 transition-transform duration-300 group-hover:-translate-x-0.5">
+          <i data-lucide="arrow-left" class="h-5 w-5"></i>
+        </span>
+        <span class="leading-tight">
+          <span class="block font-display text-[15px] font-extrabold tracking-tight text-ink-900">Memory Match</span>
+          <span class="hidden text-[10px] font-semibold uppercase tracking-[.2em] text-slate-400 sm:block">EduSpark Arcade</span>
+        </span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <div class="hidden items-center gap-3 rounded-xl bg-white/70 px-3 py-1.5 ring-1 ring-slate-200/80 backdrop-blur sm:flex">
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="clock" class="h-3.5 w-3.5 text-spark-600"></i>
+            <span class="font-display text-sm font-extrabold text-ink-900" id="timerDisplay">00:00</span>
+          </div>
+          <span class="h-4 w-px bg-slate-200"></span>
+          <div class="flex items-center gap-1.5">
+            <i data-lucide="mouse-pointer-click" class="h-3.5 w-3.5 text-cyan-600"></i>
+            <span class="font-display text-sm font-extrabold text-ink-900" id="movesDisplay">0</span>
+          </div>
+        </div>
+
+        <button type="button" id="restartBtn" class="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-spark-600 to-cyan-500 px-3.5 py-2.5 text-xs font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+          <i data-lucide="rotate-ccw" class="h-3.5 w-3.5"></i>
+          <span class="hidden sm:inline">Ulangi</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6">
+
+  <!-- ====== SOFT SESSION BANNER ====== -->
+  <div id="sessionBanner" class="mb-6 hidden animate-pop rounded-2xl border border-amber-200 bg-amber-50/80 p-4 shadow-glass backdrop-blur">
+    <div class="flex items-start gap-3">
+      <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-600">
+        <i data-lucide="shield-alert" class="h-4 w-4"></i>
+      </span>
+      <div class="flex-1">
+        <p class="text-[13px] font-bold text-amber-900">Kamu membuka game ini langsung tanpa unlock</p>
+        <p class="mt-0.5 text-[12.5px] leading-relaxed text-amber-800/85">
+          Game tetap bisa dimainkan, tapi untuk pengalaman lengkap silakan buka lewat
+          <a href="../../games.html" class="font-bold underline decoration-dotted underline-offset-2">Game Hub</a>
+          dan masukkan sandi akses.
+        </p>
+      </div>
+      <button type="button" id="dismissBanner" class="grid h-7 w-7 place-items-center rounded-lg text-amber-500 transition hover:bg-amber-100">
+        <i data-lucide="x" class="h-3.5 w-3.5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ====== GAME HEADER ====== -->
+  <section class="mb-6">
+    <div class="glass rounded-3xl p-5 shadow-glass sm:p-6">
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+        <div>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-spark-700 ring-1 ring-spark-100">
+            <i data-lucide="brain" class="h-3 w-3"></i> Memory Game
+          </span>
+          <h1 class="mt-2 font-display text-2xl font-extrabold tracking-tight text-ink-900 sm:text-3xl">
+            Cocokkan <span class="gradient-text">Hewan &amp; Kata Inggris</span>
+          </h1>
+          <p class="mt-1.5 max-w-lg text-[13px] leading-relaxed text-slate-500">
+            Balik dua kartu untuk mencari pasangan. Kartu hewan harus berpasangan dengan kartu kata Inggris-nya.
+          </p>
+        </div>
+
+        <!-- Level selector -->
+        <div class="flex flex-col gap-2 sm:items-end">
+          <span class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Pilih Level</span>
+          <div class="inline-flex rounded-2xl bg-white/70 p-1 ring-1 ring-slate-200/80 backdrop-blur">
+            <button type="button" data-level="1" class="level-btn rounded-xl px-4 py-2 text-xs font-bold text-slate-600 transition">Level 1</button>
+            <button type="button" data-level="2" class="level-btn rounded-xl px-4 py-2 text-xs font-bold text-slate-600 transition">Level 2</button>
+            <button type="button" data-level="3" class="level-btn rounded-xl px-4 py-2 text-xs font-bold text-slate-600 transition">Level 3</button>
+          </div>
+          <p class="text-[11px] font-semibold text-slate-400" id="levelInfo">6 pasang • 12 kartu</p>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-200/70 pt-5 sm:grid-cols-4">
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="clock" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Waktu</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-ink-900" id="statTime">00:00</p>
+        </div>
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="mouse-pointer-click" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Langkah</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-ink-900" id="statMoves">0</p>
+        </div>
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="check-circle-2" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Cocok</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-emerald-600"><span id="statMatched">0</span><span class="text-sm text-slate-400">/<span id="statTotal">6</span></span></p>
+        </div>
+        <div class="rounded-2xl bg-white/60 px-4 py-3 ring-1 ring-slate-100">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <i data-lucide="trophy" class="h-3.5 w-3.5"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">High Score</span>
+          </div>
+          <p class="mt-1 font-display text-xl font-extrabold text-amber-600" id="statHighScore">0</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== GAME BOARD ====== -->
+  <section class="glass-strong rounded-3xl p-4 shadow-card sm:p-6">
+    <div id="board" class="board grid-cols-3 sm:grid-cols-4 lg:grid-cols-4">
+      <!-- Cards injected here -->
+    </div>
+  </section>
+
+  <!-- ====== HOW TO PLAY ====== -->
+  <section class="mt-8 grid gap-4 sm:grid-cols-3">
+    <div class="glass rounded-2xl p-4 shadow-glass">
+      <div class="flex items-center gap-2 text-spark-600">
+        <i data-lucide="hand-pointer" class="h-4 w-4"></i>
+        <h3 class="font-display text-[13px] font-bold">1. Klik Kartu</h3>
+      </div>
+      <p class="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">Klik kartu untuk membalik dan melihat isinya.</p>
+    </div>
+    <div class="glass rounded-2xl p-4 shadow-glass">
+      <div class="flex items-center gap-2 text-cyan-600">
+        <i data-lucide="link-2" class="h-4 w-4"></i>
+        <h3 class="font-display text-[13px] font-bold">2. Cari Pasangan</h3>
+      </div>
+      <p class="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">Pasangkan kartu hewan dengan nama Inggris yang tepat.</p>
+    </div>
+    <div class="glass rounded-2xl p-4 shadow-glass">
+      <div class="flex items-center gap-2 text-emerald-600">
+        <i data-lucide="sparkles" class="h-4 w-4"></i>
+        <h3 class="font-display text-[13px] font-bold">3. Kumpulkan Skor</h3>
+      </div>
+      <p class="mt-1.5 text-[12.5px] leading-relaxed text-slate-500">Semakin sedikit langkah &amp; cepat, semakin tinggi skor.</p>
+    </div>
+  </section>
+</main>
+
+<!-- ====== FOOTER ====== -->
+<footer class="border-t border-white/60 bg-white/50 backdrop-blur-xl">
+  <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <div class="flex flex-col items-center justify-between gap-3 sm:flex-row">
+      <p class="text-[12px] text-slate-400">© <span data-year>2025</span> EduSpark Studio Pro — Memory Match</p>
+      <a href="../../games.html" class="inline-flex items-center gap-1.5 text-[12px] font-bold text-spark-600 transition hover:gap-2.5">
+        <i data-lucide="gamepad-2" class="h-3.5 w-3.5"></i> Kembali ke Game Hub
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== WIN MODAL ====== -->
+<div id="winOverlay" class="fixed inset-0 z-[120] hidden items-center justify-center bg-ink-900/55 p-4 backdrop-blur-md">
+  <div id="winCard" class="glass-strong w-full max-w-md animate-pop rounded-[2rem] p-7 shadow-2xl ring-1 ring-white/70 sm:p-9">
+    <div class="text-center">
+      <span class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-white shadow-soft">
+        <i data-lucide="party-popper" class="h-7 w-7"></i>
+      </span>
+      <h2 class="mt-5 font-display text-3xl font-extrabold tracking-tight text-ink-900">
+        Hebat! 🎉
+      </h2>
+      <p class="mt-1.5 text-[14px] text-slate-500">
+        Kamu menyelesaikan <strong id="winLevelText" class="font-bold text-ink-800">Level 1</strong>
+      </p>
+    </div>
+
+    <div class="mt-6 grid grid-cols-3 gap-3">
+      <div class="rounded-2xl bg-white/70 px-3 py-3.5 text-center ring-1 ring-slate-100">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Waktu</p>
+        <p class="mt-1 font-display text-lg font-extrabold text-ink-900" id="winTime">00:00</p>
+      </div>
+      <div class="rounded-2xl bg-white/70 px-3 py-3.5 text-center ring-1 ring-slate-100">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Langkah</p>
+        <p class="mt-1 font-display text-lg font-extrabold text-ink-900" id="winMoves">0</p>
+      </div>
+      <div class="rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 px-3 py-3.5 text-center ring-1 ring-amber-200">
+        <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Skor</p>
+        <p class="mt-1 font-display text-lg font-extrabold text-amber-800" id="winScore">0</p>
+      </div>
+    </div>
+
+    <p id="winNewRecord" class="mt-4 hidden text-center text-[12.5px] font-bold text-emerald-600">
+      <i data-lucide="award" class="mr-1 inline h-3.5 w-3.5"></i> Rekor baru!
+    </p>
+
+    <div class="mt-7 flex flex-col gap-2.5 sm:flex-row">
+      <button type="button" id="winPlayAgain" class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-spark-600 to-cyan-500 px-5 py-3.5 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5">
+        <i data-lucide="rotate-ccw" class="h-4 w-4"></i> Main Lagi
+      </button>
+      <button type="button" id="winNextLevel" class="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-ink-800 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-spark-600">
+        <i data-lucide="arrow-up-right" class="h-4 w-4"></i> Level Berikutnya
+      </button>
+    </div>
+
+    <a href="../../games.html" class="mt-3 flex items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-[12.5px] font-bold text-slate-500 transition hover:text-spark-600">
+      <i data-lucide="layout-grid" class="h-3.5 w-3.5"></i> Pilih game lain
+    </a>
+  </div>
+</div>
+
+<!-- ====== SCRIPTS ====== -->
+<script src="../../js/app.js"></script>
+<script>
+/* =========================================================
+   MEMORY MATCH GAME — Vanilla JS
+   ========================================================= */
+(function () {
+  'use strict';
+
+  /* ============ DATA ============ */
+  const ANIMALS = [
+    { id: 'dog',    name: 'Dog',     emoji: '🐶' },
+    { id: 'cat',    name: 'Cat',     emoji: '🐱' },
+    { id: 'rabbit', name: 'Rabbit',  emoji: '🐰' },
+    { id: 'fox',    name: 'Fox',     emoji: '🦊' },
+    { id: 'bear',   name: 'Bear',    emoji: '🐻' },
+    { id: 'panda',  name: 'Panda',   emoji: '🐼' },
+    { id: 'koala',  name: 'Koala',   emoji: '🐨' },
+    { id: 'tiger',  name: 'Tiger',   emoji: '🐯' },
+    { id: 'lion',   name: 'Lion',    emoji: '🦁' },
+    { id: 'cow',    name: 'Cow',     emoji: '🐮' },
+    { id: 'pig',    name: 'Pig',     emoji: '🐷' },
+    { id: 'frog',   name: 'Frog',    emoji: '🐸' },
+    { id: 'monkey', name: 'Monkey',  emoji: '🐵' },
+    { id: 'chick',  name: 'Chicken', emoji: '🐔' },
+    { id: 'penguin',name: 'Penguin', emoji: '🐧' },
+    { id: 'owl',    name: 'Owl',     emoji: '🦉' },
+    { id: 'unicorn',name: 'Unicorn', emoji: '🦄' },
+    { id: 'whale',  name: 'Whale',   emoji: '🐳' }
+  ];
+
+  const LEVELS = {
+    1: { pairs: 6,  cols: { base: 3, sm: 4, lg: 4 }, label: 'Level 1' },
+    2: { pairs: 8,  cols: { base: 4, sm: 4, lg: 4 }, label: 'Level 2' },
+    3: { pairs: 12, cols: { base: 4, sm: 6, lg: 6 }, label: 'Level 3' }
+  };
+
+  const SCORE_KEY = 'eduspark_memory_highscore_v1';
+
+  /* ============ DOM ============ */
+  const board = document.getElementById('board');
+  const timerDisplay = document.getElementById('timerDisplay');
+  const movesDisplay = document.getElementById('movesDisplay');
+  const statTime = document.getElementById('statTime');
+  const statMoves = document.getElementById('statMoves');
+  const statMatched = document.getElementById('statMatched');
+  const statTotal = document.getElementById('statTotal');
+  const statHighScore = document.getElementById('statHighScore');
+  const levelInfo = document.getElementById('levelInfo');
+  const levelBtns = document.querySelectorAll('.level-btn');
+  const restartBtn = document.getElementById('restartBtn');
+  const sessionBanner = document.getElementById('sessionBanner');
+  const dismissBanner = document.getElementById('dismissBanner');
+
+  const winOverlay = document.getElementById('winOverlay');
+  const winLevelText = document.getElementById('winLevelText');
+  const winTime = document.getElementById('winTime');
+  const winMoves = document.getElementById('winMoves');
+  const winScore = document.getElementById('winScore');
+  const winNewRecord = document.getElementById('winNewRecord');
+  const winPlayAgain = document.getElementById('winPlayAgain');
+  const winNextLevel = document.getElementById('winNextLevel');
+
+  /* ============ STATE ============ */
+  let currentLevel = 1;
+  let deck = [];
+  let firstCard = null;
+  let secondCard = null;
+  let lockBoard = false;
+  let moves = 0;
+  let matchedPairs = 0;
+  let totalPairs = 0;
+  let startTime = null;
+  let timerId = null;
+  let elapsedSeconds = 0;
+  let gameWon = false;
+
+  /* ============ UTIL ============ */
+  const pad = (n) => (n < 10 ? '0' + n : '' + n);
+  const fmtTime = (s) => pad(Math.floor(s / 60)) + ':' + pad(s % 60);
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const getHighScore = () => {
+    try {
+      const raw = localStorage.getItem(SCORE_KEY);
+      if (!raw) return 0;
+      const data = JSON.parse(raw);
+      return typeof data === 'object' ? (data[currentLevel] || 0) : 0;
+    } catch (e) { return 0; }
+  };
+
+  const setHighScore = (score) => {
+    try {
+      const raw = localStorage.getItem(SCORE_KEY);
+      const data = raw ? JSON.parse(raw) : {};
+      data[currentLevel] = Math.max(data[currentLevel] || 0, score);
+      localStorage.setItem(SCORE_KEY, JSON.stringify(data));
+    } catch (e) { /* noop */ }
+  };
+
+  /* ============ TIMER ============ */
+  function startTimer() {
+    if (timerId) return;
+    startTime = Date.now();
+    timerId = setInterval(() => {
+      elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const t = fmtTime(elapsedSeconds);
+      timerDisplay.textContent = t;
+      statTime.textContent = t;
+    }, 250);
+  }
+
+  function stopTimer() {
+    if (timerId) clearInterval(timerId);
+    timerId = null;
+  }
+
+  /* ============ BUILD DECK ============ */
+  function buildDeck(pairs) {
+    const picked = shuffle(ANIMALS).slice(0, pairs);
+    const cards = [];
+    picked.forEach((animal) => {
+      cards.push({
+        key: animal.id + '-img',
+        matchId: animal.id,
+        type: 'animal',
+        emoji: animal.emoji,
+        name: animal.name
+      });
+      cards.push({
+        key: animal.id + '-word',
+        matchId: animal.id,
+        type: 'word',
+        emoji: animal.emoji,
+        name: animal.name
+      });
+    });
+    return shuffle(cards);
+  }
+
+  /* ============ RENDER BOARD ============ */
+  function renderBoard() {
+    board.innerHTML = deck.map((card) => `
+      <div class="card ${card.type}" data-key="${card.key}" data-match="${card.matchId}" role="button" tabindex="0" aria-label="Kartu">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <i data-lucide="sparkles" class="h-6 w-6 text-white/85"></i>
+          </div>
+          <div class="card-face card-back">
+            ${card.type === 'animal'
+              ? `<span class="animal-emoji">${card.emoji}</span>`
+              : `<span class="animal-word">${escapeHtml(card.name)}</span>`}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    window.EduSpark.UI.refreshIcons();
+  }
+
+  /* ============ GAME FLOW ============ */
+  function startGame(level) {
+    currentLevel = level;
+    const cfg = LEVELS[level];
+
+    totalPairs = cfg.pairs;
+    matchedPairs = 0;
+    moves = 0;
+    elapsedSeconds = 0;
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+    gameWon = false;
+
+    // Update UI
+    levelInfo.textContent = cfg.pairs + ' pasang • ' + (cfg.pairs * 2) + ' kartu';
+    statMoves.textContent = '0';
+    movesDisplay.textContent = '0';
+    statMatched.textContent = '0';
+    statTotal.textContent = String(cfg.pairs);
+    statTime.textContent = '00:00';
+    timerDisplay.textContent = '00:00';
+    statHighScore.textContent = String(getHighScore());
+
+    // Level button state
+    levelBtns.forEach((b) => {
+      const isActive = Number(b.dataset.level) === level;
+      b.classList.toggle('bg-gradient-to-r', isActive);
+      b.classList.toggle('from-spark-600', isActive);
+      b.classList.toggle('to-cyan-500', isActive);
+      b.classList.toggle('text-white', isActive);
+      b.classList.toggle('shadow-soft', isActive);
+      b.classList.toggle('text-slate-600', !isActive);
+    });
+
+    // Grid columns
+    board.className = 'board grid-cols-' + cfg.cols.base +
+                      ' sm:grid-cols-' + cfg.cols.sm +
+                      ' lg:grid-cols-' + cfg.cols.lg;
+
+    // Fallback: set inline style (Tailwind JIT might miss dynamic classes)
+    board.style.gridTemplateColumns = 'repeat(' + cfg.cols.base + ', minmax(0, 1fr))';
+    if (window.matchMedia('(min-width: 640px)').matches) {
+      board.style.gridTemplateColumns = 'repeat(' + cfg.cols.sm + ', minmax(0, 1fr))';
+    }
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      board.style.gridTemplateColumns = 'repeat(' + cfg.cols.lg + ', minmax(0, 1fr))';
+    }
+
+    deck = buildDeck(cfg.pairs);
+    renderBoard();
+
+    stopTimer();
+    startTime = null;
+  }
+
+  /* Handle responsive grid recalculation */
+  window.addEventListener('resize', window.EduSpark.debounce(() => {
+    const cfg = LEVELS[currentLevel];
+    if (!cfg) return;
+    if (window.matchMedia('(min-width: 1024px)').matches) {
+      board.style.gridTemplateColumns = 'repeat(' + cfg.cols.lg + ', minmax(0, 1fr))';
+    } else if (window.matchMedia('(min-width: 640px)').matches) {
+      board.style.gridTemplateColumns = 'repeat(' + cfg.cols.sm + ', minmax(0, 1fr))';
+    } else {
+      board.style.gridTemplateColumns = 'repeat(' + cfg.cols.base + ', minmax(0, 1fr))';
+    }
+  }, 200));
+
+  /* ============ CARD INTERACTION ============ */
+  function onCardClick(cardEl) {
+    if (lockBoard) return;
+    if (!cardEl) return;
+    if (cardEl.classList.contains('flipped')) return;
+    if (cardEl.classList.contains('matched')) return;
+
+    // Mulai timer saat klik pertama
+    if (!startTime) startTimer();
+
+    cardEl.classList.add('flipped');
+
+    if (!firstCard) {
+      firstCard = cardEl;
+      return;
+    }
+
+    secondCard = cardEl;
+    lockBoard = true;
+    moves++;
+    movesDisplay.textContent = moves;
+    statMoves.textContent = moves;
+
+    checkMatch();
+  }
+
+  function checkMatch() {
+    const isMatch = firstCard.dataset.match === secondCard.dataset.match
+                 && firstCard.dataset.key !== secondCard.dataset.key;
+
+    if (isMatch) {
+      setTimeout(() => {
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        matchedPairs++;
+        statMatched.textContent = matchedPairs;
+
+        // small success feedback
+        window.EduSpark.toast.success('Tepat! ' + (firstCard.dataset.match || '').toUpperCase(), { duration: 1500, title: 'Match!' });
+
+        resetTurn();
+
+        if (matchedPairs === totalPairs) {
+          handleWin();
+        }
+      }, 320);
+    } else {
+      // wrong: shake then flip back
+      firstCard.classList.add('wrong');
+      secondCard.classList.add('wrong');
+
+      setTimeout(() => {
+        firstCard.classList.remove('wrong');
+        secondCard.classList.remove('wrong');
+        firstCard.classList.remove('flipped');
+        secondCard.classList.remove('flipped');
+        resetTurn();
+      }, 720);
+    }
+  }
+
+  function resetTurn() {
+    firstCard = null;
+    secondCard = null;
+    lockBoard = false;
+  }
+
+  /* ============ WIN ============ */
+  function handleWin() {
+    gameWon = true;
+    stopTimer();
+
+    const score = calculateScore(elapsedSeconds, moves, totalPairs);
+    const prevHigh = getHighScore();
+    const isNewRecord = score > prevHigh;
+    if (isNewRecord) setHighScore(score);
+
+    statHighScore.textContent = String(getHighScore());
+
+    // Isi modal
+    winLevelText.textContent = LEVELS[currentLevel].label;
+    winTime.textContent = fmtTime(elapsedSeconds);
+    winMoves.textContent = moves;
+    winScore.textContent = score;
+    winNewRecord.classList.toggle('hidden', !isNewRecord);
+
+    // Tampilkan modal
+    winOverlay.classList.remove('hidden');
+    winOverlay.classList.add('flex');
+    window.EduSpark.UI.refreshIcons();
+
+    // Confetti + toast
+    fireConfetti();
+    window.EduSpark.toast.success('Skor kamu: ' + score + ' poin!', { title: 'Level Selesai', duration: 4000 });
+  }
+
+  function calculateScore(seconds, movesCount, pairs) {
+    const base = pairs * 120;
+    const timeBonus = Math.max(0, 400 - seconds * 3);
+    const movePenalty = Math.max(0, (movesCount - pairs) * 8);
+    return Math.max(50, Math.round(base + timeBonus - movePenalty));
+  }
+
+  function fireConfetti() {
+    const colors = ['#4f46e5', '#0ea5e9', '#f59e0b', '#10b981', '#ec4899', '#8b5cf6'];
+    for (let i = 0; i < 60; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.animationDuration = (2.4 + Math.random() * 1.8) + 's';
+      el.style.animationDelay = (Math.random() * 0.5) + 's';
+      el.style.width = (6 + Math.random() * 8) + 'px';
+      el.style.height = (8 + Math.random() * 10) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }
+  }
+
+  /* ============ EVENTS ============ */
+  board.addEventListener('click', (e) => {
+    const card = e.target.closest('.card');
+    if (card) onCardClick(card);
+  });
+
+  board.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target.closest('.card');
+    if (card) {
+      e.preventDefault();
+      onCardClick(card);
+    }
+  });
+
+  levelBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const lv = Number(btn.dataset.level);
+      if (lv === currentLevel && !gameWon) return;
+      startGame(lv);
+      window.EduSpark.toast.info('Memulai ' + LEVELS[lv].label, { duration: 1800 });
+    });
+  });
+
+  restartBtn.addEventListener('click', () => {
+    startGame(currentLevel);
+    window.EduSpark.toast.info('Papan diacak ulang', { duration: 1800 });
+  });
+
+  // Win modal
+  winPlayAgain.addEventListener('click', () => {
+    winOverlay.classList.add('hidden');
+    winOverlay.classList.remove('flex');
+    startGame(currentLevel);
+  });
+
+  winNextLevel.addEventListener('click', () => {
+    winOverlay.classList.add('hidden');
+    winOverlay.classList.remove('flex');
+    const next = currentLevel < 3 ? currentLevel + 1 : 1;
+    startGame(next);
+    window.EduSpark.toast.success('Naik ke ' + LEVELS[next].label, { duration: 2200, title: 'Next Level' });
+  });
+
+  winOverlay.addEventListener('click', (e) => {
+    if (e.target === winOverlay) {
+      winOverlay.classList.add('hidden');
+      winOverlay.classList.remove('flex');
+    }
+  });
+
+  // Banner dismiss
+  if (dismissBanner) {
+    dismissBanner.addEventListener('click', () => {
+      sessionBanner.classList.add('hidden');
+    });
+  }
+
+  /* ============ SESSION SOFT CHECK ============ */
+  function checkSession() {
+    try {
+      const hasAccess = window.EduSpark.Session.has(window.EduSpark.storage.GAME_ACCESS);
+      if (!hasAccess && sessionBanner) {
+        sessionBanner.classList.remove('hidden');
+      }
+    } catch (e) {
+      // Jika Session tidak tersedia (mis. dibuka langsung), tampilkan banner
+      if (sessionBanner) sessionBanner.classList.remove('hidden');
+    }
+  }
+
+  /* ============ BOOTSTRAP ============ */
+  function boot() {
+    checkSession();
+    startGame(1);
+
+    // Pastikan ikon Lucide ter-render
+    window.EduSpark.UI.refreshIcons();
+
+    // Preload emoji font hint (opsional, memastikan rendering cepat)
+    // Tidak ada aksi.
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+
+})();
+</script>
+</body>
+</html>

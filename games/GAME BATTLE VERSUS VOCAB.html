@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⚔️ MONSTER BATTLE — Multi-Touch & Clash System</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&display=swap');
+
+        :root {
+            --p1-color: #ec4899;
+            --p2-color: #3b82f6;
+            --bg-dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --correct: #22c55e;
+            --wrong: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', cursive, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none; /* Mencegah default gesture pada mobile */
+        }
+
+        body {
+            background: #020617;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 1280px;
+            max-height: 750px;
+            background: var(--bg-dark);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        /* Top Battle Arena Area */
+        .battle-arena-box {
+            width: 100%;
+            height: 230px;
+            position: relative;
+            background: linear-gradient(180deg, #020617 0%, #1e1b4b 100%);
+            border-bottom: 3px solid rgba(255,255,255,0.1);
+        }
+
+        #arenaCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* HUD Overlay */
+        .hud-overlay {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .hp-card {
+            width: 42%;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 10px 16px;
+            border-radius: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        .hp-card.p1 { border-color: rgba(236, 72, 153, 0.4); }
+        .hp-card.p2 { border-color: rgba(59, 130, 246, 0.4); }
+
+        .hp-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .hp-bar-bg {
+            width: 100%;
+            height: 16px;
+            background: #334155;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 10px;
+        }
+
+        .p1-fill { background: linear-gradient(90deg, #ec4899, #f472b6); }
+        .p2-fill { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+        .teacher-btn-top {
+            pointer-events: auto;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+            touch-action: auto;
+        }
+
+        /* Split-Screen Question Section */
+        .split-questions-container {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #090d16;
+        }
+
+        .player-panel {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .player-panel.p1-panel { border-color: rgba(236, 72, 153, 0.3); }
+        .player-panel.p2-panel { border-color: rgba(59, 130, 246, 0.3); }
+
+        .p-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .p-name-tag {
+            font-size: 1.1rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .p1-tag { background: rgba(236, 72, 153, 0.2); color: var(--p1-color); }
+        .p2-tag { background: rgba(59, 130, 246, 0.2); color: var(--p2-color); }
+
+        .progress-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .q-prompt-box {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .q-sub {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .q-title {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-ans {
+            background: #1e293b;
+            color: #f8fafc;
+            border: 2px solid #334155;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.05s ease, background-color 0.15s ease;
+            text-align: center;
+            touch-action: manipulation;
+        }
+
+        .btn-ans:active { transform: scale(0.95); }
+
+        .btn-ans.correct {
+            background: var(--correct) !important;
+            border-color: #16a34a !important;
+            color: #fff !important;
+        }
+
+        .btn-ans.wrong {
+            background: var(--wrong) !important;
+            border-color: #dc2626 !important;
+            color: #fff !important;
+        }
+
+        /* MODAL OVERLAYS */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+            touch-action: auto;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Setup Screen Controls */
+        .setup-container {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        .player-setup-card {
+            flex: 1;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .setup-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fbbf24;
+            margin-bottom: 20px;
+        }
+
+        .input-name {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            background: #0f172a;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            text-align: center;
+            touch-action: auto;
+        }
+
+        .char-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .char-opt {
+            font-size: 2rem;
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .char-opt.selected {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .btn-main {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+            touch-action: manipulation;
+        }
+
+        /* Teacher Mode UI */
+        .teacher-box {
+            width: 100%;
+            max-width: 800px;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #334155;
+        }
+
+        .teacher-textarea {
+            width: 100%;
+            height: 220px;
+            background: #0f172a;
+            color: #38bdf8;
+            font-family: monospace;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            margin: 10px 0;
+            resize: none;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            touch-action: auto;
+        }
+
+        .shake {
+            animation: shakeAnim 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shakeAnim {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+
+    <!-- Top Arena Canvas View -->
+    <div class="battle-arena-box">
+        <div class="hud-overlay">
+            <!-- P1 Health Bar -->
+            <div class="hp-card p1">
+                <div class="hp-header">
+                    <span id="p1-hud-name" style="color: var(--p1-color);">AYRA 🧙‍♂️</span>
+                    <span id="p1-hp-text">240 / 240 XP</span>
+                </div>
+                <div class="hp-bar-bg">
+                    <div id="p1-hp-fill" class="hp-bar-fill p1-fill"></div>
+                </div>
+            </div>
+
+            <button class="teacher-btn-top" id="btnTeacherOpen">⚙️ TEACHER MODE</button>
+
+            <!-- P2 Health Bar -->
+            <div class="hp-card p2">
+                <div class="hp-header">
+                    <span id="p2-hud-name" style="color: var(--p2-color);">NAURA 🐲</span>
+                    <span id="p2-hp-text">240 / 240 XP</span>
+                </div>
+                <div class="hp-bar-bg">
+                    <div id="p2-hp-fill" class="hp-bar-fill p2-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="arenaCanvas"></canvas>
+    </div>
+
+    <!-- Bottom Split-Screen Question Panel -->
+    <div class="split-questions-container">
+        
+        <!-- PLAYER 1 PANEL -->
+        <div class="player-panel p1-panel">
+            <div class="p-panel-header">
+                <span class="p-name-tag p1-tag" id="p1-tag-name">AYRA</span>
+                <span class="progress-tag" id="p1-prog-text">Hits: 0</span>
+            </div>
+            <div class="q-prompt-box">
+                <div class="q-sub">TERJEMAHKAN KATA INI:</div>
+                <div class="q-title" id="p1-q-title">...</div>
+            </div>
+            <div class="answers-grid" id="p1-answers-grid"></div>
+        </div>
+
+        <!-- PLAYER 2 PANEL -->
+        <div class="player-panel p2-panel">
+            <div class="p-panel-header">
+                <span class="p-name-tag p2-tag" id="p2-tag-name">NAURA</span>
+                <span class="progress-tag" id="p2-prog-text">Hits: 0</span>
+            </div>
+            <div class="q-prompt-box">
+                <div class="q-sub">TERJEMAHKAN KATA INI:</div>
+                <div class="q-title" id="p2-q-title">...</div>
+            </div>
+            <div class="answers-grid" id="p2-answers-grid"></div>
+        </div>
+
+    </div>
+
+    <!-- 1. SETUP MODAL (Nama & Karakter) -->
+    <div class="modal-overlay active" id="setupModal">
+        <h1 class="setup-title">⚔️ 1v1 VERSUS BATTLE SETUP</h1>
+        
+        <div class="setup-container">
+            <!-- Player 1 Setup -->
+            <div class="player-setup-card">
+                <h3 style="color: var(--p1-color); margin-bottom: 10px;">PEMAIN 1</h3>
+                <input type="text" id="p1-input-name" class="input-name" value="AYRA" placeholder="Nama Pemain 1">
+                <div class="char-selector" id="p1-char-box">
+                    <span class="char-opt selected" onclick="selectChar(1, '🧙‍♂️', this)">🧙‍♂️</span>
+                    <span class="char-opt" onclick="selectChar(1, '🥷', this)">🥷</span>
+                    <span class="char-opt" onclick="selectChar(1, '🤖', this)">🤖</span>
+                    <span class="char-opt" onclick="selectChar(1, '🦁', this)">🦁</span>
+                </div>
+            </div>
+
+            <!-- Player 2 Setup -->
+            <div class="player-setup-card">
+                <h3 style="color: var(--p2-color); margin-bottom: 10px;">PEMAIN 2</h3>
+                <input type="text" id="p2-input-name" class="input-name" value="NAURA" placeholder="Nama Pemain 2">
+                <div class="char-selector" id="p2-char-box">
+                    <span class="char-opt selected" onclick="selectChar(2, '🐲', this)">🐲</span>
+                    <span class="char-opt" onclick="selectChar(2, '🦄', this)">🦄</span>
+                    <span class="char-opt" onclick="selectChar(2, '🐯', this)">🐯</span>
+                    <span class="char-opt" onclick="selectChar(2, '👽', this)">👽</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-main" onclick="openTeacherModal()">⚙️ EDIT SOAL (TEACHER MODE)</button>
+            <button class="btn-main" style="background: linear-gradient(135deg, #22c55e, #16a34a);" onclick="startBattle()">⚔️ MULAI BERTARUNG</button>
+        </div>
+    </div>
+
+    <!-- 2. TEACHER MODE MODAL -->
+    <div class="modal-overlay" id="teacherModal">
+        <div class="teacher-box">
+            <h2 style="color: #fbbf24; margin-bottom: 6px;">⚙️ TEACHER MODE (INPUT TEKS BIASA)</h2>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px;">
+                Format: <code>Pertanyaan | Jawaban Benar | Salah 1 | Salah 2 | Salah 3</code>
+            </p>
+
+            <textarea id="textInput" class="teacher-textarea" placeholder="ANJING | DOG | HORSE | CAT | BREAD"></textarea>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="teacher-btn-top" onclick="loadDefaultQuestions()">🔄 Reset Soal Default</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="teacher-btn-top" style="background: #334155;" onclick="closeTeacherModal()">Batal</button>
+                    <button class="btn-main" style="padding: 10px 20px; font-size: 1rem;" onclick="saveTeacherQuestions()">💾 Simpan Soal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. VICTORY MODAL -->
+    <div class="modal-overlay" id="resultModal">
+        <h1 style="font-size: 3rem; font-weight: 800; color: #fbbf24; margin-bottom: 10px;" id="winnerText">🏆 AYRA WINS!</h1>
+        <p style="font-size: 1.2rem; color: #cbd5e1;" id="winnerSub">Berhasil mengalahkan lawan dalam pertempuran!</p>
+        <button class="btn-main" style="margin-top: 20px;" onclick="showSetupScreen()">🔄 MAIN LAGI / GANTI PEMAIN</button>
+    </div>
+
+</div>
+
+<script>
+    /* ==========================================================================
+       1. AUDIO SYNTHESIZER
+       ========================================================================== */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'hit') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'clash') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(450, now);
+            osc.frequency.exponentialRampToValueAtTime(120, now + 0.3);
+            gain.gain.setValueAtTime(0.4, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if (type === 'wrong') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, now);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.start(now); osc.stop(now + 0.25);
+        } else if (type === 'victory') {
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now + 0.12);
+            osc.frequency.setValueAtTime(783.99, now + 0.24);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.start(now); osc.stop(now + 0.5);
+        }
+    }
+
+    /* ==========================================================================
+       2. MULTI-TOUCH UTILITY
+       ========================================================================== */
+    function attachMultiTouchHandler(element, onTrigger) {
+        let hasFired = false;
+
+        const trigger = (e) => {
+            if (e.cancelable) e.preventDefault();
+            if (!hasFired) {
+                hasFired = true;
+                onTrigger();
+                setTimeout(() => { hasFired = false; }, 300);
+            }
+        };
+
+        element.addEventListener('pointerdown', trigger, { passive: false });
+    }
+
+    /* ==========================================================================
+       3. DATA BANK & CONFIG
+       ========================================================================== */
+    const XP_PER_QUESTION = 20;
+
+    const defaultTextQuestions = 
+`ANJING | DOG | HORSE | CAT | BREAD
+HARIMAU | TIGER | RABBIT | LIBRARY | BIRD
+KUCING | CAT | FISH | LION | DUCK
+RUMAH | HOUSE | SCHOOL | MARKET | PARK
+BURUNG | BIRD | SNAKE | MONKEY | COW
+GAJAH | ELEPHANT | BEAR | PIG | SHEEP
+ULAR | SNAKE | FROG | MOUSE | HORSE
+IKAN | FISH | CHICKEN | GOAT | FOX
+SEKOLAH | SCHOOL | HOSPITAL | BANK | STORE
+BUKU | BOOK | PEN | BAG | DESK
+APEL | APPLE | BANANA | GRAPE | MELON
+MELATI | JASMINE | ROSE | ORCHID | LILY`;
+
+    let questionDataset = [];
+    let maxHp = 240;
+
+    let p1Config = { name: "AYRA", char: "🧙‍♂️" };
+    let p2Config = { name: "NAURA", char: "🐲" };
+
+    let p1State = { hp: 0, qIndex: 0, hits: 0, questions: [], isLocked: false };
+    let p2State = { hp: 0, qIndex: 0, hits: 0, questions: [], isLocked: false };
+    let isGameOver = false;
+
+    function parseTextToQuestions(text) {
+        const lines = text.trim().split('\n');
+        const list = [];
+        lines.forEach(line => {
+            const parts = line.split('|').map(s => s.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+                list.push({
+                    word: parts[0],
+                    correct: parts[1],
+                    wrong: parts.slice(2)
+                });
+            }
+        });
+        return list;
+    }
+
+    function parseQuestionsToText(questions) {
+        return questions.map(q => [q.word, q.correct, ...q.wrong].join(' | ')).join('\n');
+    }
+
+    questionDataset = parseTextToQuestions(defaultTextQuestions);
+    maxHp = questionDataset.length * XP_PER_QUESTION;
+
+    /* ==========================================================================
+       4. SETUP & CHARACTER SELECTION
+       ========================================================================== */
+    function selectChar(pNum, charSymbol, element) {
+        const parent = element.parentElement;
+        parent.querySelectorAll('.char-opt').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+
+        if (pNum === 1) p1Config.char = charSymbol;
+        else p2Config.char = charSymbol;
+    }
+
+    function showSetupScreen() {
+        document.getElementById('resultModal').classList.remove('active');
+        document.getElementById('setupModal').classList.add('active');
+    }
+
+    function startBattle() {
+        p1Config.name = document.getElementById('p1-input-name').value.trim() || "PEMAIN 1";
+        p2Config.name = document.getElementById('p2-input-name').value.trim() || "PEMAIN 2";
+
+        document.getElementById('p1-hud-name').innerText = `${p1Config.name} ${p1Config.char}`;
+        document.getElementById('p2-hud-name').innerText = `${p2Config.name} ${p2Config.char}`;
+        document.getElementById('p1-tag-name').innerText = p1Config.name;
+        document.getElementById('p2-tag-name').innerText = p2Config.name;
+
+        document.getElementById('setupModal').classList.remove('active');
+        initGame();
+    }
+
+    /* ==========================================================================
+       5. TEACHER MODE FUNCTIONS
+       ========================================================================== */
+    function openTeacherModal() {
+        document.getElementById('textInput').value = parseQuestionsToText(questionDataset);
+        document.getElementById('teacherModal').classList.add('active');
+    }
+
+    function closeTeacherModal() {
+        document.getElementById('teacherModal').classList.remove('active');
+    }
+
+    function loadDefaultQuestions() {
+        document.getElementById('textInput').value = defaultTextQuestions;
+    }
+
+    function saveTeacherQuestions() {
+        const rawText = document.getElementById('textInput').value;
+        const parsed = parseTextToQuestions(rawText);
+
+        if (parsed.length === 0) {
+            alert("Harap masukkan minimal 1 baris soal dengan format: Pertanyaan | Jawaban Benar | Jawaban Salah!");
+            return;
+        }
+
+        questionDataset = parsed;
+        maxHp = questionDataset.length * XP_PER_QUESTION;
+
+        alert(`Berhasil menyimpan ${questionDataset.length} soal! Total HP/XP disesuaikan menjadi ${maxHp} XP.`);
+        closeTeacherModal();
+
+        if (!document.getElementById('setupModal').classList.contains('active')) {
+            initGame();
+        }
+    }
+
+    /* ==========================================================================
+       6. CANVAS ANIMATION ENGINE WITH CLASH MECHANIC
+       ========================================================================== */
+    const canvas = document.getElementById('arenaCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    let entities = { p1: {}, p2: {}, particles: [], floatingTexts: [] };
+
+    function initEntities() {
+        resizeCanvas();
+        const groundY = canvas.height * 0.65;
+        entities.p1 = { 
+            x: canvas.width * 0.2, y: groundY, origX: canvas.width * 0.2, 
+            emoji: p1Config.char, size: 60, state: 'idle', targetX: canvas.width * 0.2, timer: 0 
+        };
+        entities.p2 = { 
+            x: canvas.width * 0.8, y: groundY, origX: canvas.width * 0.8, 
+            emoji: p2Config.char, size: 64, state: 'idle', targetX: canvas.width * 0.8, timer: 0 
+        };
+        entities.particles = [];
+        entities.floatingTexts = [];
+    }
+
+    function addHitParticles(x, y, color) {
+        for (let i = 0; i < 16; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * 5;
+            entities.particles.push({
+                x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                size: 4 + Math.random() * 5, color, alpha: 1.0, life: 0.04
+            });
+        }
+    }
+
+    function addFloatingText(text, x, y, color) {
+        entities.floatingTexts.push({ text, x, y, color, alpha: 1.0, vy: -1.5 });
+    }
+
+    function triggerAttack(attackerNum) {
+        const p1 = entities.p1;
+        const p2 = entities.p2;
+
+        if (attackerNum === 1) {
+            if (p2.state === 'attacking') {
+                // Keduanya menekan berdekatan! Adu Serangan di Tengah
+                p1.state = 'clashing';
+                p2.state = 'clashing';
+                const meetingPoint = (p1.x + p2.x) / 2;
+                p1.targetX = meetingPoint - 30;
+                p2.targetX = meetingPoint + 30;
+            } else {
+                p1.state = 'attacking';
+                p1.targetX = p2.x - 40;
+            }
+        } else if (attackerNum === 2) {
+            if (p1.state === 'attacking') {
+                // Keduanya menekan berdekatan! Adu Serangan di Tengah
+                p1.state = 'clashing';
+                p2.state = 'clashing';
+                const meetingPoint = (p1.x + p2.x) / 2;
+                p1.targetX = meetingPoint - 30;
+                p2.targetX = meetingPoint + 30;
+            } else {
+                p2.state = 'attacking';
+                p2.targetX = p1.x + 40;
+            }
+        }
+    }
+
+    function renderLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const p1 = entities.p1;
+        const p2 = entities.p2;
+
+        p1.timer += 0.05;
+        p2.timer += 0.05;
+
+        let p1Bounce = Math.sin(p1.timer * 2) * 4;
+        let p2Bounce = Math.cos(p2.timer * 2) * 4;
+
+        // ---- P1 State Machine ----
+        if (p1.state === 'attacking') {
+            p1.x += (p1.targetX - p1.x) * 0.25;
+            if (Math.abs(p1.x - p1.targetX) < 10) {
+                p1.state = 'returning';
+                playSound('hit');
+                triggerShake();
+                addHitParticles(p2.x, p2.y, '#ec4899');
+            }
+        } else if (p1.state === 'clashing') {
+            p1.x += (p1.targetX - p1.x) * 0.25;
+            if (Math.abs(p1.x - p1.targetX) < 10) {
+                p1.state = 'returning';
+                playSound('clash');
+                triggerShake();
+                addHitParticles((p1.x + p2.x)/2, p1.y, '#fbbf24');
+            }
+        } else if (p1.state === 'returning') {
+            p1.x += (p1.origX - p1.x) * 0.15;
+            if (Math.abs(p1.x - p1.origX) < 2) { p1.x = p1.origX; p1.state = 'idle'; }
+        }
+
+        // ---- P2 State Machine ----
+        if (p2.state === 'attacking') {
+            p2.x += (p2.targetX - p2.x) * 0.25;
+            if (Math.abs(p2.x - p2.targetX) < 10) {
+                p2.state = 'returning';
+                playSound('hit');
+                triggerShake();
+                addHitParticles(p1.x, p1.y, '#3b82f6');
+            }
+        } else if (p2.state === 'clashing') {
+            p2.x += (p2.targetX - p2.x) * 0.25;
+            if (Math.abs(p2.x - p2.targetX) < 10) {
+                p2.state = 'returning';
+            }
+        } else if (p2.state === 'returning') {
+            p2.x += (p2.origX - p2.x) * 0.15;
+            if (Math.abs(p2.x - p2.origX) < 2) { p2.x = p2.origX; p2.state = 'idle'; }
+        }
+
+        // Draw Characters
+        ctx.save();
+        ctx.font = `${p1.size}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText(p1.emoji, p1.x, p1.y + p1Bounce);
+        ctx.restore();
+
+        ctx.save();
+        ctx.font = `${p2.size}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText(p2.emoji, p2.x, p2.y + p2Bounce);
+        ctx.restore();
+
+        // Render Particles
+        for (let i = entities.particles.length - 1; i >= 0; i--) {
+            const pt = entities.particles[i];
+            pt.x += pt.vx; pt.y += pt.vy; pt.alpha -= pt.life;
+            if (pt.alpha <= 0) { entities.particles.splice(i, 1); continue; }
+            ctx.save();
+            ctx.globalAlpha = pt.alpha;
+            ctx.fillStyle = pt.color;
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        // Render Floating Text
+        for (let i = entities.floatingTexts.length - 1; i >= 0; i--) {
+            const ft = entities.floatingTexts[i];
+            ft.y += ft.vy; ft.alpha -= 0.02;
+            if (ft.alpha <= 0) { entities.floatingTexts.splice(i, 1); continue; }
+            ctx.save();
+            ctx.globalAlpha = ft.alpha;
+            ctx.font = "bold 22px Fredoka, sans-serif";
+            ctx.fillStyle = ft.color;
+            ctx.textAlign = "center";
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.restore();
+        }
+
+        requestAnimationFrame(renderLoop);
+    }
+
+    function triggerShake() {
+        const el = document.getElementById('game-container');
+        el.classList.add('shake');
+        setTimeout(() => el.classList.remove('shake'), 300);
+    }
+
+    /* ==========================================================================
+       7. GAMEPLAY ENGINE
+       ========================================================================== */
+    function initGame() {
+        isGameOver = false;
+        document.getElementById('resultModal').classList.remove('active');
+
+        maxHp = questionDataset.length * XP_PER_QUESTION;
+
+        p1State = { hp: maxHp, qIndex: 0, hits: 0, questions: [...questionDataset].sort(() => Math.random() - 0.5), isLocked: false };
+        p2State = { hp: maxHp, qIndex: 0, hits: 0, questions: [...questionDataset].sort(() => Math.random() - 0.5), isLocked: false };
+
+        updateHpUI();
+        initEntities();
+
+        loadP1Question();
+        loadP2Question();
+    }
+
+    function updateHpUI() {
+        const p1Pct = Math.max(0, (p1State.hp / maxHp) * 100);
+        const p2Pct = Math.max(0, (p2State.hp / maxHp) * 100);
+
+        document.getElementById('p1-hp-fill').style.width = `${p1Pct}%`;
+        document.getElementById('p2-hp-fill').style.width = `${p2Pct}%`;
+
+        document.getElementById('p1-hp-text').innerText = `${Math.max(0, p1State.hp)} / ${maxHp} XP`;
+        document.getElementById('p2-hp-text').innerText = `${Math.max(0, p2State.hp)} / ${maxHp} XP`;
+    }
+
+    function loadP1Question() {
+        if (isGameOver) return;
+        
+        if (p1State.qIndex >= p1State.questions.length) {
+            p1State.questions = [...questionDataset].sort(() => Math.random() - 0.5);
+            p1State.qIndex = 0;
+        }
+
+        p1State.isLocked = false;
+        const q = p1State.questions[p1State.qIndex];
+
+        document.getElementById('p1-prog-text').innerText = `Hits: ${p1State.hits}`;
+        document.getElementById('p1-q-title').innerText = q.word;
+
+        const container = document.getElementById('p1-answers-grid');
+        container.innerHTML = '';
+
+        const opts = [q.correct, ...q.wrong].sort(() => Math.random() - 0.5);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-ans';
+            btn.innerText = opt;
+            
+            // Attach Multi-Touch Event Listener
+            attachMultiTouchHandler(btn, () => handleAnswer(1, opt, q.correct, btn));
+            
+            container.appendChild(btn);
+        });
+    }
+
+    function loadP2Question() {
+        if (isGameOver) return;
+
+        if (p2State.qIndex >= p2State.questions.length) {
+            p2State.questions = [...questionDataset].sort(() => Math.random() - 0.5);
+            p2State.qIndex = 0;
+        }
+
+        p2State.isLocked = false;
+        const q = p2State.questions[p2State.qIndex];
+
+        document.getElementById('p2-prog-text').innerText = `Hits: ${p2State.hits}`;
+        document.getElementById('p2-q-title').innerText = q.word;
+
+        const container = document.getElementById('p2-answers-grid');
+        container.innerHTML = '';
+
+        const opts = [q.correct, ...q.wrong].sort(() => Math.random() - 0.5);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-ans';
+            btn.innerText = opt;
+            
+            // Attach Multi-Touch Event Listener
+            attachMultiTouchHandler(btn, () => handleAnswer(2, opt, q.correct, btn));
+
+            container.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(playerNum, selected, correct, btn) {
+        if (isGameOver) return;
+        const state = playerNum === 1 ? p1State : p2State;
+        if (state.isLocked) return;
+        state.isLocked = true;
+
+        const isCorrect = selected === correct;
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            state.hits++;
+            
+            triggerAttack(playerNum);
+
+            if (playerNum === 1) {
+                p2State.hp -= XP_PER_QUESTION;
+                addFloatingText(`-${XP_PER_QUESTION} HP`, entities.p2.x, entities.p2.y - 40, '#ec4899');
+            } else {
+                p1State.hp -= XP_PER_QUESTION;
+                addFloatingText(`-${XP_PER_QUESTION} HP`, entities.p1.x, entities.p1.y - 40, '#3b82f6');
+            }
+
+            updateHpUI();
+            checkVictoryCondition();
+        } else {
+            btn.classList.add('wrong');
+            playSound('wrong');
+        }
+
+        state.qIndex++;
+
+        setTimeout(() => {
+            if (playerNum === 1) loadP1Question();
+            else loadP2Question();
+        }, 600);
+    }
+
+    function checkVictoryCondition() {
+        if (p2State.hp <= 0) {
+            endGame(`${p1Config.name.toUpperCase()} WINS! 🏆`, `${p2Config.name} telah dikalahkan dalam pertempuran!`);
+        } else if (p1State.hp <= 0) {
+            endGame(`${p2Config.name.toUpperCase()} WINS! 🏆`, `${p1Config.name} telah dikalahkan dalam pertempuran!`);
+        }
+    }
+
+    function endGame(title, subtitle) {
+        isGameOver = true;
+        playSound('victory');
+
+        document.getElementById('winnerText').innerText = title;
+        document.getElementById('winnerSub').innerText = subtitle;
+        document.getElementById('resultModal').classList.add('active');
+
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+    }
+
+    // Attach listener for teacher button safely
+    attachMultiTouchHandler(document.getElementById('btnTeacherOpen'), openTeacherModal);
+
+    // Start Engine Loop
+    renderLoop();
+</script>
+</body>
+</html>

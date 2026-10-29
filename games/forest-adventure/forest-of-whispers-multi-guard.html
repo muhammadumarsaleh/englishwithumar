@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>English Quest — Forest of Whispers: Regional Guardians</title>
+<style>
+:root{color-scheme:dark;--mint:#83f5be;--ink:#102948}*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#8ed7ff;color:#fff;font:15px system-ui,sans-serif}button,textarea{font:inherit}button{border:0;border-radius:12px;padding:12px 18px;background:#345987;color:white;cursor:pointer;font-weight:700}button:hover{filter:brightness(1.15)}button:disabled{opacity:.75;cursor:default}button:focus-visible,textarea:focus-visible{outline:3px solid #ffdc6b;outline-offset:3px}.primary{background:var(--mint);color:var(--ink)}.hidden{display:none!important}.overlay{position:fixed;inset:0;z-index:20;background:#102449b8;backdrop-filter:blur(7px);display:grid;place-items:center;padding:20px}.card{width:min(650px,100%);max-height:93vh;overflow:auto;background:#102c50f5;border:2px solid #80cfff55;border-radius:25px;padding:30px;box-shadow:0 25px 90px #10294855}h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:12px 0}h2{font-size:24px;line-height:1.4}p{color:#c8def6;line-height:1.65}.eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#ffdc6b;font-weight:900}.badges,.actions{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0}.badge{background:#ffffff12;padding:7px 10px;border-radius:9px;font-size:12px}.help{font-size:13px;line-height:2;border-block:1px solid #ffffff25;padding:15px 0}#title{touch-action:none;user-select:none;-webkit-user-select:none}#hud{position:fixed;left:16px;top:16px;display:flex;flex-wrap:wrap;gap:7px;max-width:calc(100% - 220px);pointer-events:none;z-index:3}.stat{background:#102c50e8;border:1px solid #fff3;border-radius:12px;padding:10px 12px;font-size:13px}.stat b{color:#ffdc6b;margin-left:5px}#mapBox{position:fixed;right:16px;top:16px;width:185px;border:1px solid #fff5;background:#102c50eb;padding:10px;border-radius:16px;z-index:4}#mapBox header{font-size:11px;display:flex;justify-content:space-between;margin-bottom:6px;color:#c8def6}#map{width:163px;height:120px;display:block;border-radius:8px}#sound{width:100%;padding:8px;margin-top:7px;font-size:12px}#cross{position:fixed;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:white;box-shadow:0 0 0 3px #10294855;transform:translate(-50%,-50%);pointer-events:none}#prompt,#bottom{position:fixed;left:50%;transform:translateX(-50%);background:#102c50ed;border-radius:12px;padding:11px 17px;z-index:4;text-align:center;pointer-events:none}#prompt{bottom:80px;border:1px solid var(--mint)}#bottom{bottom:18px;font-size:12px;white-space:nowrap}#quiz{z-index:30}.quizhead{display:flex;justify-content:space-between;align-items:center;gap:12px}#progress{height:6px;background:#ffffff18;border-radius:9px;margin:18px 0}#fill{height:100%;background:var(--mint);border-radius:9px}#answers{display:grid;gap:10px;margin:20px 0}.answer{text-align:left;display:flex;gap:13px;align-items:center;background:#294c77;border:2px solid transparent}.letter{background:#ffffff18;border-radius:7px;padding:5px 10px}.right{background:#216447!important;border-color:#83f5be!important}.wrong{background:#873851!important;border-color:#ffb4bd!important}#hint{margin-top:15px;background:#ffdc6b14;border-left:3px solid #ffdc6b;padding:12px;color:#ffe7a2;font-size:13px;line-height:1.6}#feedback{min-height:28px;margin-top:14px;font-weight:700}#meaning{margin-top:12px;color:#8ee5ff}#teacher{z-index:40}textarea{width:100%;min-height:230px;resize:vertical;background:#081f3b;color:white;border:1px solid #89b8e7;border-radius:12px;padding:12px;line-height:1.7;font-size:13px}.small{font-size:12px}#teacherStatus,#status{font-size:13px;color:#ffdf84}.results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}.result{background:#ffffff12;border-radius:12px;padding:20px 8px;text-align:center}.result strong{display:block;font-size:25px;color:var(--mint)}.result small{color:#c8def6}canvas#world{display:block}#toast{position:fixed;bottom:125px;left:50%;transform:translateX(-50%);z-index:5;background:#102c50ee;padding:12px 20px;border-radius:12px;pointer-events:none}@media(max-width:640px){.card{padding:21px}#mapBox{width:135px;right:8px;top:8px;padding:7px}#map{width:119px;height:88px}#hud{left:8px;top:8px;max-width:calc(100% - 150px);gap:4px}.stat{font-size:10px;padding:7px}#bottom{white-space:normal;width:93%;font-size:10px}.result strong{font-size:20px}}
+
+/* Tema malam: panel arsip, fosfor hijau, aksen merah tembaga. */
+:root{--mint:#b1d69b;--ink:#111a17}
+body{background:#060b10;color:#e1e6da}button{background:#303e3a;color:#dce5d6;border:1px solid #83917a40;border-radius:5px}
+.overlay{background:#03080dc9}.card{background:linear-gradient(145deg,#15201ff7,#0c1419fa);border:1px solid #8caa824d;border-radius:10px;box-shadow:0 25px 100px #0009}
+h1{letter-spacing:-.04em}p{color:#b0beb7}.eyebrow{color:#c79379}.badge{border:1px solid #9aac8d33;background:#a3b3940b;border-radius:3px}
+.stat,#mapBox,#prompt,#bottom,#toast{background:#0d1719ed;border-color:#94ab8055;border-radius:5px}.stat b,#status,#teacherStatus{color:#c5d4a7}
+.answer{background:#243430;border-radius:5px}.right{background:#284e3d!important}.wrong{background:#663736!important}
+#hint{color:#c8c6a3;background:#bdb7870d;border-color:#a69b68}textarea{background:#091314;border-color:#637760}#mapBox header{color:#adbdaf}
+#atmosphere{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at center,transparent 24%,#0004 70%,#000a 100%);box-shadow:inset 0 0 100px #0007}
+#atmosphere:after{content:'';position:absolute;inset:0;opacity:.055;background:repeating-linear-gradient(0deg,#fff 0px,#fff 1px,transparent 1px,transparent 4px)}
+#missionTag{position:fixed;left:18px;bottom:72px;color:#a7b29c;font:11px monospace;letter-spacing:.12em;z-index:3;pointer-events:none}
+#mapBox #flashButton{width:100%;font-size:11px;padding:7px;margin-top:6px}
+
+#safePanel{position:fixed;left:18px;bottom:82px;z-index:5;pointer-events:none;background:#131c20ee;border:1px solid #c6987455;border-radius:7px;padding:11px 15px;max-width:320px;box-shadow:0 8px 30px #0004}
+#safePanel strong{display:block;font-size:12px;letter-spacing:.09em;color:#e2bd92}#safePanel span{display:block;font-size:11px;line-height:1.6;color:#b5c3b9;margin-top:3px}
+#safePanel.safe{border-color:#8ac19c88;background:#12251fee}#safePanel.safe strong{color:#a5ddaf}
+#threatVignette{position:fixed;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 0 100px #b4573d;opacity:0;transition:opacity .3s}
+#fail{z-index:45}.failIcon{font-size:48px;color:#d5a18e;margin-bottom:12px}.objectives{padding:13px 16px;border:1px solid #a9bd8a44;border-radius:10px;color:#c4d1be;line-height:1.8;font-size:13px;background:#a3b98709}
+#itemSummary{font-size:12px;color:#b5c6ad;line-height:1.7}#hud{max-width:calc(100% - 235px)}#hud .stat{font-size:12px}#bottom{bottom:16px}#missionTag{bottom:65px}
+@media(max-width:650px){#safePanel{left:10px;bottom:92px;padding:8px 10px;max-width:220px}#safePanel strong{font-size:10px}#safePanel span{font-size:10px}#hud{max-width:calc(100% - 150px)}#hud .stat{font-size:9px;padding:7px}#prompt{bottom:170px;font-size:12px;max-width:94%}}
+/* Shared responsive controls: no user-scalable=no and no CSS rotation hack. */
+html,body{width:100%;height:var(--game-height,100dvh);overscroll-behavior:none}
+#world{width:100%;height:var(--game-height,100dvh);touch-action:none}
+.overlay{height:var(--game-height,100dvh);padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overflow:hidden}
+.card{max-height:calc(var(--game-height,100dvh) - 28px);overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+textarea,input,select{font-size:16px!important}button,select{touch-action:manipulation}
+.inputTools{margin:13px 0 18px;padding:13px;border:1px solid #b8d7c033;border-radius:12px;background:#ffffff06}
+.inputTools label{font-size:12px;display:block;margin-bottom:7px;color:#cad8d5}.inputTools select{width:100%;padding:10px;border-radius:8px;background:#182d43;color:#fff;border:1px solid #8caaa866;min-height:44px}.inputTools button{margin-top:9px;min-height:44px;font-size:12px}
+#mobileControls{position:fixed;inset:0;pointer-events:none;z-index:10;user-select:none;-webkit-user-select:none}
+#moveStick{pointer-events:auto;position:absolute;left:calc(env(safe-area-inset-left) + 20px);bottom:calc(env(safe-area-inset-bottom) + 20px);width:128px;height:128px;border:2px solid #d0e9e36b;border-radius:50%;background:radial-gradient(circle,#c9ded615,#19312c9c);box-shadow:0 6px 30px #0003;touch-action:none}
+#moveStick:before,#moveStick:after{content:'';position:absolute;background:#d7eee32b;pointer-events:none}#moveStick:before{width:1px;height:90%;top:5%;left:50%}#moveStick:after{height:1px;width:90%;left:5%;top:50%}
+#stickKnob{position:absolute;left:50%;top:50%;width:52px;height:52px;transform:translate(-50%,-50%);border:2px solid #d1f6e6bd;border-radius:50%;background:#83bca69c;box-shadow:0 3px 12px #0003;pointer-events:none}
+.stickLabel{position:absolute;top:-24px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.12em;color:#d4e7da;text-shadow:0 1px 5px #000}
+#touchActions{position:absolute;right:calc(env(safe-area-inset-right) + 15px);bottom:calc(env(safe-area-inset-bottom) + 18px);display:grid;grid-template-columns:repeat(3,52px);gap:7px;pointer-events:auto}
+#touchActions button{min-width:48px;min-height:49px;padding:8px 4px;border:1px solid #cce4d777;color:#fff;background:#14292edb;border-radius:50%;font-size:11px;line-height:1.2;touch-action:none;box-shadow:0 3px 16px #0003}
+#touchActions #touchInteract{grid-column:1/-1;border-radius:13px;background:#8bbba6;color:#102a23;min-height:44px;font-size:14px;font-weight:800}#touchInteract:disabled{opacity:.5}#touchRun.pressed{background:#d2b974;color:#29251b;border-color:#f9e7b8}
+#mobileUtility{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);display:flex;gap:6px;pointer-events:auto}#mobileUtility button{min-width:43px;min-height:42px;padding:7px;background:#14292ee8;border:1px solid #b0d4c366;border-radius:11px;color:white;font-size:17px}
+#lookHint{position:absolute;right:calc(env(safe-area-inset-right) + 30px);bottom:calc(env(safe-area-inset-bottom) + 137px);font-size:10px;color:#d7e9e0;text-shadow:0 1px 6px #000;pointer-events:none}
+#rotateScreen{z-index:44;background:#09141cf5}.rotateCard{text-align:center;max-width:420px}.rotateIcon{font-size:54px;line-height:1.2;margin-bottom:16px;transform:rotate(-25deg)}.rotateCard p{font-size:14px;line-height:1.7}.rotateCard button{display:block;width:100%;min-height:46px;margin-top:10px}
+.touch-ui #bottom,.touch-ui #missionTag{display:none!important}
+.touch-ui #hud{left:calc(env(safe-area-inset-left) + 9px)!important;top:calc(env(safe-area-inset-top) + 8px)!important;max-width:calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 166px)!important;gap:4px}
+.touch-ui #hud .stat{font-size:11px!important;padding:6px 8px!important;border-radius:7px}.touch-ui .stat b{margin-left:4px}
+.touch-ui #mapBox{top:calc(env(safe-area-inset-top) + 58px);right:calc(env(safe-area-inset-right) + 10px);width:114px;padding:6px;border-radius:9px}.touch-ui #mapBox header{font-size:8px;margin-bottom:4px}.touch-ui #map{width:100px;height:74px}.touch-ui #mapBox #sound,.touch-ui #mapBox #flashButton{display:none}
+.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 150px)!important;padding:8px 12px;max-width:70%;font-size:12px;border-radius:8px}
+.touch-ui #toast{bottom:calc(env(safe-area-inset-bottom) + 190px);font-size:12px;max-width:80%;padding:9px 13px}
+.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 162px);bottom:calc(env(safe-area-inset-bottom) + 18px);width:min(240px,calc(100vw - 370px));max-width:240px;padding:8px 10px}.touch-ui #safePanel strong{font-size:10px}.touch-ui #safePanel span{font-size:10px;line-height:1.5}
+.touch-ui .card{width:min(700px,100%);padding:20px}.touch-ui #question{font-size:20px}.touch-ui .answer{min-height:48px;font-size:16px;padding:10px 12px}.touch-ui .quizhead{position:sticky;top:-20px;background:inherit;padding:8px 0;z-index:2}.touch-ui #closeTeacher,.touch-ui #leaveQuiz{min-height:44px}.touch-ui #hint{font-size:13px}
+@media(max-height:510px) and (orientation:landscape){.touch-ui .card{padding:17px 22px}.touch-ui h1{font-size:30px;margin:8px 0}.touch-ui .badges{margin:10px 0}.touch-ui .help{margin:9px 0;padding:9px 0;font-size:12px;line-height:1.7}.touch-ui #answers{grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.touch-ui #question{font-size:20px;margin:8px 0 12px}.touch-ui #progress{margin:10px 0}.touch-ui .answer{min-height:48px;font-size:15px}.touch-ui #hint{padding:9px;margin-top:10px}.touch-ui .results{margin:13px 0}.touch-ui .result{padding:12px 8px}.touch-ui .quizhead{top:-17px}.touch-ui #safePanel span{max-height:31px;overflow:hidden}}
+@media(max-width:540px) and (orientation:portrait){.touch-ui #hud{max-width:calc(100% - 160px)!important}.touch-ui #hud .stat{font-size:10px!important;padding:6px!important}.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 12px);bottom:calc(env(safe-area-inset-bottom) + 176px);width:calc(100% - 24px);max-width:none}.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 244px)!important;max-width:92%}.touch-ui #toast{bottom:calc(env(safe-area-inset-bottom) + 300px)}.touch-ui #moveStick{width:116px;height:116px;left:calc(env(safe-area-inset-left) + 14px)}.touch-ui #touchActions{right:calc(env(safe-area-inset-right) + 12px);grid-template-columns:repeat(3,48px);gap:6px}.touch-ui #lookHint{bottom:calc(env(safe-area-inset-bottom) + 138px)}.touch-ui h1{font-size:31px}.touch-ui .card{padding:19px}.touch-ui #answers{grid-template-columns:1fr}}
+@media(max-width:600px) and (orientation:landscape){.touch-ui #moveStick{width:112px;height:112px;left:calc(env(safe-area-inset-left) + 12px)}.touch-ui #touchActions{grid-template-columns:repeat(3,46px);gap:5px;right:calc(env(safe-area-inset-right) + 10px)}.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 135px);width:calc(100vw - 315px)}.touch-ui #hud .stat{font-size:10px!important}.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 140px)!important}.touch-ui #mapBox{width:100px}.touch-ui #map{width:86px;height:63px}}
+
+#worldMapButton{width:100%;padding:9px 5px;font-size:12px;margin:6px 0;background:#455e49;border:1px solid #a5c19c55}#forestMap{z-index:36}.forestMapCard{width:min(900px,100%)}#bigMap{display:block;width:100%;height:auto;max-height:65dvh;object-fit:contain;border:1px solid #8aa28655;border-radius:10px;background:#101f20}.touch-ui #worldMapButton{min-height:35px;font-size:10px;padding:6px}.touch-ui #hud .stat:first-child{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.touch-ui #bigMap{max-height:55dvh}#floorHUD{color:#b4d6a1}
+</style>
+</head>
+<body>
+<canvas id="world"></canvas>
+<div id="mobileControls" class="hidden" aria-label="Kontrol sentuh"><div id="moveStick" role="group" aria-label="Joystick untuk bergerak"><span class="stickLabel">GERAK</span><div id="stickKnob"></div></div><div id="touchActions"><button id="touchInteract" disabled>✋ Interaksi</button><button id="touchRun">Lari</button><button id="touchJump">↑<br>Lompat</button><button id="touchFlash" >☀<br>Senter</button></div><div id="mobileUtility"><button id="mobileFull" aria-label="Layar penuh">⛶</button><button id="mobilePause" aria-label="Jeda">Ⅱ</button><button id="mobileSound" aria-label="Aktifkan atau matikan suara">🔊</button></div><span id="lookHint">GESER LAYAR UNTUK MELIHAT</span></div>
+<div id="rotateScreen" class="overlay hidden"><div class="card rotateCard"><div class="rotateIcon" aria-hidden="true">▯ ↻</div><h2>Putar HP ke landscape</h2><p>Game mencoba mengatur layar mendatar. Jika browser tidak mengizinkan, putar perangkat secara manual dan aktifkan rotasi otomatis HP.</p><button id="retryLandscape" class="primary">Coba layar penuh &amp; landscape</button><button id="playPortrait">Tetap main dalam portrait</button><p class="small">Saat layar ini muncul, permainan dan penjaga dijeda.</p></div></div><div id="threatVignette"></div><div id="safePanel" class="hidden"><strong id="safeTitle">KORIDOR · WASPADA</strong><span id="safeText">Masuk kelas untuk berlindung.</span></div><div id="atmosphere"></div><div id="missionTag" class="hidden">ARSIP 09 / SEKOLAH ANOMALI</div>
+<div id="hud" class="hidden"><div class="stat">Area <b id="floorHUD">Kamp Barat Daya</b></div><div class="stat">Anomali dituntaskan <b id="npcHUD">0/9</b></div><div class="stat">Item ditemukan <b id="itemHUD">0/5</b></div><div class="stat">Benar <b id="correctHUD">0</b></div><div class="stat">❌ Kesalahan <b id="wrongHUD">0</b></div><div class="stat">Waktu <b id="timeHUD">00:00</b></div></div>
+<div id="mapBox" class="hidden"><header><span>PETA HUTAN</span><span id="mapFloor">L1</span></header><canvas id="map" width="326" height="240"></canvas><button id="worldMapButton">⌖ Peta Hutan</button><button id="sound">🔊 Suara: ON</button><button id="flashButton">F · Senter ON</button></div>
+<div id="cross" class="hidden"></div><div id="prompt" class="hidden"></div><div id="toast" class="hidden"></div><div id="bottom" class="hidden">WASD / Panah · Shift Lari · Space Lompat · E Selidiki · F Senter · M Peta · Esc Jeda</div>
+<div id="start" class="overlay"><div class="card"><div class="eyebrow">ENGLISH QUEST · FOREST SURVIVAL</div><h1 id="title">Forest of Whispers<br><span style="font-size:.43em;letter-spacing:.04em;color:#a9c69a">ENGLISH QUEST</span></h1><p>Jelajahi hutan luas 176 × 156 meter, sungai, tiga jembatan, enam gubuk tua, pepohonan, dan batu raksasa. Temukan sembilan anomali, jawab tujuh pertanyaan masing-masing, lalu kumpulkan lima benda tersembunyi sambil menghindari sembilan Penjaga Wilayah yang berpatroli secara bersamaan.</p><div class="badges"><span class="badge">30 lokasi penjelajahan</span><span class="badge">9 anomali · 63 soal</span><span class="badge">5 item acak</span><span class="badge">9 penjaga · 9 rute wilayah</span></div><p class="help">WASD / Panah: berjalan · Mouse: melihat<br>Shift: lari · Space: lompat · E: selidiki anomali · F: senter<br><b>Gubuk bertanda SAFE adalah zona aman.</b> Sungai hanya dapat diseberangi lewat jembatan. Buka Peta Hutan untuk melihat tempat penting.<br>Saat kuis, kamu aman sementara. Setelah kuis ditutup, ada 3 detik untuk bersiap.<br><b>Tertangkap = gagal dan mengulang dari nol.</b> Lokasi anomali serta item diacak pada percobaan baru.</p><div class="inputTools"><label for="inputMode">Mode kontrol</label><select id="inputMode"><option value="auto">Otomatis sesuai perangkat</option><option value="touch">Joystick &amp; layar sentuh</option><option value="keyboard">Keyboard &amp; mouse</option></select><button id="mobileTeacher" type="button">Teacher Mode · Soal kustom</button><p class="small">HP: joystick kiri untuk berjalan, geser layar untuk melihat, dan gunakan tombol sentuh. Laptop: WASD / panah, mouse, E, Shift, Space.</p></div><button id="startButton" class="primary">Mulai Misi</button><p id="status" role="status">Memuat Three.js…</p><p class="small">Untuk pengajar: tahan judul di atas selama 3 detik untuk membuka input soal massal.</p></div></div>
+<div id="quiz" class="overlay hidden"><div class="card"><div class="quizhead"><div><div id="npcName" class="eyebrow"></div><p id="questionNumber" class="small"></p></div><button id="leaveQuiz">Lanjut nanti</button></div><div id="progress"><div id="fill"></div></div><h2 id="question"></h2><div id="answers"></div><button id="meaningButton">Tampilkan Arti</button><div id="meaning" class="hidden"></div><div id="hint"></div><div id="feedback" role="status" aria-live="polite"></div></div></div>
+<div id="forestMap" class="overlay hidden"><div class="card forestMapCard"><div class="quizhead"><div><div class="eyebrow">FOREST FIELD MAP</div><h2>Peta Hutan</h2></div><button id="closeForestMap">Tutup &amp; lanjut</button></div><canvas id="bigMap" width="900" height="780"></canvas><p class="small">Hijau muda: gubuk aman · Kuning: sinyal anomali dekat · Merah: penjaga dekat · Segitiga: kamu. Item tetap harus ditemukan lewat penjelajahan.</p><p class="small">Jembatan utara, tengah, selatan menghubungkan dua sisi sungai. Seluruh sembilan patroli dijeda selama peta terbuka. Enam penjaga menjaga hutan darat, tiga lainnya menjaga tiap jembatan.</p></div></div><div id="teacher" class="overlay hidden"><div class="card"><div class="eyebrow">Bulk custom questions</div><h2>Teacher Mode</h2><p class="small">Masukkan satu soal per baris. Tepat lima kolom, dipisahkan tanda |:<br><b>pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah</b></p><textarea id="custom" aria-label="Soal kustom massal" spellcheck="false" placeholder="Berapa hasil 2 + 2? | 4 | 3 | 5 | 6&#10;Apa arti book? | Buku | Meja | Pintu | Kursi"></textarea><p class="small">Posisi jawaban benar diacak. Soal kustom diprioritaskan; jika kurang dari 63, bank bawaan melengkapi. Jika lebih dari 63, dipilih acak. Tidak ada soal berulang antarnpc. Perubahan berlaku pada misi baru.</p><div class="actions"><button id="save" class="primary">Simpan Semua Soal</button><button id="clear">Hapus Kustom</button><button id="closeTeacher">Tutup</button></div><p id="teacherStatus" role="status"></p></div></div>
+<div id="win" class="overlay hidden"><div class="card"><div class="eyebrow">Misi tuntas</div><h1>Hutan kembali tenang.</h1><p>Sembilan anomali telah dituntaskan, 63 pertanyaan selesai dijawab, dan kelima benda ditemukan. Kamu berhasil menuntaskan petualangan Forest of Whispers!</p><div class="objectives">✓ 9 / 9 anomali dituntaskan<br>✓ 5 / 5 item ditemukan</div><div class="results"><div class="result"><strong id="finalScore"></strong><small>Benar / Total</small></div><div class="result"><strong id="finalWrong"></strong><small>Total kesalahan</small></div><div class="result"><strong id="finalTime"></strong><small>Waktu bermain</small></div></div><button id="again" class="primary">Main Lagi</button></div></div>
+<div id="fail" class="overlay hidden"><div class="card"><div class="eyebrow">MISI GAGAL · TERTANGKAP</div><div class="failIcon">◉</div><h1>Salah satu penjaga menemukanmu.</h1><p id="failReason"></p><div class="objectives">Seluruh progres telah direset: anomali 0/9, item 0/5, jawaban 0/63. Soal kustom pengajar tetap tersimpan.</div><p class="small">Pada percobaan berikutnya, dengarkan langkah berat. Masuk ke gubuk bertanda SAFE dan tunggu penjaga lewat sebelum kembali ke jalan setapak.</p><button id="retry" class="primary">Ulang dari awal</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="document.getElementById('status').textContent='CDN gagal dimuat. Periksa internet lalu buka ulang file.'"></script>
+<script>
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id);
+if(!window.THREE)return;
+const FH=4.5,EYE=1.65,RADIUS=.29,HEIGHT=1.78,STEP=.23,STORE='forest-of-whispers-custom-v1';
+let touchMode=false,touchSession=false,portraitAllowed=false,touchRun=false,stickPointer=null,lookPointer=null,lookX=0,lookY=0;
+const touchMove={forward:0,strafe:0};
+let renderer,scene,camera,ready=false,started=false,won=false,yaw=0,pitch=0,vy=0,grounded=true;
+let elapsed=0,correct=0,wrong=0,finished=0,active=null,nearby=null,busy=false,answerTimer,toastTimer;
+let previous=performance.now(),footClock=0,customBank=[],npcs=[];
+const player=new THREE.Vector3(-64,0,60),keys={},colliders=[],walkables=[],slots=[];
+const ray=new THREE.Raycaster(),origin=new THREE.Vector3(),down=new THREE.Vector3(0,-1,0);
+const colors=[0x4d5d58,0x53616a,0x605663,0x655d4e];
+let flashlight,flashTarget,flashOn=true,ambienceGain,droneNodes=[],dust,nearSignal=0;
+const corridorLights=[];
+// Keadaan percobaan terpisah dari bank soal pengajar.
+let failed=false,attemptToken=0,foundItems=0,nearItem=null,hunter=null;const hunters=[];
+let pickups=[],itemCandidates=[],patrolRoute=[],hunterThreat=0;
+const safeRooms=[];let riverMesh=null,forestTreeCount=0,mapWasPlaying=false,graceUntil=8;
+const itemTypes=[
+ {name:'Silver Key',meaning:'Kunci perak',kind:'key',color:0xbac9c1},
+ {name:'Lost Journal',meaning:'Buku catatan tua',kind:'book',color:0x9a8263},
+ {name:'Old Compass',meaning:'Jam saku',kind:'watch',color:0xc5ac73},
+ {name:'Wax Candle',meaning:'Lilin',kind:'candle',color:0xd5c7a5},
+ {name:'Music Box',meaning:'Kotak musik',kind:'box',color:0x8d6972}
+];
+
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function time(s){s=Math.floor(s);return(s>=3600?String(Math.floor(s/3600)).padStart(2,'0')+':':'')+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function floor(){return 0}
+function showToast(text){$('toast').textContent=text;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),3500)}
+// Bank soal berupa Array of Objects; 184 soal bawaan berbeda.
+
+function makeBank(){
+ const words=[['tree','pohon'],['river','sungai'],['bridge','jembatan'],['rock','batu'],['forest','hutan'],['cabin','gubuk'],['leaf','daun'],['flower','bunga'],['bird','burung'],['fish','ikan'],['rabbit','kelinci'],['deer','rusa'],['owl','burung hantu'],['butterfly','kupu-kupu'],['water','air'],['sun','matahari'],['moon','bulan'],['star','bintang'],['night','malam'],['morning','pagi'],['book','buku'],['key','kunci'],['candle','lilin'],['bag','tas'],['door','pintu'],['window','jendela'],['red','merah'],['blue','biru'],['green','hijau'],['yellow','kuning'],['white','putih'],['black','hitam'],['big','besar'],['small','kecil'],['long','panjang'],['short','pendek'],['walk','berjalan'],['run','berlari'],['jump','melompat'],['swim','berenang']];
+ const result=[];
+ words.forEach((w,i)=>{
+  result.push({q:'What does "'+w[0]+'" mean in Indonesian?',answer:w[1],distractors:[words[(i+7)%words.length][1],words[(i+17)%words.length][1],words[(i+29)%words.length][1]],hint:'Ingat kosakata alam dan benda di sekitarmu.',meaning:w[0]+' = '+w[1]});
+  result.push({q:'Which English word means "'+w[1]+'"?',answer:w[0],distractors:[words[(i+5)%words.length][0],words[(i+13)%words.length][0],words[(i+23)%words.length][0]],hint:'Pilih kosakata bahasa Inggris yang sesuai.',meaning:w[1]+' = '+w[0]});
+ });
+ const sentences=[
+ ['The key is ____ the box. (di dalam)','in',['on','under','behind'],'In = di dalam.'],
+ ['The owl is ____ the tree. (di belakang)','behind',['under','between','in front of'],'Behind = di belakang.'],
+ ['The book is ____ the table. (di atas)','on',['under','between','behind'],'On = di atas permukaan.'],
+ ['Please ____ the door. (buka)','open',['swim','read','sleep'],'Open = buka.'],
+ ['There ____ two birds on the branch.','are',['is','am','be'],'Benda jamak memakai there are.'],
+ ['There ____ a key in the cabin.','is',['are','am','were'],'Satu benda memakai there is.'],
+ ['She ____ a green bag.','has',['have','having','are'],'She memakai has.'],
+ ['I ____ a blue book.','have',['has','having','is'],'I memakai have.'],
+ ['A rabbit can ____.','jump',['fly','read','write'],'Rabbit dapat melompat.'],
+ ['A fish can ____.','swim',['fly','read','sing'],'Fish dapat berenang.'],
+ ['Choose the polite request.','May I have some water, please?',['Water give now!','I am water.','Water is me.'],'May I have … please? adalah permintaan sopan.'],
+ ['What do you say after receiving help?','Thank you.',['Good night.','I am a tree.','Go away.'],'Thank you berarti terima kasih.'],
+ ['Which word is the opposite of big?','small',['long','tall','green'],'Big berlawanan dengan small.'],
+ ['Which word is the opposite of hot?','cold',['warm','red','short'],'Hot berlawanan dengan cold.'],
+ ['Which sentence is correct?','The river is blue.',['The river are blue.','The river am blue.','The river be blue.'],'The river adalah satu, gunakan is.'],
+ ['Choose the correct plural of leaf.','leaves',['leafs','leafes','leafies'],'Bentuk jamak leaf adalah leaves.'],
+ ['Choose the correct plural of tree.','trees',['treees','treeies','treves'],'Tambahkan s pada tree.'],
+ ['What does "Turn left" mean?','Belok kiri',['Belok kanan','Jalan lurus','Berhenti'],'Left = kiri.'],
+ ['What does "Go straight" mean?','Jalan lurus',['Belok kanan','Belok kiri','Duduk'],'Straight = lurus.'],
+ ['What does "Be careful" mean?','Hati-hati',['Selamat pagi','Terima kasih','Sampai jumpa'],'Be careful berarti hati-hati.']
+ ];
+ sentences.forEach(([q,answer,distractors,hint])=>result.push({q,answer,distractors,hint,meaning:hint}));return result;
+}
+
+const bank=makeBank();
+function parseBulk(text){const questions=[],errors=[],seen=new Set();text.split(/\r?\n/).forEach((line,i)=>{if(!line.trim())return;const p=line.split('|').map(s=>s.trim());if(p.length!==5||p.some(s=>!s)){errors.push('Baris '+(i+1)+': wajib tepat lima kolom terisi.');return}if(new Set(p.slice(1).map(s=>s.toLowerCase())).size!==4){errors.push('Baris '+(i+1)+': semua pilihan harus berbeda.');return}const id=p[0].toLowerCase();if(seen.has(id)){errors.push('Baris '+(i+1)+': pertanyaan duplikat.');return}seen.add(id);questions.push({q:p[0],answer:p[1],distractors:p.slice(2),hint:'Baca pertanyaan dan bandingkan keempat pilihan.',meaning:''})});return{questions,errors}}
+try{const text=localStorage.getItem(STORE)||'';$('custom').value=text;const p=parseBulk(text);if(!p.errors.length)customBank=p.questions}catch(e){}
+let pressTimer;
+function cancelPress(){clearTimeout(pressTimer)}
+$('title').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();cancelPress();$('title').setPointerCapture(e.pointerId);pressTimer=setTimeout(()=>{$('teacher').classList.remove('hidden');$('teacherStatus').textContent=customBank.length+' soal kustom aktif. Bank bawaan: '+bank.length+' soal.'},3000)});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('title').addEventListener(t,cancelPress));
+$('title').addEventListener('contextmenu',e=>e.preventDefault());
+$('closeTeacher').onclick=()=>$('teacher').classList.add('hidden');
+$('save').onclick=()=>{const text=$('custom').value.trim(),p=parseBulk(text);if(p.errors.length){$('teacherStatus').textContent=p.errors.slice(0,5).join(' ');return}customBank=p.questions;try{localStorage.setItem(STORE,text);$('teacherStatus').textContent='Tersimpan: '+customBank.length+' soal. Berlaku pada misi baru.'}catch(e){$('teacherStatus').textContent=customBank.length+' soal aktif sesi ini. Browser menolak localStorage; data tidak bertahan setelah ditutup.'}};
+$('clear').onclick=()=>{customBank=[];$('custom').value='';try{localStorage.removeItem(STORE);$('teacherStatus').textContent='Soal kustom dihapus. Misi baru menggunakan bank bawaan.'}catch(e){$('teacherStatus').textContent='Soal sesi ini dihapus. Penyimpanan browser tidak dapat diakses.'}};
+// Web Audio API: nada C–E–G, buzz, dan langkah noise lowpass.
+let audio,master,noise,muted=false;
+function audioStart(){try{if(!audio){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audio=new AC();master=audio.createGain();master.gain.value=muted?0:.3;master.connect(audio.destination);ambienceGain=audio.createGain();ambienceGain.gain.value=0;ambienceGain.connect(master);[43.65,65.41,87.8].forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type=i===1?"triangle":"sine";o.frequency.value=f;g.gain.value=i===0?.10:.025;o.connect(g);g.connect(ambienceGain);o.start();droneNodes.push(o,g)});noise=audio.createBuffer(1,Math.floor(audio.sampleRate*.14),audio.sampleRate);let a=noise.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1}if(audio.state==='suspended')audio.resume().catch(()=>{})}catch(e){}}
+function tone(f,t,d,type='sine',vol=.3){if(!audio||muted)return;let o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02)}
+function bling(){if(audio)[523.25,659.25,783.99].forEach((f,i)=>tone(f,audio.currentTime+i*.09,.3))}
+function buzz(){if(audio)tone(85,audio.currentTime,.3,'sawtooth',.22)}
+function footstep(){if(!audio||muted)return;let n=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain(),t=audio.currentTime;n.buffer=noise;f.type='lowpass';f.frequency.value=250+Math.random()*100;g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.0001,t+.12);n.connect(f);f.connect(g);g.connect(master);n.start();n.stop(t+.13)}
+$('sound').onclick=()=>{audioStart();muted=!muted;if(master)master.gain.value=muted?0:.3;$('sound').textContent=muted?'🔇 Suara: OFF':'🔊 Suara: ON'};
+const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.8,...extra});
+let wallMat,woodMat,metalMat,glassMat,tileTex,stairMat;
+function texture(kind){let c=document.createElement('canvas');c.width=c.height=256;let g=c.getContext('2d');g.fillStyle=kind==='tile'?'#313c3d':kind==='wall'?'#7a8170':'#5c493b';g.fillRect(0,0,256,256);if(kind==='tile'){for(let y=0;y<256;y+=64)for(let x=0;x<256;x+=64){g.fillStyle=(x+y)%128?'#758078':'#536362';g.fillRect(x+2,y+2,60,60);g.strokeStyle='#b1b69a40';g.strokeRect(x+4,y+4,55,55)}}else if(kind==='wall'){g.strokeStyle='#353d3960';g.lineWidth=3;for(let y=0;y<=256;y+=64){g.beginPath();g.moveTo(0,y);g.lineTo(256,y);g.stroke();for(let x=(y/64%2)*64;x<256;x+=128)g.strokeRect(x,y,128,64)}}else{for(let i=0;i<70;i++){g.fillStyle=i%2?'#e0a26270':'#77402340';g.fillRect(Math.random()*256,0,1+Math.random()*3,256)}}// Noda dan retakan prosedural tanpa gambar eksternal.
+for(let i=0;i<95;i++){g.fillStyle=i%2?'#111b1b18':'#b3b59c0c';g.fillRect(Math.random()*256,Math.random()*256,3+Math.random()*35,2+Math.random()*25)}
+if(kind!=='wood'){g.strokeStyle='#17242065';g.lineWidth=1;for(let k=0;k<5;k++){let x=Math.random()*256,y=Math.random()*256;g.beginPath();g.moveTo(x,y);for(let n=0;n<5;n++){x+=Math.random()*18-9;y+=9;g.lineTo(x,y)}g.stroke()}}
+let t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;return t}
+function box(w,h,d,x,y,z,m,solid=false,walk=false){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.receiveShadow=true;o.castShadow=solid;scene.add(o);if(solid)colliders.push({minX:x-w/2,maxX:x+w/2,minY:y-h/2,maxY:y+h/2,minZ:z-d/2,maxZ:z+d/2});if(walk)walkables.push(o);return o}
+function wall(w,h,d,x,y,z,m=wallMat){return box(w,h,d,x,y,z,m,true)}
+function slab(x1,x2,z1,z2,y){let t=tileTex.clone();t.needsUpdate=true;t.repeat.set((x2-x1)/4,(z2-z1)/4);box(x2-x1,.24,z2-z1,(x1+x2)/2,y-.12,(z1+z2)/2,mat(0xffffff,{map:t,roughness:.65}),true,true)}
+function label(text,w=256,bg='#172b29'){let c=document.createElement('canvas');c.width=w;c.height=80;let g=c.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,w,80);g.strokeStyle='#a9c29a';g.lineWidth=5;g.strokeRect(3,3,w-6,74);g.font='bold 27px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='white';g.fillText(text,w/2,42,w-15);let s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));s.scale.set(2.5,.78,1);return s}
+// FOREST_WORLD_START
+const WORLD={halfX:88,halfZ:78,riverHalf:6};
+const cabinDefinitions=[
+ {name:'Kamp Penjelajah',x:-64,z:60,color:0x647f69},
+ {name:'Gubuk Tua',x:-54,z:-62,color:0x79614c},
+ {name:'Pondok Lumut',x:-24,z:15,color:0x687650},
+ {name:'Gubuk Jembatan',x:24,z:63,color:0x79765a},
+ {name:'Pondok Reruntuhan',x:56,z:-63,color:0x7e7263},
+ {name:'Gubuk Nelayan',x:76,z:15,color:0x617f7c}
+];
+const greatTrees=[{x:-18,z:40},{x:22,z:-32},{x:-77,z:-12},{x:76,z:42}];
+const greatRocks=[{x:-72,z:25},{x:-20,z:-25},{x:22,z:24},{x:74,z:-23}];
+const forestSites=[
+ ...cabinDefinitions.map(h=>({x:h.x,z:h.z,name:h.name})),
+ {x:-77,z:30,name:'Belakang Batu Barat'}, {x:-24,z:-29,name:'Batu Raksasa'},
+ {x:25,z:29,name:'Batu Berlumut'}, {x:78,z:-28,name:'Batu Timur'},
+ {x:-14,z:40,name:'Pohon Beringin Barat'}, {x:26,z:-32,name:'Pohon Beringin Timur'},
+ {x:-77,z:-8,name:'Akar Pohon Tua'}, {x:76,z:46,name:'Pohon Dekat Gubuk'},
+ {x:-2,z:-48,name:'Jembatan Utara'}, {x:2,z:0,name:'Jembatan Tengah'},
+ {x:-2,z:48,name:'Jembatan Selatan'},
+ {x:-10,z:-22,name:'Tepi Sungai Barat'}, {x:11,z:26,name:'Tepi Sungai Timur'},
+ {x:-50,z:33,name:'Lingkaran Jamur'}, {x:48,z:28,name:'Api Unggun Padam'},
+ {x:-48,z:-30,name:'Jalan Setapak Barat'}, {x:48,z:-30,name:'Jalan Setapak Timur'},
+ {x:-31,z:62,name:'Kayu Tumbang'}, {x:61,z:62,name:'Kebun Pakis'},
+ {x:-76,z:-60,name:'Gerbang Tua'}, {x:77,z:-61,name:'Reruntuhan Pilar'},
+ {x:16,z:-62,name:'Pohon Lentera'}, {x:-16,z:5,name:'Tambatan Perahu'},
+ {x:20,z:6,name:'Belakang Peti Tua'}
+];
+function regionName(pos=player){if(Math.abs(pos.x)<9)return'Sungai & Jembatan';if(pos.x<0)return pos.z< -25?'Hutan Barat Laut':pos.z>28?'Kamp Barat Daya':'Hutan Barat';return pos.z< -25?'Reruntuhan Timur':pos.z>28?'Hutan Tenggara':'Tepi Sungai Timur'}
+function buildPatrolRoute(){return[
+ [-40,48],[-40,0],[-68,0],[-68,-48],[-40,-48],[0,-48],[40,-48],[68,-48],[68,0],[40,0],[0,0],[-40,0],[-40,48],[0,48],[40,48],[68,48],[68,0],[40,0],[40,-48],[0,-48],[-40,-48],[-40,0]
+].map(([x,z])=>({x,y:0,z}))}
+function buildItemCandidates(){
+ const locations=[];const add=(x,z,name,zone,y=0)=>locations.push({id:'forest-'+locations.length,x,y,z,name,zone,kind:'forest',floor:0});
+ for(const h of cabinDefinitions){const zone=h.z< -35?'utara':h.x<0?'barat':'selatan';add(h.x-3.9,h.z-3.6,'Sudut '+h.name,zone);add(h.x+3.9,h.z-3.6,'Dalam '+h.name,zone)}
+ for(const r of greatRocks){const zone=r.x<0?'barat':'timur';add(r.x-2.2,r.z+4.7,'Belakang batu besar',zone);add(r.x+2.2,r.z+4.7,'Sisi batu berlumut',zone)}
+ for(const t of greatTrees){add(t.x+1.7,t.z,'Dahan rendah pohon tua',t.x<0?'barat':'timur',.42);add(t.x-1.8,t.z+1.1,'Di antara akar pohon',t.x<0?'barat':'timur')}
+ for(const z of [-48,0,48]){add(-2.6,z+2,'Sudut jembatan','sungai');add(2.6,z-2,'Tepi jembatan','sungai')}
+ for(const z of [-65,-22,22,66]){add(-9.4,z,'Tepi sungai barat',z< -35?'utara':z>35?'selatan':'sungai');add(9.4,z,'Tepi sungai timur',z< -35?'utara':z>35?'selatan':'sungai')}
+ add(-76,-65,'Gerbang hutan tua','utara');add(76,-68,'Di belakang reruntuhan','utara');add(-34,67,'Kayu tumbang','selatan');add(62,68,'Semak dekat pondok','selatan');
+ return locations;
+}
+function chooseItemLocations(){return shuffle(['barat','timur','utara','selatan','sungai'].map(zone=>shuffle(itemCandidates.filter(p=>p.zone===zone))[0]))}
+function distanceToSegment(x,z,a,b){const dx=b.x-a.x,dz=b.z-a.z,t=Math.max(0,Math.min(1,((x-a.x)*dx+(z-a.z)*dz)/(dx*dx+dz*dz||1)));return Math.hypot(x-a.x-t*dx,z-a.z-t*dz)}
+function groundTexture(){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');g.fillStyle='#425746';g.fillRect(0,0,256,256);for(let i=0;i<1400;i++){g.fillStyle=i%3===0?'#8b8a622a':i%2?'#253c3445':'#657f4b50';g.fillRect(Math.random()*256,Math.random()*256,1+Math.random()*7,1+Math.random()*6)}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(22,22);t.encoding=THREE.sRGBEncoding;return t}
+function forestCabin(h){
+ const wood=mat(h.color),roof=mat(0x42473d),frame=mat(0x94856a),y=0;
+ // Bukaan pintu nyata; zona aman berada di dalam gubuk.
+ box(10,.15,9,h.x,-.075,h.z,woodMat,true,true);
+ wall(10,3.7,.25,h.x,1.85,h.z-4.5,wood);
+ wall(.25,3.7,9,h.x-5,1.85,h.z,wood);wall(.25,3.7,9,h.x+5,1.85,h.z,wood);
+ wall(3.6,3.7,.25,h.x-3.2,1.85,h.z+4.5,wood);wall(3.6,3.7,.25,h.x+3.2,1.85,h.z+4.5,wood);
+ wall(2.8,.65,.25,h.x,3.375,h.z+4.5,wood);
+ box(10.8,.25,10,h.x,3.95,h.z,roof,true);box(11,.16,.22,h.x,4.1,h.z+4.8,frame);
+ box(1.3,.02,2.1,h.x,.02,h.z+3.6,mat(0x71916c,{emissive:0x2b5a3a,emissiveIntensity:.5}));
+ const sign=label('SAFE · '+h.name,512);sign.position.set(h.x,3.12,h.z+4.66);sign.scale.set(4.6,.72,1);scene.add(sign);
+ const lamp=new THREE.Mesh(new THREE.SphereGeometry(.13,8,8),mat(0xc7e7ab,{emissive:0x86b575,emissiveIntensity:1}));lamp.position.set(h.x,2.7,h.z+4.8);scene.add(lamp);
+ safeRooms.push({floor:0,room:h.name,y,minX:h.x-4.5,maxX:h.x+4.5,minZ:h.z-4,maxZ:h.z+3.85});
+ box(1.8,.15,.8,h.x-2.7,.65,h.z-2.7,woodMat,true);
+ box(.7,.65,.7,h.x+3.1,.325,h.z+1.3,woodMat,true);
+}
+function forest(){
+ const earth=mat(0xffffff,{map:groundTexture(),roughness:1});
+ box(82,.35,156,-47,-.175,0,earth,true,true);box(82,.35,156,47,-.175,0,earth,true,true);
+ // Sungai hanya dapat diseberangi melalui tiga jembatan.
+ const waterMaterial=mat(0x366e7d,{transparent:true,opacity:.8,roughness:.24,metalness:.22});
+ riverMesh=box(12,.06,156,0,-.55,0,waterMaterial);
+ for(const [z1,z2]of [[-78,-51.1],[-44.9,-3.1],[3.1,44.9],[51.1,78]])colliders.push({minX:-6,maxX:6,minY:-4,maxY:2.9,minZ:z1,maxZ:z2,water:true});
+ for(const z of [-48,0,48]){
+  box(15,.25,6.2,0,-.125,z,woodMat,true,true);
+  for(let x=-7;x<=7;x+=1)box(.05,.015,6,x,.012,z,metalMat);
+  for(const side of [-1,1]){wall(14,.13,.13,0,1.04,z+side*3.3,woodMat);for(let x=-7;x<=7;x+=2)wall(.13,1.1,.13,x,.55,z+side*3.3,woodMat)}
+  const sign=label(z<0?'NORTH BRIDGE':z>0?'SOUTH BRIDGE':'RIVER BRIDGE',512);sign.position.set(-7.7,2.1,z+3.6);sign.scale.set(3.6,.56,1);scene.add(sign);
+ }
+ // Pembatas menutup tepi peta.
+ wall(.6,3,156,-88,1.5,0,mat(0x2e3e34));wall(.6,3,156,88,1.5,0,mat(0x2e3e34));wall(176,3,.6,0,1.5,-78,mat(0x2e3e34));wall(176,3,.6,0,1.5,78,mat(0x2e3e34));
+ const route=buildPatrolRoute(),pathMaterial=mat(0x767260,{roughness:1});
+ for(let i=0;i<route.length;i++){const a=route[i],b=route[(i+1)%route.length];if(a.x===b.x&&Math.abs(a.x)>6)box(4.3,.012,Math.abs(a.z-b.z),a.x,.008,(a.z+b.z)/2,pathMaterial);else if(a.z===b.z){const left=Math.min(a.x,b.x),right=Math.max(a.x,b.x);if(left< -6)box(Math.min(-6,right)-left,.012,4.3,(left+Math.min(-6,right))/2,.008,a.z,pathMaterial);if(right>6)box(right-Math.max(6,left),.012,4.3,(right+Math.max(6,left))/2,.008,a.z,pathMaterial)}}
+ cabinDefinitions.forEach(forestCabin);
+ for(const r of greatRocks){const mesh=new THREE.Mesh(new THREE.IcosahedronGeometry(3.1,0),mat(0x747f77,{flatShading:true}));mesh.position.set(r.x,2.15,r.z);mesh.scale.set(1.2,1,.95);scene.add(mesh);colliders.push({minX:r.x-3.3,maxX:r.x+3.3,minY:0,maxY:4.6,minZ:r.z-2.85,maxZ:r.z+2.85})}
+ for(const t of greatTrees){box(1.4,8,1.4,t.x,4,t.z,woodMat,true);const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(4,0),mat(0x3d6652,{flatShading:true}));crown.position.set(t.x,8,t.z);scene.add(crown);box(2,.13,.4,t.x+1,.72,t.z,woodMat);box(1.7,.10,.4,t.x-1,.15,t.z+1.1,woodMat)}
+ // Broken stone pillars in the northeast, with a walkable gap.
+ for(const x of [73,81])box(1.1,4,1.1,x,2,-67,mat(0x737d71),true);
+ box(9,.6,1.2,77,4.15,-67,mat(0x737d71));
+ const log=box(6,.7,.9,-34,.35,65,woodMat,true);log.rotation.y=.16;
+ forestSites.forEach((p,i)=>slots.push({x:p.x,y:0,z:p.z,floor:0,room:p.name,site:i}));
+ // Instancing keeps the large forest affordable on phones.
+ const reserved=buildItemCandidates(),trees=[],target=touchMode?220:350;
+ for(let tries=0;tries<target*35&&trees.length<target;tries++){
+  const x=-85+Math.random()*170,z=-75+Math.random()*150;
+  if(Math.abs(x)<9||route.some((a,i)=>distanceToSegment(x,z,a,route[(i+1)%route.length])<4.2)||cabinDefinitions.some(h=>Math.abs(x-h.x)<8&&Math.abs(z-h.z)<8)||forestSites.some(p=>Math.hypot(x-p.x,z-p.z)<3.3)||reserved.some(p=>Math.hypot(x-p.x,z-p.z)<2.5)||greatRocks.some(r=>Math.hypot(x-r.x,z-r.z)<5.5)||greatTrees.some(t=>Math.hypot(x-t.x,z-t.z)<4)||trees.some(t=>Math.hypot(x-t.x,z-t.z)<2.7))continue;
+  trees.push({x,z,s:.9+Math.random()*.65});
+ }
+ const trunk=new THREE.InstancedMesh(new THREE.CylinderGeometry(.3,.42,4,6),woodMat,trees.length),leaves=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(2.5,0),mat(0x355b45,{flatShading:true}),trees.length),tops=new THREE.InstancedMesh(new THREE.ConeGeometry(2.2,4.8,6),mat(0x466c50,{flatShading:true}),trees.length);
+ const dummy=new THREE.Object3D();
+ trees.forEach((t,i)=>{dummy.position.set(t.x,2*t.s,t.z);dummy.scale.set(t.s,t.s,t.s);dummy.updateMatrix();trunk.setMatrixAt(i,dummy.matrix);dummy.position.y=5*t.s;dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);dummy.position.y=7.1*t.s;dummy.updateMatrix();tops.setMatrixAt(i,dummy.matrix);colliders.push({minX:t.x-.44*t.s,maxX:t.x+.44*t.s,minY:0,maxY:4*t.s,minZ:t.z-.44*t.s,maxZ:t.z+.44*t.s})});
+ scene.add(trunk,leaves,tops);forestTreeCount=trees.length;
+ for(let i=0;i<route.length;i+=3){const p=route[i];if(Math.abs(p.x)<9)continue;box(.13,2.8,.13,p.x+2.7,1.4,p.z,woodMat);const light=new THREE.Mesh(new THREE.BoxGeometry(.26,.34,.26),mat(0xc4bc91,{emissive:0xbca26b,emissiveIntensity:.7}));light.position.set(p.x+2.7,2.85,p.z);scene.add(light)}
+}
+function buildAtmosphere(){
+ flashlight=new THREE.SpotLight(0xe5ecd0,3,42,Math.PI/5.5,.55,1.2);flashTarget=new THREE.Object3D();camera.add(flashlight,flashTarget);flashlight.position.set(.20,-.15,-.05);flashTarget.position.set(0,-.02,-10);flashlight.target=flashTarget;flashlight.castShadow=true;flashlight.shadow.mapSize.set(touchMode?512:1024,touchMode?512:1024);flashlight.shadow.camera.near=.1;flashlight.shadow.camera.far=44;flashlight.shadow.bias=-.0007;scene.add(camera);
+ const geometry=new THREE.BufferGeometry(),positions=new Float32Array((touchMode?180:400)*3);for(let i=0;i<positions.length;i+=3){positions[i]=-85+Math.random()*170;positions[i+1]=1+Math.random()*6;positions[i+2]=-75+Math.random()*150}geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));dust=new THREE.Points(geometry,new THREE.PointsMaterial({color:0xbcdfac,size:.055,transparent:true,opacity:.4,depthWrite:false}));scene.add(dust);
+}
+function minimap(target=$('map'),large=false){
+ const ctx=target.getContext('2d'),W=target.width,H=target.height,s=Math.min((W-26)/176,(H-25)/156),px=x=>W/2+x*s,pz=z=>H/2+z*s;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#101f20';ctx.fillRect(0,0,W,H);ctx.fillStyle='#294939';ctx.fillRect(px(-88),pz(-78),176*s,156*s);ctx.fillStyle='#3b7581';ctx.fillRect(px(-6),pz(-78),12*s,156*s);
+ ctx.strokeStyle='#9b9370';ctx.lineWidth=large?5:2;const route=buildPatrolRoute();for(let i=0;i<route.length;i++){const a=route[i],b=route[(i+1)%route.length];ctx.beginPath();ctx.moveTo(px(a.x),pz(a.z));ctx.lineTo(px(b.x),pz(b.z));ctx.stroke()}
+ for(const h of cabinDefinitions){ctx.fillStyle='#b9d6a2';ctx.fillRect(px(h.x-5),pz(h.z-4.5),10*s,9*s);if(large){ctx.font='bold 14px sans-serif';ctx.fillStyle='#e3ead2';ctx.textAlign='center';ctx.fillText(h.name,px(h.x),pz(h.z)-10*s)}}
+ for(const r of greatRocks){ctx.fillStyle='#929e8b';ctx.beginPath();ctx.arc(px(r.x),pz(r.z),3.2*s,0,Math.PI*2);ctx.fill()}
+ for(const n of npcs)if(!n.done&&(n.discovered||Math.hypot(n.slot.x-player.x,n.slot.z-player.z)<17)){ctx.fillStyle='#efd68a';ctx.beginPath();ctx.arc(px(n.slot.x),pz(n.slot.z),large?5:3,0,7);ctx.fill()}
+ for(const guard of hunters)if(monsterDistance(guard)<30){ctx.fillStyle=guard.state==='ALERT'?'#ff9d82':'#d17e70';ctx.beginPath();ctx.arc(px(guard.g.position.x),pz(guard.g.position.z),large?7:4,0,7);ctx.fill()}
+ ctx.save();ctx.translate(px(player.x),pz(player.z));ctx.rotate(-yaw);ctx.beginPath();ctx.moveTo(0,large?-10:-6);ctx.lineTo(large?-7:-4,large?7:4);ctx.lineTo(large?7:4,large?7:4);ctx.closePath();ctx.fillStyle='#c8ffd9';ctx.fill();ctx.restore();
+}
+function openForestMap(){if(!started||ended()||active)return;mapWasPlaying=locked();clearKeys();stopTouchSession();if(document.pointerLockElement)releasePointer();$('forestMap').classList.remove('hidden');$('start').classList.add('hidden');minimap($('bigMap'),true)}
+function closeForestMap(){$('forestMap').classList.add('hidden');$('start').classList.add('hidden');if(mapWasPlaying)lock();else pause()}
+function updateSurvivalHUD(){const hut=safeRoom(),d=monsterDistance();hunterThreat=!failed&&!won?Math.max(0,1-d/24):0;const grace=elapsed<graceUntil;$('safePanel').classList.toggle('safe',!!hut||!!active||grace);$('safeTitle').textContent=failed?'PERCOBAAN BERAKHIR':won?'MISI HUTAN TUNTAS':active?'KUIS · AMAN SEMENTARA':hut?'ZONA AMAN · '+hut.room:grace?'BERSIAP · '+Math.ceil(graceUntil-elapsed)+' DETIK':'JALUR HUTAN · WASPADA';$('safeText').textContent=hut?'Gubuk melindungimu. Enam wilayah darat dan tiga jembatan memiliki penjaga masing-masing. Periksa semua penjaga terdekat sebelum keluar.':d<24?'Dekat: '+(closestGuardian()?.name||'penjaga')+'. Cari gubuk SAFE!':'Cari anomali dan item di gubuk, jembatan, pohon, serta belakang batu.';$('threatVignette').style.opacity=String(hut||active||grace?hunterThreat*.10:hunterThreat*.4)}
+// FOREST_WORLD_END
+
+const names=['01 · Penjaga Akar','02 · Pengelana Jam','03 · Bayangan Lumut','04 · Roh Sungai','05 · Pengawas Rimba','06 · Wajah Terbalik','07 · Anak Kabut','08 · Mantel Kosong','09 · Sang Peramu'];
+function npcMake(slot,i,questions){
+ const g=new THREE.Group(),body=new THREE.Group();g.add(body);
+ const pale=mat(0xa5b4a9),dark=mat(0x10191d),cloth=mat([0x314742,0x3e3c4a,0x172128,0x737c74,0x343f42,0x454046,0xa5b5ac,0x37454c,0x50493e][i]);
+ const glow=mat(i%2?0xb4d9cb:0xd99c83,{emissive:i%2?0x7bbaab:0xb65034,emissiveIntensity:1.6});
+ function part(w,h,d,x,y,z,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;body.add(o);return o}
+ const head=part(.45,.49,.41,0,1.85,0,i===7?dark:pale);
+ part(.62,.77,.33,0,1.18,0,cloth);
+ for(const side of [-1,1]){
+  const arm=part(.13,i===2?.98:.76,.15,side*.43,1.08,0,cloth);arm.rotation.z=side*(i===4?.42:.08);
+  part(.12,.18,.15,side*.46,.59,0,pale);
+  if(i!==3&&i!==7)part(.20,.67,.24,side*.16,.46,0,dark);
+  if(i!==0&&i!==7)part(.06,.045,.026,side*.105,1.89,.213,glow);
+ }
+ if(i===0){part(.31,.34,.03,0,1.86,.22,pale);part(.38,.12,.4,0,2.14,0,dark)}
+ if(i===1){const clock=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.06,24),pale);clock.rotation.x=Math.PI/2;clock.position.set(0,1.26,.22);body.add(clock);part(.025,.20,.04,0,1.32,.27,dark);part(.15,.025,.04,.06,1.24,.27,dark)}
+ if(i===2){head.material=dark;body.scale.set(.78,1.22,.67)}
+ if(i===3){body.position.y=.30;part(.68,.64,.42,0,.59,0,cloth);part(.5,.25,.45,0,2.03,-.04,dark)}
+ if(i===4){part(.78,.10,.50,0,2.16,0,dark);part(.44,.18,.38,0,2.27,0,dark)}
+ if(i===5){head.rotation.z=Math.PI;part(.24,.035,.03,0,2.01,.22,glow)}
+ if(i===6){part(.34,.08,.03,0,1.7,.22,dark);for(let k=0;k<3;k++)part(.04,.15,.03,-.15+k*.15,1.38,.19,dark)}
+ if(i===7){head.visible=false;part(.26,.09,.25,0,1.63,0,pale);part(.58,.08,.34,0,.8,0,dark);body.position.y=.18}
+ if(i===8){part(.13,.23,.05,0,1.85,.23,dark);part(.05,.05,.05,0,1.86,.27,glow);part(.45,.12,.41,0,2.13,0,dark);part(.32,.39,.10,.41,.94,.14,mat(0x807053))}
+ const tag=label(names[i],512);tag.position.y=2.9;tag.scale.set(3,.47,1);g.add(tag);
+ g.position.set(slot.x,slot.y,slot.z);g.rotation.y=slot.x>0?-Math.PI/2:Math.PI/2;
+ scene.add(g);return{g,body,baseY:body.position.y,slot,name:names[i],tag,questions,index:0,done:false,discovered:false,seed:i*1.7};
+}
+
+function removeNPC(n){scene.remove(n.g);const gs=new Set(),ms=new Set(),ts=new Set();n.g.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material){ms.add(o.material);if(o.material.map)ts.add(o.material.map)}});gs.forEach(g=>g.dispose());ts.forEach(t=>t.dispose());ms.forEach(m=>m.dispose())}
+function populate(){npcs.forEach(n=>{if(!n.done)removeNPC(n)});let custom=shuffle(customBank),seen=new Set(custom.map(q=>q.q.toLowerCase().trim())),deck=shuffle(custom.concat(shuffle(bank.filter(q=>!seen.has(q.q.toLowerCase().trim())))).slice(0,63)).map(q=>{const options=shuffle([q.answer,...q.distractors]);return{...q,options,right:options.indexOf(q.answer)}});npcs=shuffle(slots).slice(0,9).map((s,i)=>npcMake(s,i,deck.slice(i*7,i*7+7)))}
+// PHYSICS_START
+function overlaps(c,x,z){return x+RADIUS>c.minX+.0001&&x-RADIUS<c.maxX-.0001&&z+RADIUS>c.minZ+.0001&&z-RADIUS<c.maxZ-.0001}
+function blocked(x,z,y){return colliders.some(c=>overlaps(c,x,z)&&y+HEIGHT>c.minY+.003&&y<c.maxY-.003)}
+// Lima ray di tapak pemain. Ray tepi mempertahankan pijakan yang baru dinaiki;
+// satu ray pusat saja akan menjatuhkan pemain kembali ke anak tangga sebelumnya.
+function supportAt(x,z,top,bottom){let best=-Infinity;const r=RADIUS+.012;for(const [dx,dz]of [[0,0],[r,0],[-r,0],[0,r],[0,-r]]){origin.set(x+dx,top,z+dz);ray.set(origin,down);ray.near=0;ray.far=Math.max(.001,top-bottom);for(const hit of ray.intersectObjects(walkables,false)){if(hit.face&&hit.face.normal.y>.5&&hit.point.y>best){best=hit.point.y;break}}}return best}
+function moveAxis(dx,dz){const x=player.x+dx,z=player.z+dz;if(Math.abs(x)>87.3||Math.abs(z)>77.3)return;let y=player.y;
+ if(grounded){const support=supportAt(x,z,y+STEP+.005,y-.32);if(Number.isFinite(support)&&support<=y+STEP+.006){const candidate=Math.max(y,support);if(!blocked(x,z,candidate+.006))y=candidate}}
+ if(!blocked(x,z,y+.006)){player.x=x;player.z=z;player.y=y}
+}
+function physics(dt){const ox=player.x,oz=player.z;let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)+touchMove.forward,s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+touchMove.strafe,n=Math.hypot(f,s),running=keys.ShiftLeft||keys.ShiftRight||touchRun;
+ if(n){f/=n;s/=n;const speed=(running?7.8:4.5)*Math.min(1,n),dx=(s*Math.cos(yaw)-f*Math.sin(yaw))*speed*dt,dz=(-f*Math.cos(yaw)-s*Math.sin(yaw))*speed*dt,count=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.055));for(let i=0;i<count;i++){moveAxis(dx/count,0);moveAxis(0,dz/count)}}
+ const old=player.y;vy=Math.max(-24,vy-18*dt);let target=old+vy*dt;
+ if(vy>0){for(const c of colliders){if(overlaps(c,player.x,player.z)&&old+HEIGHT<=c.minY+.004&&target+HEIGHT>=c.minY){target=Math.min(target,c.minY-HEIGHT-.006);vy=0}}}
+ if(vy<=0){const support=supportAt(player.x,player.z,old+.025,target-.06);if(Number.isFinite(support)&&support<=old+.03&&support>=target-.06){target=support;vy=0;grounded=true}else grounded=false}else grounded=false;
+ player.y=target;if(player.y< -8){player.set(-64,0,60);vy=0;grounded=true}
+ if(grounded&&Math.hypot(player.x-ox,player.z-oz)>.001){footClock+=dt;if(footClock>(running?.27:.4)){footstep();footClock=0}}else footClock=.2;
+}
+// PHYSICS_END
+function lineBlocked(a,b){const d={x:b.x-a.x,y:b.y-a.y,z:b.z-a.z};return colliders.some(c=>{let lo=0,hi=1;for(const [axis,min,max]of [['x',c.minX,c.maxX],['y',c.minY,c.maxY],['z',c.minZ,c.maxZ]]){if(Math.abs(d[axis])<1e-7){if(a[axis]<min||a[axis]>max)return false}else{let t1=(min-a[axis])/d[axis],t2=(max-a[axis])/d[axis];if(t1>t2)[t1,t2]=[t2,t1];lo=Math.max(lo,t1);hi=Math.min(hi,t2);if(lo>hi)return false}}return hi>.01&&lo<.99})}
+function nearest(){nearby=null;let best=2.7;for(const n of npcs){if(n.done||n.slot.floor!==floor()||Math.abs(player.y-n.slot.y)>.6)continue;const d=Math.hypot(player.x-n.slot.x,player.z-n.slot.z);if(d<best&&!lineBlocked({x:player.x,y:player.y+1.3,z:player.z},{x:n.slot.x,y:n.slot.y+1.3,z:n.slot.z})){nearby=n;best=d}}$('prompt').classList.toggle('hidden',!nearby);if(nearby)$('prompt').textContent='Tekan E · Selidiki '+nearby.name;updateItemFocus()}
+// SHARED_TOUCH_START
+function ended(){return won||(typeof failed!=='undefined'&&failed)}
+function chooseInputMode(){
+ const choice=$('inputMode').value;
+ touchMode=choice==='touch'||(choice==='auto'&&(window.matchMedia('(pointer: coarse)').matches||((navigator.maxTouchPoints||0)>0&&!window.matchMedia('(any-pointer: fine)').matches)));
+ document.body.classList.toggle('touch-ui',touchMode);
+ try{localStorage.setItem('english-quest-input-mode',choice)}catch(e){}
+ clearTouchInput();refreshViewport();
+}
+function clearTouchInput(){
+ touchMove.forward=touchMove.strafe=0;touchRun=false;stickPointer=lookPointer=null;
+ if($('stickKnob'))$('stickKnob').style.transform='translate(-50%,-50%)';
+ if($('touchRun')){$('touchRun').classList.remove('pressed');$('touchRun').textContent='Lari'}
+}
+function stopTouchSession(){touchSession=false;clearTouchInput();syncTouchUI()}
+function releasePointer(){
+ if(touchMode){stopTouchSession();if(started&&!active&&!ended())pause('Misi dijeda. Sentuh Lanjutkan Misi untuk bermain.');return}
+ if(document.pointerLockElement&&document.exitPointerLock)document.exitPointerLock();
+}
+function modalIsVisible(){return['start','quiz','teacher','win','fail','forestMap'].some(id=>$(id)&&!$(id).classList.contains('hidden'))}
+function portraitGate(){return touchMode&&touchSession&&started&&!ended()&&!active&&!portraitAllowed&&innerHeight>innerWidth&&!modalIsVisible()}
+function syncTouchUI(){
+ const blocked=portraitGate(),showControls=touchMode&&touchSession&&started&&!ended()&&!active&&!document.hidden&&!blocked&&!modalIsVisible();
+ $('rotateScreen').classList.toggle('hidden',!blocked);
+ $('mobileControls').classList.toggle('hidden',!showControls);
+ $('cross').classList.toggle('hidden',!locked()||!!active||ended()||modalIsVisible());
+ if(!showControls)clearTouchInput();
+ if(touchMode){
+  const item=typeof nearItem!=='undefined'&&nearItem;
+  $('touchInteract').disabled=!(item||nearby)||!showControls;
+  $('touchInteract').textContent=item?'✋ Ambil item':nearby?'☏ Bicara':'✋ Interaksi';
+ }
+}
+function refreshViewport(){
+ const w=Math.max(1,window.innerWidth),h=Math.max(1,Math.round(window.visualViewport&&window.visualViewport.height||window.innerHeight));
+ document.documentElement.style.setProperty('--game-height',h+'px');
+ if(renderer&&camera){renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,touchMode?1.25:1.7));renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
+ syncTouchUI();
+}
+async function requestMobileDisplay(){
+ let full=false;
+ try{
+  const root=document.documentElement;
+  if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+   const request=root.requestFullscreen||root.webkitRequestFullscreen;
+   if(request)await request.call(root);
+  }
+  full=!!(document.fullscreenElement||document.webkitFullscreenElement);
+ }catch(e){}
+ try{if(window.screen&&screen.orientation&&typeof screen.orientation.lock==='function')await screen.orientation.lock('landscape')}catch(e){}
+ // Browser yang menolak fullscreen/orientasi tetap bisa memainkan game.
+ refreshViewport();return full;
+}
+function resumeTouch(){
+ touchSession=true;clearTouchInput();$('start').classList.add('hidden');previous=performance.now();
+ syncTouchUI();void requestMobileDisplay();
+}
+function mobilePause(){
+ if(!started||ended()||active)return;
+ stopTouchSession();pause('Misi dijeda. Sentuh Lanjutkan Misi untuk kembali bermain.');
+}
+function touchInteraction(){
+ if(!touchMode||!locked()||active||ended())return;
+ if(typeof nearItem!=='undefined'&&nearItem){collectItem(nearItem);return}
+ if(nearby)openQuiz(nearby);
+ clearTouchInput();syncTouchUI();
+}
+function touchJump(){if(locked()&&!active&&!ended()&&grounded){vy=6.6;grounded=false}}
+function updateStick(e){
+ if(e.pointerId!==stickPointer)return;e.preventDefault();
+ const rect=$('moveStick').getBoundingClientRect(),radius=rect.width*.34;
+ const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2),length=Math.hypot(dx,dy),clamp=length>radius?radius/length:1;
+ const x=dx*clamp,y=dy*clamp,magnitude=Math.min(1,length/radius),strength=Math.max(0,(magnitude-.12)/.88);
+ touchMove.strafe=length?dx/length*strength:0;touchMove.forward=length?-dy/length*strength:0;
+ $('stickKnob').style.transform='translate(calc(-50% + '+x+'px),calc(-50% + '+y+'px))';
+}
+function endStick(e){if(e.pointerId!==stickPointer)return;stickPointer=null;touchMove.forward=touchMove.strafe=0;$('stickKnob').style.transform='translate(-50%,-50%)'}
+function beginLook(e){
+ if(!touchMode||!locked()||active||ended()||e.clientX<innerWidth*.3||lookPointer!==null)return;
+ e.preventDefault();lookPointer=e.pointerId;lookX=e.clientX;lookY=e.clientY;
+ try{$('world').setPointerCapture(e.pointerId)}catch(err){}
+}
+function moveLook(e){
+ if(e.pointerId!==lookPointer||!locked()||active)return;e.preventDefault();
+ const sensitivity=Math.PI/Math.max(380,Math.min(innerWidth,innerHeight)*1.6);
+ yaw-=(e.clientX-lookX)*sensitivity;pitch=Math.max(-1.5,Math.min(1.5,pitch-(e.clientY-lookY)*sensitivity));lookX=e.clientX;lookY=e.clientY;
+}
+function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
+$('moveStick').addEventListener('pointerdown',e=>{
+ if(!locked()||active||ended()||stickPointer!==null)return;e.preventDefault();e.stopPropagation();stickPointer=e.pointerId;
+ try{$('moveStick').setPointerCapture(e.pointerId)}catch(err){}updateStick(e);
+});
+$('moveStick').addEventListener('pointermove',updateStick);
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('moveStick').addEventListener(t,endStick));
+$('world').addEventListener('pointerdown',beginLook);$('world').addEventListener('pointermove',moveLook);
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('world').addEventListener(t,endLook));
+$('mobileControls').addEventListener('pointerdown',e=>e.stopPropagation());
+$('mobileControls').addEventListener('contextmenu',e=>e.preventDefault());
+$('touchInteract').onclick=touchInteraction;$('touchJump').onclick=touchJump;
+$('touchRun').onclick=()=>{if(!locked())return;touchRun=!touchRun;$('touchRun').classList.toggle('pressed',touchRun);$('touchRun').textContent=touchRun?'Lari ON':'Lari'};
+$('touchFlash').onclick=()=>{if(typeof toggleFlash==='function')toggleFlash()};
+$('mobilePause').onclick=mobilePause;
+$('mobileFull').onclick=()=>void requestMobileDisplay();$('retryLandscape').onclick=()=>void requestMobileDisplay();
+$('playPortrait').onclick=()=>{portraitAllowed=true;refreshViewport()};
+$('mobileSound').onclick=()=>{$('sound').click();$('mobileSound').textContent=muted?'🔇':'🔊'};
+$('mobileTeacher').onclick=()=>{$('teacher').classList.remove('hidden');$('teacherStatus').textContent=customBank.length+' soal kustom aktif. Perubahan berlaku pada misi baru.'};
+$('inputMode').addEventListener('change',()=>{stopTouchSession();chooseInputMode()});
+window.addEventListener('resize',refreshViewport);
+window.addEventListener('orientationchange',()=>{clearKeys();clearTouchInput();refreshViewport()});
+document.addEventListener('fullscreenchange',()=>{refreshViewport()});
+window.addEventListener('blur',()=>{if(touchMode&&touchSession&&!active&&!ended())mobilePause();clearTouchInput()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTouchInput();if(touchMode&&touchSession&&!active&&!ended())mobilePause()}});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',refreshViewport);
+try{const saved=localStorage.getItem('english-quest-input-mode');if(['auto','touch','keyboard'].includes(saved))$('inputMode').value=saved}catch(e){}
+// SHARED_TOUCH_END
+
+function clearKeys(){Object.keys(keys).forEach(k=>delete keys[k]);clearTouchInput()}
+const locked=()=>touchMode?touchSession&&started&&!ended()&&!active&&!document.hidden&&!portraitGate()&&!modalIsVisible():document.pointerLockElement===$('world');
+function pause(message='Klik tombol untuk kembali menjelajah.'){if(active||won||failed)return;stopTouchSession();$('start').classList.remove('hidden');$('startButton').textContent=started?'Lanjutkan Misi':'Mulai Misi';$('status').textContent=message}
+function lock(){if(touchMode){resumeTouch();return}if(!$('world').requestPointerLock){pause('Mode mouse tidak tersedia. Pilih Joystick & layar sentuh pada Mode kontrol untuk bermain.');return}try{const p=$('world').requestPointerLock();if(p&&p.catch)p.catch(()=>pause('Klik tombol untuk mengaktifkan mouse.'))}catch(e){pause('Klik tombol untuk mencoba mengunci mouse lagi.')}}
+document.addEventListener('pointerlockchange',()=>{if(touchMode)return;$('cross').classList.toggle('hidden',!locked());if(locked()){$('start').classList.add('hidden');previous=performance.now()}else{clearKeys();$('prompt').classList.add('hidden');if(started&&!active&&!won)pause()}});
+document.addEventListener('pointerlockerror',()=>pause('Klik Lanjutkan Misi untuk mengaktifkan mouse.'));
+document.addEventListener('mousemove',e=>{if(touchMode||!locked()||active||won||failed)return;yaw-=e.movementX*.0022;pitch=Math.max(-1.5,Math.min(1.5,pitch-e.movementY*.0022))});
+document.addEventListener('keydown',e=>{if(e.target.matches('textarea,input'))return;if(started&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.repeat)return;if(e.code==='Space'&&locked()&&!active&&grounded){vy=6.6;grounded=false}if(e.code==='KeyF'&&locked()&&!active)toggleFlash();if(e.code==='KeyE'&&locked()&&!active&&!failed){if(nearItem)collectItem(nearItem);else if(nearby)openQuiz(nearby)}});
+document.addEventListener('keyup',e=>keys[e.code]=false);
+window.addEventListener('blur',()=>{clearKeys();cancelPress();if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.1);if(locked())releasePointer()});
+document.addEventListener('visibilitychange',()=>{previous=performance.now();if(document.hidden){if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.1);if(locked())releasePointer()}});
+function reset(){stopTouchSession();attemptToken++;clearTimeout(answerTimer);clearKeys();active=nearby=null;busy=false;elapsed=correct=wrong=finished=0;won=false;vy=0;grounded=true;yaw=Math.PI;pitch=0;flashOn=true;$('flashButton').textContent='F · Senter ON';player.set(-64,0,60);populate();resetSurvival();scene.updateMatrixWorld(true);['quiz','win','prompt','toast','fail','forestMap'].forEach(id=>$(id).classList.add('hidden'));['hud','mapBox','bottom','missionTag','safePanel'].forEach(id=>$(id).classList.remove('hidden'));hud()}
+$('startButton').onclick=()=>{if(!ready)return;audioStart();if(!started){reset();started=true}$('start').classList.add('hidden');lock()};
+$('again').onclick=()=>{audioStart();reset();started=true;$('start').classList.add('hidden');lock()};
+function openQuiz(n){if(failed||won)return;n.discovered=true;active=n;busy=false;clearKeys();$('quiz').classList.remove('hidden');$('prompt').classList.add('hidden');if(locked())releasePointer();renderQuestion()}
+function renderQuestion(){if(!active)return;const q=active.questions[active.index];$('npcName').textContent=active.name+' · '+active.slot.room;$('questionNumber').textContent='Pertanyaan '+(active.index+1)+' dari 7';$('question').textContent=q.q;$('fill').style.width=active.index/7*100+'%';$('hint').textContent='💡 Hint: '+q.hint;$('meaning').textContent=q.meaning;$('meaning').classList.add('hidden');$('meaningButton').classList.toggle('hidden',!q.meaning);$('meaningButton').textContent='Tampilkan Arti';$('feedback').textContent='';$('answers').replaceChildren();$('leaveQuiz').disabled=false;busy=false;q.options.forEach((text,i)=>{const b=document.createElement('button');b.className='answer';const a=document.createElement('span');a.className='letter';a.textContent='ABCD'[i];const t=document.createElement('span');t.textContent=text;b.append(a,t);b.onclick=()=>answer(i);$('answers').appendChild(b)})}
+$('meaningButton').onclick=()=>{const h=$('meaning').classList.toggle('hidden');$('meaningButton').textContent=h?'Tampilkan Arti':'Sembunyikan Arti'};
+$('leaveQuiz').onclick=()=>{if(busy)return;graceUntil=elapsed+3;active=null;$('quiz').classList.add('hidden');lock()};
+function answer(i){if(!active||busy||failed||won)return;const epoch=attemptToken;busy=true;const n=active,q=n.questions[n.index],ok=i===q.right,buttons=[...$('answers').children];buttons.forEach(b=>b.disabled=true);buttons[q.right].classList.add('right');$('leaveQuiz').disabled=true;audioStart();if(ok){correct++;bling();$('feedback').style.color='#83f5be';$('feedback').textContent='✓ Benar! Bagus sekali.'}else{wrong++;buzz();buttons[i].classList.add('wrong');$('feedback').style.color='#ffb4bd';$('feedback').textContent='✕ Jawaban benar: '+q.answer}n.index++;$('fill').style.width=n.index/7*100+'%';hud();answerTimer=setTimeout(()=>{if(epoch!==attemptToken||failed)return;busy=false;if(n.index<7)renderQuestion();else{n.done=true;removeNPC(n);finished++;graceUntil=elapsed+3;active=nearby=null;$('quiz').classList.add('hidden');hud();if(!checkVictory())pause('Kuis '+n.name+' selesai. Anomali menghilang. Cari petunjuk berikutnya; berlindung di gubuk jika penjaga mendekat.')}},ok?900:1800)}
+function victory(){if(failed||won||finished!==9||foundItems!==5)return;won=true;if(locked())releasePointer();$('start').classList.add('hidden');$('cross').classList.add('hidden');$('prompt').classList.add('hidden');$('finalScore').textContent=correct+'/63';$('finalWrong').textContent=wrong;$('finalTime').textContent=time(elapsed);$('win').classList.remove('hidden');bling()}
+function hud(){$('floorHUD').textContent=regionName();$('npcHUD').textContent=finished+'/9';$('itemHUD').textContent=foundItems+'/5';$('correctHUD').textContent=correct;$('wrongHUD').textContent=wrong;$('timeHUD').textContent=time(elapsed);$('mapFloor').textContent='UTARA ↑'}
+
+
+// REGION_GUARDS_START
+const guardRegions=[
+ {name:'Penjaga Barat Laut',zone:'Gubuk tua & batu barat',points:[[-68,-48],[-40,-48],[-40,-8],[-40,-48]]},
+ {name:'Penjaga Rimba Barat',zone:'Pohon tua & pondok lumut',points:[[-68,0],[-40,0],[-14,0],[-40,0]]},
+ {name:'Penjaga Kamp Selatan',zone:'Kamp penjelajah & kayu tumbang',points:[[-40,8],[-40,48],[-14,48],[-40,48]]},
+ {name:'Penjaga Reruntuhan',zone:'Reruntuhan & hutan timur laut',points:[[68,-48],[40,-48],[40,-8],[40,-48]]},
+ {name:'Penjaga Tepi Timur',zone:'Gubuk nelayan & tepi sungai',points:[[68,0],[40,0],[14,0],[40,0]]},
+ {name:'Penjaga Tenggara',zone:'Gubuk jembatan & kebun pakis',points:[[68,48],[40,48],[14,48],[40,48],[68,48],[68,8]]},
+ {name:'Penjaga Jembatan Utara',zone:'Jembatan utara',points:[[-12,-48],[12,-48]]},
+ {name:'Penjaga Jembatan Tengah',zone:'Jembatan tengah',points:[[-12,0],[12,0]]},
+ {name:'Penjaga Jembatan Selatan',zone:'Jembatan selatan',points:[[-12,48],[12,48]]}
+];
+function closestGuardian(){let closest=null,best=Infinity;for(const guard of hunters){const d=monsterDistance(guard);if(d<best){closest=guard;best=d}}return closest}
+function resetRegionalGuards(){
+ hunters.forEach((guard,i)=>{
+  const choices=guard.route.map((p,index)=>({p,index})).filter(({p})=>Math.hypot(p.x-player.x,p.z-player.z)>18);
+  const pick=shuffle(choices.length?choices:guard.route.map((p,index)=>({p,index})))[0];
+  const p=pick.p;guard.index=(pick.index+1)%guard.route.length;guard.g.position.set(p.x,p.y,p.z);guard.pathPosition.set(p.x,p.y,p.z);guard.g.visible=true;guard.footDistance=i*.08;guard.moved=0;guard.state='PATROL';
+ });
+ hunter=closestGuardian();
+}
+function updatePatrol(dt){
+ if(failed||won||!started||document.hidden||(!locked()&&!active))return;
+ // Each guardian updates only its own route; capture by any guardian fails the run.
+ for(const guard of hunters){hunter=guard;updateOnePatrol(dt);if(failed||won)return}
+ hunter=closestGuardian();
+}
+// REGION_GUARDS_END
+
+// SURVIVAL_START
+function safeRoom(pos=player){
+ return safeRooms.find(r=>pos.x>=r.minX&&pos.x<=r.maxX&&pos.z>=r.minZ&&pos.z<=r.maxZ&&pos.y>=r.y-.12&&pos.y<=r.y+FH-1.15)||null;
+}
+
+function disposeGroup(group){
+ scene.remove(group);const geometries=new Set(),materials=new Set(),textures=new Set();group.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material){materials.add(o.material);if(o.material.map)textures.add(o.material.map)}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());
+}
+function makePickup(type,location,index){
+ const g=new THREE.Group(),body=new THREE.Group();g.add(body);const material=mat(type.color,{emissive:type.color,emissiveIntensity:.15}),dark=mat(0x35413e),paper=mat(0xc9c9ad);
+ function part(w,h,d,x,y,z,m=material){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);mesh.position.set(x,y,z);body.add(mesh);return mesh}
+ if(type.kind==='key'){const ring=new THREE.Mesh(new THREE.TorusGeometry(.15,.045,8,20),material);ring.position.y=.18;body.add(ring);part(.075,.35,.07,0,-.07,0);part(.16,.06,.07,.06,-.18,0);part(.14,.06,.07,.05,-.08,0)}
+ if(type.kind==='book'){part(.43,.07,.32,0,0,0,paper);part(.47,.025,.35,0,.055,0);part(.47,.025,.35,0,-.055,0);part(.035,.13,.35,-.23,0,0)}
+ if(type.kind==='watch'){const disk=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.065,24),material);disk.rotation.x=Math.PI/2;body.add(disk);part(.025,.17,.02,0,.045,.05,dark);part(.12,.025,.02,.04,-.015,.05,dark);part(.08,.10,.07,0,.23,0)}
+ if(type.kind==='candle'){const wax=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.43,16),material);body.add(wax);part(.022,.08,.022,0,.25,0,dark);const flame=new THREE.Mesh(new THREE.SphereGeometry(.055,8,8),mat(0xffd18c,{emissive:0xe09f54,emissiveIntensity:.8}));flame.position.y=.32;flame.scale.y=1.5;body.add(flame)}
+ if(type.kind==='box'){part(.38,.27,.30,0,0,0);part(.43,.045,.34,0,.16,0);part(.10,.07,.04,0,.015,.17,paper);part(.18,.035,.035,.25,0,0);part(.035,.10,.035,.32,.035,0)}
+ const tag=label(type.name,384);tag.scale.set(1.65,.34,1);tag.position.y=.65;tag.visible=false;g.add(tag);
+ g.position.set(location.x,location.y+.37,location.z);g.rotation.y=Math.random()*Math.PI*2;scene.add(g);return{g,body,tag,type,location,index,done:false};
+}
+function makeHunter(index=0){
+ const g=new THREE.Group(),body=new THREE.Group();g.add(body);
+ const pale=mat(0x989d79),dress=mat([0x3b5345,0x4b4a3d,0x4c3f48,0x4e493b,0x384d51,0x414653,0x52503e,0x3d5249,0x4d4440][index%9]),hair=mat(0x23392e),dark=mat(0x253138),eye=mat(0xe9ad8a,{emissive:0xcd6d49,emissiveIntensity:1.6});
+ function part(w,h,d,x,y,z,m){const a=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);a.position.set(x,y,z);a.castShadow=true;body.add(a);return a}
+ part(1.05,1.1,.57,0,2.12,0,dress);
+ const skirt=new THREE.Mesh(new THREE.CylinderGeometry(.47,.82,1.62,8),dress);skirt.position.set(0,1.1,0);skirt.castShadow=true;body.add(skirt);
+ part(.69,.75,.61,0,3.14,0,pale);part(.79,.23,.70,0,3.58,-.04,hair);part(.77,1.22,.28,0,2.98,-.30,hair);
+ const arms=[];for(const side of [-1,1]){const arm=part(.23,1.6,.27,side*.71,1.88,0,dress);arm.rotation.z=side*.09;arms.push(arm);part(.21,.38,.23,side*.79,.96,0,pale);part(.28,.20,.5,side*.29,.13,.08,dark);part(.10,.07,.03,side*.17,3.21,.315,eye)}
+ part(.21,.035,.025,0,2.99,.322,dark);for(const side of [-1,1]){const antler=part(.10,.75,.10,side*.46,3.7,0,dark);antler.rotation.z=side*-.4;const twig=part(.32,.08,.10,side*.60,3.9,0,dark);twig.rotation.z=side*.4}
+ scene.add(g);return{g,body,arms,pathPosition:new THREE.Vector3(),index:0,footDistance:0,moved:0,state:'PATROL'};
+}
+function buildSurvival(){patrolRoute=buildPatrolRoute();itemCandidates=buildItemCandidates();guardRegions.forEach((region,i)=>{const guard=makeHunter(i);guard.id=i;guard.name=region.name;guard.zone=region.zone;guard.route=region.points.map(([x,z])=>({x,y:0,z}));hunters.push(guard)});hunter=hunters[0]}
+function resetSurvival(){
+ failed=false;foundItems=0;nearItem=null;hunterThreat=0;graceUntil=elapsed+8;
+ for(const p of pickups)if(!p.done)disposeGroup(p.g);
+ const locations=chooseItemLocations();pickups=itemTypes.map((type,i)=>makePickup(type,locations[i],i));
+ resetRegionalGuards();
+ $('threatVignette').style.opacity='0';
+}
+function updateItemFocus(){
+ nearItem=null;let best=nearby?Math.hypot(player.x-nearby.slot.x,player.z-nearby.slot.z):1.85;
+ for(const item of pickups){if(item.done||Math.abs(player.y-item.location.y)>.65)continue;const distance=Math.hypot(player.x-item.location.x,player.z-item.location.z);if(distance<best&&!lineBlocked({x:player.x,y:player.y+1.2,z:player.z},{x:item.g.position.x,y:item.g.position.y+.14,z:item.g.position.z})){best=distance;nearItem=item}}
+ if(nearItem){$('prompt').classList.remove('hidden');$('prompt').textContent='Tekan E · Ambil '+nearItem.type.name}
+}
+function collectItem(item){
+ if(!started||won||failed||item.done||active)return;
+ if(Math.abs(player.y-item.location.y)>.65||Math.hypot(player.x-item.location.x,player.z-item.location.z)>1.85)return;
+ if(lineBlocked({x:player.x,y:player.y+1.2,z:player.z},{x:item.g.position.x,y:item.g.position.y+.14,z:item.g.position.z}))return;
+ item.done=true;disposeGroup(item.g);foundItems++;nearItem=null;bling();hud();showToast('✓ '+item.type.name+' — '+item.type.meaning+' ('+foundItems+'/5)');checkVictory();
+}
+function checkVictory(){if(!failed&&!won&&finished===9&&foundItems===5){victory();return true}return false}
+function animateItems(){for(const item of pickups)if(!item.done){const d=Math.hypot(player.x-item.location.x,player.z-item.location.z);item.body.position.y=Math.sin(elapsed*1.7+item.index)*.018;item.tag.visible=!failed&&!won&&Math.abs(player.y-item.location.y)<.8&&d<3.5&&!lineBlocked({x:player.x,y:player.y+1.2,z:player.z},{x:item.g.position.x,y:item.g.position.y+.14,z:item.g.position.z})}}
+function monsterDistance(guard=null){if(guard)return Math.hypot(guard.g.position.x-player.x,guard.g.position.z-player.z);let best=Infinity;for(const entity of hunters)best=Math.min(best,Math.hypot(entity.g.position.x-player.x,entity.g.position.z-player.z));return best}
+function hunterSeesPlayer(){
+ if(!hunter||safeRoom()||Math.abs(hunter.g.position.y-player.y)>1.6||monsterDistance(hunter)>10.5)return false;
+ return!lineBlocked({x:hunter.g.position.x,y:hunter.g.position.y+1.6,z:hunter.g.position.z},{x:player.x,y:player.y+1.3,z:player.z});
+}
+function heavyStep(){
+ if(!audio||muted||Math.abs(hunter.g.position.y-player.y)>5)return;
+ const proximity=Math.max(0,1-monsterDistance(hunter)/23);if(proximity<=0)return;
+ tone(49,audio.currentTime,.28,'triangle',.30*proximity);tone(73,audio.currentTime+.055,.19,'sine',.15*proximity);
+}
+function canCapture(){
+ if(!hunter||safeRoom()||failed||won||active||elapsed<graceUntil)return false;
+ const m=hunter.g.position;if(monsterDistance(hunter)>1.38||player.y>=m.y+3.5||player.y+HEIGHT<=m.y+.12)return false;
+ return!lineBlocked({x:m.x,y:m.y+1.4,z:m.z},{x:player.x,y:player.y+1.3,z:player.z});
+}
+function updateOnePatrol(dt){
+ if(!hunter||failed||won||!started||document.hidden||(!locked()&&!active))return;
+ hunter.state=hunterSeesPlayer()?'ALERT':'PATROL';
+ let travel=(hunter.state==='ALERT'?5.1:3.4)*dt;
+ while(travel>1e-7){const target=hunter.route[hunter.index],pos=hunter.pathPosition,dx=target.x-pos.x,dy=target.y-pos.y,dz=target.z-pos.z,d=Math.hypot(dx,dy,dz);if(d<.025){pos.set(target.x,target.y,target.z);hunter.index=(hunter.index+1)%hunter.route.length;continue}
+  const step=Math.min(travel,d,.15);const x=pos.x+dx/d*step,z=pos.z+dz/d*step,y=pos.y+dy/d*step;
+  // Rute menaiki tangga nyata; ray lantai merapatkan kaki ke injakan.
+  // Posisi vertikal rute disimpan terpisah agar snapping tidak menahan rute.
+  pos.set(x,y,z);const floorY=supportAt(x,z,y+.25,y-.35);hunter.g.position.set(x,Number.isFinite(floorY)?floorY:y,z);if(Math.hypot(dx,dz)>.001)hunter.g.rotation.y=Math.atan2(dx,dz);
+  travel-=step;hunter.footDistance+=step;hunter.moved+=step;
+  if(canCapture()){failMission();return}
+ }
+ hunter.body.position.y=Math.sin(hunter.moved*3.5)*.035;hunter.body.rotation.z=Math.sin(hunter.moved*1.8)*.022;
+ hunter.arms.forEach((a,i)=>a.rotation.x=Math.sin(hunter.moved*3.5+i*Math.PI)*.12);
+ if(hunter.footDistance>.95){hunter.footDistance%=.95;heavyStep()}
+ if(canCapture())failMission();
+}
+function failMission(){
+ if(failed||won)return;const summary='Sebelum tertangkap: '+finished+'/9 anomali, '+foundItems+'/5 item, waktu '+time(elapsed)+'.';
+ clearTimeout(answerTimer);reset();failed=true;active=nearby=null;nearItem=null;clearKeys();
+ hideSurvivalPrompt();$('start').classList.add('hidden');$('failReason').textContent=summary;$('fail').classList.remove('hidden');
+ if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.12);
+ if(locked())releasePointer();hud();buzz();
+}
+function hideSurvivalPrompt(){$('cross').classList.add('hidden');$('prompt').classList.add('hidden')}
+$('retry').onclick=()=>{audioStart();reset();started=true;$('start').classList.add('hidden');lock()};
+// SURVIVAL_END
+
+function toggleFlash(){flashOn=!flashOn;$('flashButton').textContent='F · Senter '+(flashOn?'ON':'OFF')}
+$('flashButton').onclick=toggleFlash;
+
+function mood(now){
+ const live=started&&!won&&!failed&&!document.hidden&&(locked()||active),t=elapsed;
+ if(flashlight)flashlight.intensity=started&&!won&&!failed&&flashOn?2.8:0;
+ // Perubahan cahaya perlahan.
+ corridorLights.forEach((l,i)=>{l.intensity=.48+.18*Math.sin(t*.8+i*2.1);if(Math.sin(t*.31+i*1.8)>.97)l.intensity*=.35});
+ let nearestDistance=100;
+ for(const n of npcs)if(!n.done){
+  const distance=Math.hypot(n.slot.x-player.x,n.slot.z-player.z);
+  if(n.slot.floor===floor())nearestDistance=Math.min(nearestDistance,distance);
+  n.body.position.y=n.baseY+Math.sin(t*1.1+n.seed)*.065;
+  n.body.rotation.z=Math.sin(t*.47+n.seed)*.025;
+  n.tag.position.y=2.9+Math.sin(t*.9+n.seed)*.04;
+  // Anomali tetap di kelasnya dan menoleh ke pemain yang mendekat.
+  if(distance<7)n.g.rotation.y=Math.atan2(player.x-n.slot.x,player.z-n.slot.z);
+ }
+ nearSignal=Math.max(0,1-nearestDistance/10);
+ if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(live?.32+nearSignal*.2:0,audio.currentTime,.25);
+ if(dust){dust.position.y=Math.sin(now*.00009)*.06;dust.material.opacity=.19+nearSignal*.06}
+ $('missionTag').textContent='FOREST QUEST / '+(won?'SEMUA TUJUAN TUNTAS':failed?'PERCOBAAN BERAKHIR':'ANOMALI '+finished+'/9 · ITEM '+foundItems+'/5');
+}
+
+
+function setup(){
+ renderer=new THREE.WebGLRenderer({canvas:$('world'),antialias:true,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,touchMode?1.25:1.7));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.4;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x070e16);scene.fog=new THREE.FogExp2(0x13252a,.012);
+ camera=new THREE.PerspectiveCamera(73,innerWidth/innerHeight,.07,150);camera.rotation.order='YXZ';
+ scene.add(new THREE.HemisphereLight(0x839fa9,0x29352e,.60));
+ const moon=new THREE.DirectionalLight(0x8faec5,.5);moon.position.set(-25,40,10);scene.add(moon);
+ tileTex=texture('tile');wallMat=mat(0xabb4a2,{map:texture('wall')});woodMat=mat(0x8b8676,{map:texture('wood')});metalMat=mat(0x455b59);glassMat=mat(0x638c96,{transparent:true,opacity:.28,depthWrite:false,roughness:.6});stairMat=mat(0x92917a);
+ forest();buildAtmosphere();buildSurvival();scene.updateMatrixWorld(true);ready=true;$('status').textContent='Senter siap. Mulai dari gubuk aman, lalu jelajahi hutan.';requestAnimationFrame(animate);
+}
+
+
+function animate(now){
+ requestAnimationFrame(animate);const real=Math.max(0,(now-previous)/1000),dt=Math.min(real,.05);previous=now;
+ const playing=started&&!won&&!failed&&!document.hidden&&(locked()||active);
+ if(playing){elapsed+=Math.min(real,.25);if(locked()&&!active){const old=floor();physics(dt);if(floor()!==old)showToast('Lantai '+(floor()+1)+' · Periksa koridor. Gubuk adalah zona aman.')}updatePatrol(dt);if(!failed&&!active&&locked())nearest()}
+ if(started){camera.position.set(player.x,player.y+EYE,player.z);camera.rotation.set(pitch,yaw,0,'YXZ');hud();minimap();updateSurvivalHUD();animateItems()}
+ else{camera.position.set(-35,35,82);camera.lookAt(0,0,0)}
+ if(riverMesh)riverMesh.material.opacity=.76+Math.sin(elapsed*.45)*.04;if(!$('forestMap').classList.contains('hidden'))minimap($('bigMap'),true);mood(now);syncTouchUI();renderer.render(scene,camera);
+}
+
+
+$('worldMapButton').onclick=openForestMap;$('closeForestMap').onclick=closeForestMap;document.addEventListener('keydown',e=>{if(e.target.matches('textarea,input,select'))return;if(e.code==='KeyM'&&!e.repeat&&started&&!active&&!ended()){e.preventDefault();if($('forestMap').classList.contains('hidden'))openForestMap();else closeForestMap()}});chooseInputMode();try{setup()}catch(e){console.error(e);$('status').textContent='WebGL gagal diaktifkan. Coba browser desktop dengan akselerasi perangkat keras. '+e.message}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+ENGLISH QUEST: FOREST OF WHISPERS — REGIONAL GUARDIANS
+===============================
+
+VERSI HUTAN — SURVIVAL + BAHASA INGGRIS
+Satu file HTML untuk HP dan laptop. Buka forest-of-whispers-multi-guard.html langsung,
+atau unggah file itu ke hosting HTTPS. Internet diperlukan untuk Three.js r128.
+
+TUJUAN
+- Temukan 9 anomali, masing-masing memberikan 7 pertanyaan (63 soal per sesi).
+- Temukan 5 item tersembunyi di lokasi acak.
+- Hindari 9 penjaga yang bergerak bersamaan, masing-masing pada rute wilayahnya.
+  Enam penjaga darat: Barat Laut, Rimba Barat, Kamp Selatan, Reruntuhan,
+  Tepi Timur, dan Tenggara. Tiga lainnya menjaga Jembatan Utara, Tengah, Selatan.
+- Menang hanya jika 9 anomali dituntaskan DAN kelima item ditemukan.
+- Tertangkap berarti gagal dan progres dimulai kembali dari nol.
+- Soal kustom pengajar tidak ikut terhapus saat gagal.
+
+PETA
+- Area permainan berukuran 176 x 156 meter dalam satuan dunia game.
+- Dua sisi hutan dipisahkan oleh sungai.
+- Sungai hanya bisa diseberangi melalui jembatan utara, tengah, atau selatan.
+- Ada 6 gubuk aman, 30 titik kemungkinan lokasi anomali, dan ratusan pohon low-poly.
+- Lokasi mencakup gubuk tua, tepi sungai, jembatan, akar/dahan rendah pohon,
+  belakang batu besar, kayu tumbang, gerbang tua, dan reruntuhan pilar.
+- Item dipilih dari lima zona berbeda agar tersebar di seluruh peta.
+- Lokasi anomali serta item diacak lagi pada percobaan baru.
+
+BERTAHAN HIDUP
+- Gubuk bertanda SAFE adalah zona aman. Masuk sepenuhnya ke dalam.
+- Dengarkan langkah berat atau amati sinyal merah pada peta saat penjaga dekat.
+- Kamu aman sementara ketika mengerjakan kuis, termasuk kuis di luar gubuk.
+- Saat keluar/selesai kuis ada 3 detik untuk bersiap sebelum dapat tertangkap lagi.
+- Pembukaan Peta Hutan dan jeda menu menghentikan gerakan/patroli sementara.
+- Mulai dari Kamp Penjelajah di barat daya, dekat tepi bawah peta.
+
+KONTROL LAPTOP
+- WASD / panah: berjalan.
+- Mouse: melihat; klik mulai untuk mengunci mouse.
+- Shift: lari. Space: lompat. E: berbicara / mengambil item.
+- F: senter. M: buka/tutup Peta Hutan. Esc: jeda.
+
+KONTROL HP
+- Joystick kiri untuk bergerak.
+- Geser area kanan untuk melihat.
+- Gunakan tombol Interaksi, Lari, Lompat, Senter, Jeda, dan Fullscreen.
+- Buka Peta Hutan melalui tombol di bawah minimap.
+- Landscape dicoba otomatis setelah tombol mulai ditekan. Jika browser menolak,
+  putar HP secara manual atau pilih tetap bermain portrait.
+- Mode kontrol bisa diganti di layar awal.
+
+TEACHER MODE
+- Tombol tersedia di layar awal; long press judul 3 detik juga tetap tersedia.
+- Satu soal per baris dengan format:
+  pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+- Posisi jawaban benar diacak dan soal tidak berulang antarnpc dalam sesi.
+- Materi contoh berisi 100 soal kosakata dan kalimat bahasa Inggris.
+- Soal kustom diprioritaskan. Jika kurang dari 63, sisanya dilengkapi dari contoh.
+- Penyimpanan soal memakai localStorage browser yang sama; berlaku pada misi baru.
+
+DEPLOY
+- File game berdiri sendiri; tidak ada gambar atau audio eksternal tambahan.
+- Jika memakai iframe, izinkan fullscreen dan gunakan tinggi 100dvh.
+- Hindari container iframe dengan tinggi tetap yang terlalu pendek di HP.
+- Sesudah mengganti versi di hosting, muat ulang; tambahkan ?v=forest1 pada URL
+  jika cache hosting/browser masih menampilkan versi lama.
+
+VERIFIKASI
+Sintaks dan simulasi mencakup lokasi yang dapat dijangkau, lintasan patroli,
+ketiga jembatan, batas sungai, zona aman, soal/kemenangan, reset kegagalan,
+bulk soal kustom, serta kontrol HP dan jeda peta. Belum diuji di HP fisik
+atau diverifikasi visual langsung di browser.

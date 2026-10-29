@@ -1,0 +1,58 @@
+ENGLISH QUEST: OCEAN ADVENTURE
+
+CARA MEMULAI
+Buka ocean-adventure.html lalu klik Mulai Misi. Tidak perlu local server.
+Internet diperlukan untuk memuat Three.js r128 dari CDN. Satu file HTML ini
+juga dapat diunggah ke hosting web. Tidak membutuhkan gambar/audio terpisah.
+
+MISI
+Jadilah ikan kecil di laut siang hari. Temui 9 ikan unik yang ditempatkan
+acak pada 30 lokasi, jawab 7 soal setiap ikan (63 soal), dan temukan 5 benda
+laut di lima habitat berbeda. Ada 9 hiu dengan rute patroli masing-masing.
+Sentuhan hiu mengulang progres misi. Tidak ada darah atau jumpscare.
+SAFE REEF melindungi pemain selama berada sepenuhnya di dalam gua.
+Kuis melindungi sementara; setelah kuis selesai ada waktu aman 3 detik.
+
+KONTROL LAPTOP / KOMPUTER
+WASD atau tombol panah: berenang.
+Mouse: melihat; arah berenang mengikuti arah pandang.
+Space atau R: naik. Q: turun. Shift: berenang cepat.
+E: temui ikan atau ambil benda yang dekat.
+C atau tombol Kamera: ganti kamera mengikuti ikan / mata ikan.
+M atau Peta Laut: peta besar (permainan dijeda).
+Esc: jeda. Klik Lanjut untuk mengaktifkan kembali mouse.
+
+KONTROL HP
+Joystick kiri: berenang. Geser area layar di luar tombol: melihat.
+Tahan tombol Naik/Turun: mengubah kedalaman. Cepat: ubah kecepatan.
+Interaksi: berbicara atau mengambil item saat dekat.
+Layar penuh dan landscape dicoba setelah sentuhan pengguna.
+Jika browser menolak rotasi otomatis, putar HP secara manual atau pilih
+Tetap main dalam portrait. Dukungan layar penuh berbeda antarbrowser.
+
+TEACHER MODE
+Klik Teacher Mode pada layar awal, atau tahan judul selama 3 detik.
+Satu soal per baris dengan lima kolom terisi:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does shark mean? | Hiu | Ikan | Penyu | Kepiting
+A fish can ____. | swim | fly | read | write
+
+Klik Simpan Semua Soal, kemudian mulai misi baru agar perubahan dipakai.
+Posisi jawaban diacak. Pertanyaan duplikat dan pilihan yang sama ditolak
+dengan nomor baris. Soal kustom diprioritaskan; jika kurang dari 63 maka
+bank 100 soal bawaan melengkapi; jika lebih, dipilih 63 secara acak.
+Data disimpan di localStorage browser/perangkat yang dipakai, bukan server.
+Soal kustom tetap disimpan ketika tertangkap hiu atau mengulang permainan.
+
+LOKASI PENJELAJAHAN
+Terumbu karang, enam gua perlindungan, kapal karam, kuil tenggelam,
+padang lamun, lengkungan karang, batu besar, dan arus laut di berbagai
+kedalaman. Periksa ketinggian: objek yang tampak dekat di peta bisa berada
+lebih tinggi atau lebih rendah dari ikanmu.
+
+PENGUJIAN
+Lolos pengujian simulasi logika: situs ikan/item, rute hiu, berenang 3D,
+kedalaman, tempat aman, kontrol sentuh, kamera, peta, impor soal, reset,
+dan kemenangan. Tampilan WebGL dan pengalaman pada HP fisik belum diuji.

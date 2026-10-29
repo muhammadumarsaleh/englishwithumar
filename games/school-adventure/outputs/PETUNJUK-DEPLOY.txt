@@ -1,0 +1,68 @@
+ENGLISH QUEST — HP + LAPTOP
+==========================
+
+File game yang diperbarui:
+1. sekolah-kartun-3d.html       — School Adventure / siang
+2. sekolah-anomali-3d.html      — School of Whispers / malam
+3. sekolah-anomali-survival.html — The Hallway Watcher / survival
+
+DEPLOY ULANG
+- Ganti tiga file HTML game lama di hosting dengan file baru yang namanya sama.
+- Jika nama file di hosting berbeda, sesuaikan nama file baru dengan URL game lama.
+- Deploy ulang, lalu muat ulang game. Jika hosting/browser masih menyimpan versi lama,
+  gunakan hard refresh di laptop, atau tambahkan ?v=mobile1 pada URL game di HP.
+- File mulai-main.html adalah menu opsional. Tidak perlu mengganti beranda website Anda.
+- Gunakan HTTPS untuk hosting. Internet tetap diperlukan untuk memuat Three.js r128.
+- Tidak ada backend atau paket tambahan yang perlu dipasang.
+
+KONTROL HP
+- Joystick bulat kiri: berjalan maju/mundur dan menyamping, dengan kecepatan analog.
+- Geser area permainan di sisi kanan: melihat sekeliling.
+- Bicara / Ambil item: berinteraksi dengan karakter atau benda yang dekat.
+- Lari: tekan untuk mengaktifkan, tekan lagi untuk mematikan.
+- Lompat: tombol panah ke atas.
+- Senter: tersedia pada versi malam dan survival.
+- Tombol atas kanan: layar penuh, jeda, dan suara.
+- Beberapa jari bisa digunakan sekaligus untuk berjalan sambil melihat.
+- Kontrol berhenti saat jari dilepas/dibatalkan, dialog muncul, atau aplikasi masuk latar.
+
+LANDSCAPE
+- Setelah Mulai Misi ditekan, game mencoba fullscreen dan kunci landscape.
+- Keberhasilannya tergantung browser, perangkat, dan izin halaman.
+- Jika browser menolak, muncul petunjuk memutar HP; aktifkan rotasi otomatis perangkat.
+- Ada pilihan Tetap main dalam portrait. Tata letak dan kontrol tetap menyesuaikan.
+- Permainan/penjaga dijeda ketika layar petunjuk rotasi sedang ditampilkan.
+- Game tidak memutar halaman secara paksa dengan CSS karena itu mengacaukan sentuhan.
+
+JIKA GAME DIPASANG DI DALAM IFRAME
+- Cara paling sederhana: buka URL file game langsung di tab/halaman penuh.
+- Jika tetap memakai iframe, induk harus mengizinkan fullscreen, misalnya:
+  <iframe src="sekolah-anomali-survival.html" allow="fullscreen" allowfullscreen
+          style="display:block;width:100%;height:100dvh;border:0"></iframe>
+- Jangan mengunci container iframe ke aspect-ratio:16/9 dengan tinggi yang terlalu pendek
+  di HP. Gunakan tinggi viewport agar game mendapat area layar yang sesungguhnya.
+- Iframe dengan sandbox/izin terbatas bisa menolak fullscreen/orientation; petunjuk
+  rotasi manual akan tetap tersedia.
+
+KONTROL LAPTOP
+- WASD / panah: berjalan. Mouse: melihat. E: bicara/ambil.
+- Shift: lari. Space: lompat. F: senter pada versi malam.
+- Esc: jeda/lepas mouse.
+- Mode kontrol terdeteksi otomatis dan bisa diubah di layar awal.
+
+TEACHER MODE DAN PROGRES
+- Tombol Teacher Mode / Soal kustom kini langsung tersedia di layar awal.
+- Long press judul tiga detik masih tersedia.
+- Format per baris:
+  pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+- Penyimpanan soal kustom tetap menggunakan localStorage di browser masing-masing.
+- Kuis, 9 NPC/anomali, 5 item, patroli, zona aman, dan aturan gagal pada survival tetap ada.
+- Tidak ada penyimpanan otomatis progres ketika halaman ditutup.
+
+VERIFIKASI
+- Sintaks dan simulasi kontrol keyboard/sentuh telah diperiksa untuk ketiga game.
+- Diuji dalam simulasi: multitouch independen, joystick analog, lompat/lari, pembatalan
+  sentuhan, dialog, jeda saat berpindah aplikasi, fallback rotasi, kuis 63 soal,
+  serta kemenangan dengan syarat 9 anomali + 5 item pada survival.
+- Belum diuji pada HP fisik; fullscreen dan penguncian orientasi tidak dapat dijamin
+  pada semua browser. Periksa hasil deploy di HP yang biasa dipakai siswa.

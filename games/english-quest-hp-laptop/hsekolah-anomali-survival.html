@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sekolah Anomali — The Hallway Watcher</title>
+<style>
+:root{color-scheme:dark;--mint:#83f5be;--ink:#102948}*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#8ed7ff;color:#fff;font:15px system-ui,sans-serif}button,textarea{font:inherit}button{border:0;border-radius:12px;padding:12px 18px;background:#345987;color:white;cursor:pointer;font-weight:700}button:hover{filter:brightness(1.15)}button:disabled{opacity:.75;cursor:default}button:focus-visible,textarea:focus-visible{outline:3px solid #ffdc6b;outline-offset:3px}.primary{background:var(--mint);color:var(--ink)}.hidden{display:none!important}.overlay{position:fixed;inset:0;z-index:20;background:#102449b8;backdrop-filter:blur(7px);display:grid;place-items:center;padding:20px}.card{width:min(650px,100%);max-height:93vh;overflow:auto;background:#102c50f5;border:2px solid #80cfff55;border-radius:25px;padding:30px;box-shadow:0 25px 90px #10294855}h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:12px 0}h2{font-size:24px;line-height:1.4}p{color:#c8def6;line-height:1.65}.eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#ffdc6b;font-weight:900}.badges,.actions{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0}.badge{background:#ffffff12;padding:7px 10px;border-radius:9px;font-size:12px}.help{font-size:13px;line-height:2;border-block:1px solid #ffffff25;padding:15px 0}#title{touch-action:none;user-select:none;-webkit-user-select:none}#hud{position:fixed;left:16px;top:16px;display:flex;flex-wrap:wrap;gap:7px;max-width:calc(100% - 220px);pointer-events:none;z-index:3}.stat{background:#102c50e8;border:1px solid #fff3;border-radius:12px;padding:10px 12px;font-size:13px}.stat b{color:#ffdc6b;margin-left:5px}#mapBox{position:fixed;right:16px;top:16px;width:185px;border:1px solid #fff5;background:#102c50eb;padding:10px;border-radius:16px;z-index:4}#mapBox header{font-size:11px;display:flex;justify-content:space-between;margin-bottom:6px;color:#c8def6}#map{width:163px;height:120px;display:block;border-radius:8px}#sound{width:100%;padding:8px;margin-top:7px;font-size:12px}#cross{position:fixed;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:white;box-shadow:0 0 0 3px #10294855;transform:translate(-50%,-50%);pointer-events:none}#prompt,#bottom{position:fixed;left:50%;transform:translateX(-50%);background:#102c50ed;border-radius:12px;padding:11px 17px;z-index:4;text-align:center;pointer-events:none}#prompt{bottom:80px;border:1px solid var(--mint)}#bottom{bottom:18px;font-size:12px;white-space:nowrap}#quiz{z-index:30}.quizhead{display:flex;justify-content:space-between;align-items:center;gap:12px}#progress{height:6px;background:#ffffff18;border-radius:9px;margin:18px 0}#fill{height:100%;background:var(--mint);border-radius:9px}#answers{display:grid;gap:10px;margin:20px 0}.answer{text-align:left;display:flex;gap:13px;align-items:center;background:#294c77;border:2px solid transparent}.letter{background:#ffffff18;border-radius:7px;padding:5px 10px}.right{background:#216447!important;border-color:#83f5be!important}.wrong{background:#873851!important;border-color:#ffb4bd!important}#hint{margin-top:15px;background:#ffdc6b14;border-left:3px solid #ffdc6b;padding:12px;color:#ffe7a2;font-size:13px;line-height:1.6}#feedback{min-height:28px;margin-top:14px;font-weight:700}#meaning{margin-top:12px;color:#8ee5ff}#teacher{z-index:40}textarea{width:100%;min-height:230px;resize:vertical;background:#081f3b;color:white;border:1px solid #89b8e7;border-radius:12px;padding:12px;line-height:1.7;font-size:13px}.small{font-size:12px}#teacherStatus,#status{font-size:13px;color:#ffdf84}.results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}.result{background:#ffffff12;border-radius:12px;padding:20px 8px;text-align:center}.result strong{display:block;font-size:25px;color:var(--mint)}.result small{color:#c8def6}canvas#world{display:block}#toast{position:fixed;bottom:125px;left:50%;transform:translateX(-50%);z-index:5;background:#102c50ee;padding:12px 20px;border-radius:12px;pointer-events:none}@media(max-width:640px){.card{padding:21px}#mapBox{width:135px;right:8px;top:8px;padding:7px}#map{width:119px;height:88px}#hud{left:8px;top:8px;max-width:calc(100% - 150px);gap:4px}.stat{font-size:10px;padding:7px}#bottom{white-space:normal;width:93%;font-size:10px}.result strong{font-size:20px}}
+
+/* Tema malam: panel arsip, fosfor hijau, aksen merah tembaga. */
+:root{--mint:#b1d69b;--ink:#111a17}
+body{background:#060b10;color:#e1e6da}button{background:#303e3a;color:#dce5d6;border:1px solid #83917a40;border-radius:5px}
+.overlay{background:#03080dc9}.card{background:linear-gradient(145deg,#15201ff7,#0c1419fa);border:1px solid #8caa824d;border-radius:10px;box-shadow:0 25px 100px #0009}
+h1{letter-spacing:-.04em}p{color:#b0beb7}.eyebrow{color:#c79379}.badge{border:1px solid #9aac8d33;background:#a3b3940b;border-radius:3px}
+.stat,#mapBox,#prompt,#bottom,#toast{background:#0d1719ed;border-color:#94ab8055;border-radius:5px}.stat b,#status,#teacherStatus{color:#c5d4a7}
+.answer{background:#243430;border-radius:5px}.right{background:#284e3d!important}.wrong{background:#663736!important}
+#hint{color:#c8c6a3;background:#bdb7870d;border-color:#a69b68}textarea{background:#091314;border-color:#637760}#mapBox header{color:#adbdaf}
+#atmosphere{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at center,transparent 24%,#0004 70%,#000a 100%);box-shadow:inset 0 0 100px #0007}
+#atmosphere:after{content:'';position:absolute;inset:0;opacity:.055;background:repeating-linear-gradient(0deg,#fff 0px,#fff 1px,transparent 1px,transparent 4px)}
+#missionTag{position:fixed;left:18px;bottom:72px;color:#a7b29c;font:11px monospace;letter-spacing:.12em;z-index:3;pointer-events:none}
+#mapBox #flashButton{width:100%;font-size:11px;padding:7px;margin-top:6px}
+
+#safePanel{position:fixed;left:18px;bottom:82px;z-index:5;pointer-events:none;background:#131c20ee;border:1px solid #c6987455;border-radius:7px;padding:11px 15px;max-width:320px;box-shadow:0 8px 30px #0004}
+#safePanel strong{display:block;font-size:12px;letter-spacing:.09em;color:#e2bd92}#safePanel span{display:block;font-size:11px;line-height:1.6;color:#b5c3b9;margin-top:3px}
+#safePanel.safe{border-color:#8ac19c88;background:#12251fee}#safePanel.safe strong{color:#a5ddaf}
+#threatVignette{position:fixed;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 0 100px #b4573d;opacity:0;transition:opacity .3s}
+#fail{z-index:45}.failIcon{font-size:48px;color:#d5a18e;margin-bottom:12px}.objectives{padding:13px 16px;border:1px solid #a9bd8a44;border-radius:10px;color:#c4d1be;line-height:1.8;font-size:13px;background:#a3b98709}
+#itemSummary{font-size:12px;color:#b5c6ad;line-height:1.7}#hud{max-width:calc(100% - 235px)}#hud .stat{font-size:12px}#bottom{bottom:16px}#missionTag{bottom:65px}
+@media(max-width:650px){#safePanel{left:10px;bottom:92px;padding:8px 10px;max-width:220px}#safePanel strong{font-size:10px}#safePanel span{font-size:10px}#hud{max-width:calc(100% - 150px)}#hud .stat{font-size:9px;padding:7px}#prompt{bottom:170px;font-size:12px;max-width:94%}}
+/* Shared responsive controls: no user-scalable=no and no CSS rotation hack. */
+html,body{width:100%;height:var(--game-height,100dvh);overscroll-behavior:none}
+#world{width:100%;height:var(--game-height,100dvh);touch-action:none}
+.overlay{height:var(--game-height,100dvh);padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overflow:hidden}
+.card{max-height:calc(var(--game-height,100dvh) - 28px);overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+textarea,input,select{font-size:16px!important}button,select{touch-action:manipulation}
+.inputTools{margin:13px 0 18px;padding:13px;border:1px solid #b8d7c033;border-radius:12px;background:#ffffff06}
+.inputTools label{font-size:12px;display:block;margin-bottom:7px;color:#cad8d5}.inputTools select{width:100%;padding:10px;border-radius:8px;background:#182d43;color:#fff;border:1px solid #8caaa866;min-height:44px}.inputTools button{margin-top:9px;min-height:44px;font-size:12px}
+#mobileControls{position:fixed;inset:0;pointer-events:none;z-index:10;user-select:none;-webkit-user-select:none}
+#moveStick{pointer-events:auto;position:absolute;left:calc(env(safe-area-inset-left) + 20px);bottom:calc(env(safe-area-inset-bottom) + 20px);width:128px;height:128px;border:2px solid #d0e9e36b;border-radius:50%;background:radial-gradient(circle,#c9ded615,#19312c9c);box-shadow:0 6px 30px #0003;touch-action:none}
+#moveStick:before,#moveStick:after{content:'';position:absolute;background:#d7eee32b;pointer-events:none}#moveStick:before{width:1px;height:90%;top:5%;left:50%}#moveStick:after{height:1px;width:90%;left:5%;top:50%}
+#stickKnob{position:absolute;left:50%;top:50%;width:52px;height:52px;transform:translate(-50%,-50%);border:2px solid #d1f6e6bd;border-radius:50%;background:#83bca69c;box-shadow:0 3px 12px #0003;pointer-events:none}
+.stickLabel{position:absolute;top:-24px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.12em;color:#d4e7da;text-shadow:0 1px 5px #000}
+#touchActions{position:absolute;right:calc(env(safe-area-inset-right) + 15px);bottom:calc(env(safe-area-inset-bottom) + 18px);display:grid;grid-template-columns:repeat(3,52px);gap:7px;pointer-events:auto}
+#touchActions button{min-width:48px;min-height:49px;padding:8px 4px;border:1px solid #cce4d777;color:#fff;background:#14292edb;border-radius:50%;font-size:11px;line-height:1.2;touch-action:none;box-shadow:0 3px 16px #0003}
+#touchActions #touchInteract{grid-column:1/-1;border-radius:13px;background:#8bbba6;color:#102a23;min-height:44px;font-size:14px;font-weight:800}#touchInteract:disabled{opacity:.5}#touchRun.pressed{background:#d2b974;color:#29251b;border-color:#f9e7b8}
+#mobileUtility{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);display:flex;gap:6px;pointer-events:auto}#mobileUtility button{min-width:43px;min-height:42px;padding:7px;background:#14292ee8;border:1px solid #b0d4c366;border-radius:11px;color:white;font-size:17px}
+#lookHint{position:absolute;right:calc(env(safe-area-inset-right) + 30px);bottom:calc(env(safe-area-inset-bottom) + 137px);font-size:10px;color:#d7e9e0;text-shadow:0 1px 6px #000;pointer-events:none}
+#rotateScreen{z-index:44;background:#09141cf5}.rotateCard{text-align:center;max-width:420px}.rotateIcon{font-size:54px;line-height:1.2;margin-bottom:16px;transform:rotate(-25deg)}.rotateCard p{font-size:14px;line-height:1.7}.rotateCard button{display:block;width:100%;min-height:46px;margin-top:10px}
+.touch-ui #bottom,.touch-ui #missionTag{display:none!important}
+.touch-ui #hud{left:calc(env(safe-area-inset-left) + 9px)!important;top:calc(env(safe-area-inset-top) + 8px)!important;max-width:calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 166px)!important;gap:4px}
+.touch-ui #hud .stat{font-size:11px!important;padding:6px 8px!important;border-radius:7px}.touch-ui .stat b{margin-left:4px}
+.touch-ui #mapBox{top:calc(env(safe-area-inset-top) + 58px);right:calc(env(safe-area-inset-right) + 10px);width:114px;padding:6px;border-radius:9px}.touch-ui #mapBox header{font-size:8px;margin-bottom:4px}.touch-ui #map{width:100px;height:74px}.touch-ui #mapBox #sound,.touch-ui #mapBox #flashButton{display:none}
+.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 150px)!important;padding:8px 12px;max-width:70%;font-size:12px;border-radius:8px}
+.touch-ui #toast{bottom:calc(env(safe-area-inset-bottom) + 190px);font-size:12px;max-width:80%;padding:9px 13px}
+.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 162px);bottom:calc(env(safe-area-inset-bottom) + 18px);width:min(240px,calc(100vw - 370px));max-width:240px;padding:8px 10px}.touch-ui #safePanel strong{font-size:10px}.touch-ui #safePanel span{font-size:10px;line-height:1.5}
+.touch-ui .card{width:min(700px,100%);padding:20px}.touch-ui #question{font-size:20px}.touch-ui .answer{min-height:48px;font-size:16px;padding:10px 12px}.touch-ui .quizhead{position:sticky;top:-20px;background:inherit;padding:8px 0;z-index:2}.touch-ui #closeTeacher,.touch-ui #leaveQuiz{min-height:44px}.touch-ui #hint{font-size:13px}
+@media(max-height:510px) and (orientation:landscape){.touch-ui .card{padding:17px 22px}.touch-ui h1{font-size:30px;margin:8px 0}.touch-ui .badges{margin:10px 0}.touch-ui .help{margin:9px 0;padding:9px 0;font-size:12px;line-height:1.7}.touch-ui #answers{grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.touch-ui #question{font-size:20px;margin:8px 0 12px}.touch-ui #progress{margin:10px 0}.touch-ui .answer{min-height:48px;font-size:15px}.touch-ui #hint{padding:9px;margin-top:10px}.touch-ui .results{margin:13px 0}.touch-ui .result{padding:12px 8px}.touch-ui .quizhead{top:-17px}.touch-ui #safePanel span{max-height:31px;overflow:hidden}}
+@media(max-width:540px) and (orientation:portrait){.touch-ui #hud{max-width:calc(100% - 160px)!important}.touch-ui #hud .stat{font-size:10px!important;padding:6px!important}.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 12px);bottom:calc(env(safe-area-inset-bottom) + 176px);width:calc(100% - 24px);max-width:none}.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 244px)!important;max-width:92%}.touch-ui #toast{bottom:calc(env(safe-area-inset-bottom) + 300px)}.touch-ui #moveStick{width:116px;height:116px;left:calc(env(safe-area-inset-left) + 14px)}.touch-ui #touchActions{right:calc(env(safe-area-inset-right) + 12px);grid-template-columns:repeat(3,48px);gap:6px}.touch-ui #lookHint{bottom:calc(env(safe-area-inset-bottom) + 138px)}.touch-ui h1{font-size:31px}.touch-ui .card{padding:19px}.touch-ui #answers{grid-template-columns:1fr}}
+@media(max-width:600px) and (orientation:landscape){.touch-ui #moveStick{width:112px;height:112px;left:calc(env(safe-area-inset-left) + 12px)}.touch-ui #touchActions{grid-template-columns:repeat(3,46px);gap:5px;right:calc(env(safe-area-inset-right) + 10px)}.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 135px);width:calc(100vw - 315px)}.touch-ui #hud .stat{font-size:10px!important}.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 140px)!important}.touch-ui #mapBox{width:100px}.touch-ui #map{width:86px;height:63px}}
+
+</style>
+</head>
+<body>
+<canvas id="world"></canvas>
+<div id="mobileControls" class="hidden" aria-label="Kontrol sentuh"><div id="moveStick" role="group" aria-label="Joystick untuk bergerak"><span class="stickLabel">GERAK</span><div id="stickKnob"></div></div><div id="touchActions"><button id="touchInteract" disabled>✋ Interaksi</button><button id="touchRun">Lari</button><button id="touchJump">↑<br>Lompat</button><button id="touchFlash" >☀<br>Senter</button></div><div id="mobileUtility"><button id="mobileFull" aria-label="Layar penuh">⛶</button><button id="mobilePause" aria-label="Jeda">Ⅱ</button><button id="mobileSound" aria-label="Aktifkan atau matikan suara">🔊</button></div><span id="lookHint">GESER LAYAR UNTUK MELIHAT</span></div>
+<div id="rotateScreen" class="overlay hidden"><div class="card rotateCard"><div class="rotateIcon" aria-hidden="true">▯ ↻</div><h2>Putar HP ke landscape</h2><p>Game mencoba mengatur layar mendatar. Jika browser tidak mengizinkan, putar perangkat secara manual dan aktifkan rotasi otomatis HP.</p><button id="retryLandscape" class="primary">Coba layar penuh &amp; landscape</button><button id="playPortrait">Tetap main dalam portrait</button><p class="small">Saat layar ini muncul, permainan dan penjaga dijeda.</p></div></div><div id="threatVignette"></div><div id="safePanel" class="hidden"><strong id="safeTitle">KORIDOR · WASPADA</strong><span id="safeText">Masuk kelas untuk berlindung.</span></div><div id="atmosphere"></div><div id="missionTag" class="hidden">ARSIP 09 / SEKOLAH ANOMALI</div>
+<div id="hud" class="hidden"><div class="stat">Lantai <b id="floorHUD">1/4</b></div><div class="stat">Anomali dituntaskan <b id="npcHUD">0/9</b></div><div class="stat">Item ditemukan <b id="itemHUD">0/5</b></div><div class="stat">Benar <b id="correctHUD">0</b></div><div class="stat">❌ Kesalahan <b id="wrongHUD">0</b></div><div class="stat">Waktu <b id="timeHUD">00:00</b></div></div>
+<div id="mapBox" class="hidden"><header><span>PETA SINYAL</span><span id="mapFloor">L1</span></header><canvas id="map" width="326" height="240"></canvas><button id="sound">🔊 Suara: ON</button><button id="flashButton">F · Senter ON</button></div>
+<div id="cross" class="hidden"></div><div id="prompt" class="hidden"></div><div id="toast" class="hidden"></div><div id="bottom" class="hidden">WASD / Panah · Shift Lari · Space Lompat · E Selidiki · F Senter · Esc Jeda</div>
+<div id="start" class="overlay"><div class="card"><div class="eyebrow">SURVIVAL EDITION · THE HALLWAY WATCHER</div><h1 id="title">Sekolah Anomali<br><span style="font-size:.43em;letter-spacing:.04em;color:#c89d7e">THE HALLWAY WATCHER</span></h1><p>Selesaikan tujuh pertanyaan dari masing-masing sembilan anomali dan cari lima benda tersembunyi. Penjaga Koridor berpatroli melewati tangga dari lantai 1 sampai 4. Berlindunglah sepenuhnya di dalam kelas saat ia mendekat.</p><div class="badges"><span class="badge">24 kelas terbengkalai</span><span class="badge">9 anomali · 63 soal</span><span class="badge">5 item acak</span><span class="badge">1 penjaga berpatroli</span></div><p class="help">WASD / Panah: berjalan · Mouse: melihat<br>Shift: lari · Space: lompat · E: selidiki anomali · F: senter<br>Tangga berada di koridor belakang. Ikuti papan NAIK.<br><b>Kelas = zona aman.</b> Tunggu penjaga lewat sebelum keluar. Kuis dapat dikerjakan di kelas sambil penjaga tetap berpatroli.<br><b>Tertangkap = gagal dan seluruh progres dimulai dari nol.</b> Item dan lokasi anomali diacak ulang pada percobaan baru.</p><div class="inputTools"><label for="inputMode">Mode kontrol</label><select id="inputMode"><option value="auto">Otomatis sesuai perangkat</option><option value="touch">Joystick &amp; layar sentuh</option><option value="keyboard">Keyboard &amp; mouse</option></select><button id="mobileTeacher" type="button">Teacher Mode · Soal kustom</button><p class="small">HP: joystick kiri untuk berjalan, geser layar untuk melihat, dan gunakan tombol sentuh. Laptop: WASD / panah, mouse, E, Shift, Space.</p></div><button id="startButton" class="primary">Mulai Misi</button><p id="status" role="status">Memuat Three.js…</p><p class="small">Untuk pengajar: tahan judul di atas selama 3 detik untuk membuka input soal massal.</p></div></div>
+<div id="quiz" class="overlay hidden"><div class="card"><div class="quizhead"><div><div id="npcName" class="eyebrow"></div><p id="questionNumber" class="small"></p></div><button id="leaveQuiz">Lanjut nanti</button></div><div id="progress"><div id="fill"></div></div><h2 id="question"></h2><div id="answers"></div><button id="meaningButton">Tampilkan Arti</button><div id="meaning" class="hidden"></div><div id="hint"></div><div id="feedback" role="status" aria-live="polite"></div></div></div>
+<div id="teacher" class="overlay hidden"><div class="card"><div class="eyebrow">Bulk custom questions</div><h2>Teacher Mode</h2><p class="small">Masukkan satu soal per baris. Tepat lima kolom, dipisahkan tanda |:<br><b>pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah</b></p><textarea id="custom" aria-label="Soal kustom massal" spellcheck="false" placeholder="Berapa hasil 2 + 2? | 4 | 3 | 5 | 6&#10;Apa arti book? | Buku | Meja | Pintu | Kursi"></textarea><p class="small">Posisi jawaban benar diacak. Soal kustom diprioritaskan; jika kurang dari 63, bank bawaan melengkapi. Jika lebih dari 63, dipilih acak. Tidak ada soal berulang antarnpc. Perubahan berlaku pada misi baru.</p><div class="actions"><button id="save" class="primary">Simpan Semua Soal</button><button id="clear">Hapus Kustom</button><button id="closeTeacher">Tutup</button></div><p id="teacherStatus" role="status"></p></div></div>
+<div id="win" class="overlay hidden"><div class="card"><div class="eyebrow">Misi tuntas</div><h1>Sekolah kembali sunyi.</h1><p>Sembilan anomali telah pergi, seluruh 63 pertanyaan selesai dijawab, dan kelima benda berhasil dikumpulkan. Kamu selamat dari Penjaga Koridor.</p><div class="objectives">✓ 9 / 9 anomali dituntaskan<br>✓ 5 / 5 item ditemukan</div><div class="results"><div class="result"><strong id="finalScore"></strong><small>Benar / Total</small></div><div class="result"><strong id="finalWrong"></strong><small>Total kesalahan</small></div><div class="result"><strong id="finalTime"></strong><small>Waktu bermain</small></div></div><button id="again" class="primary">Main Lagi</button></div></div>
+<div id="fail" class="overlay hidden"><div class="card"><div class="eyebrow">MISI GAGAL · TERTANGKAP</div><div class="failIcon">◉</div><h1>Penjaga menemukanmu.</h1><p id="failReason"></p><div class="objectives">Seluruh progres telah direset: anomali 0/9, item 0/5, jawaban 0/63. Soal kustom pengajar tetap tersimpan.</div><p class="small">Pada percobaan berikutnya, dengarkan langkah berat. Masuk sepenuhnya ke ruang kelas dan tunggu sampai penjaga melewati pintu sebelum kembali ke koridor.</p><button id="retry" class="primary">Ulang dari awal</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="document.getElementById('status').textContent='CDN gagal dimuat. Periksa internet lalu buka ulang file.'"></script>
+<script>
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id);
+if(!window.THREE)return;
+const FH=4.5,EYE=1.65,RADIUS=.29,HEIGHT=1.78,STEP=.23,STORE='realistic-school-3d-custom-v1';
+let touchMode=false,touchSession=false,portraitAllowed=false,touchRun=false,stickPointer=null,lookPointer=null,lookX=0,lookY=0;
+const touchMove={forward:0,strafe:0};
+let renderer,scene,camera,ready=false,started=false,won=false,yaw=0,pitch=0,vy=0,grounded=true;
+let elapsed=0,correct=0,wrong=0,finished=0,active=null,nearby=null,busy=false,answerTimer,toastTimer;
+let previous=performance.now(),footClock=0,customBank=[],npcs=[];
+const player=new THREE.Vector3(0,0,-6.3),keys={},colliders=[],walkables=[],slots=[];
+const ray=new THREE.Raycaster(),origin=new THREE.Vector3(),down=new THREE.Vector3(0,-1,0);
+const colors=[0x4d5d58,0x53616a,0x605663,0x655d4e];
+let flashlight,flashTarget,flashOn=true,ambienceGain,droneNodes=[],dust,nearSignal=0;
+const corridorLights=[];
+// Keadaan percobaan terpisah dari bank soal pengajar.
+let failed=false,attemptToken=0,foundItems=0,nearItem=null,hunter=null;
+let pickups=[],itemCandidates=[],patrolRoute=[],hunterThreat=0;
+const safeRooms=[];
+const itemTypes=[
+ {name:'Silver Key',meaning:'Kunci perak',kind:'key',color:0xbac9c1},
+ {name:'Old Notebook',meaning:'Buku catatan tua',kind:'book',color:0x9a8263},
+ {name:'Pocket Watch',meaning:'Jam saku',kind:'watch',color:0xc5ac73},
+ {name:'Wax Candle',meaning:'Lilin',kind:'candle',color:0xd5c7a5},
+ {name:'Music Box',meaning:'Kotak musik',kind:'box',color:0x8d6972}
+];
+
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function time(s){s=Math.floor(s);return(s>=3600?String(Math.floor(s/3600)).padStart(2,'0')+':':'')+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function floor(){return Math.max(0,Math.min(3,Math.floor((player.y+.10)/FH)))}
+function showToast(text){$('toast').textContent=text;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),3500)}
+// Bank soal berupa Array of Objects; 184 soal bawaan berbeda.
+function makeBank(){
+ const a=[],add=(q,answer,distractors,hint,meaning='')=>a.push({q,answer:String(answer),distractors:distractors.map(String),hint,meaning});
+ const vocabulary=[
+ ['book','buku','meja','pintu','kursi'],['teacher','guru','dokter','pilot','petani'],['student','siswa','penjual','penjaga','pelatih'],['library','perpustakaan','kantin','lapangan','kantor'],['window','jendela','atap','lantai','tangga'],['chair','kursi','lemari','tas','papan'],['water','air','api','tanah','angin'],['sun','matahari','bulan','bintang','awan'],['moon','bulan','bumi','hujan','angin'],['tree','pohon','rumput','batu','sungai'],['bird','burung','ikan','kucing','kuda'],['school','sekolah','pasar','rumah','rumah sakit'],['morning','pagi','siang','malam','sore'],['happy','senang','sedih','marah','takut'],['clean','bersih','kotor','gelap','berisik'],['red','merah','biru','hijau','kuning'],['blue','biru','merah','putih','hitam'],['green','hijau','ungu','jingga','cokelat'],['read','membaca','menulis','berlari','makan'],['write','menulis','membaca','melompat','tidur'],['listen','mendengarkan','berbicara','melihat','berjalan'],['help','membantu','menolak','merusak','menyimpan'],['friend','teman','musuh','pemimpin','orang asing'],['family','keluarga','kelas','rombongan','tetangga']];
+ vocabulary.forEach(r=>add('Apa arti kata "'+r[0]+'"?',r[1],r.slice(2),'Ingat kosakata bahasa Inggris sehari-hari.',r[0]+' = '+r[1]));
+ [
+ ['Planet tempat manusia tinggal adalah…','Bumi',['Mars','Venus','Jupiter'],'Planet biru dengan banyak air cair.'],
+ ['Pusat tata surya adalah…','Matahari',['Bumi','Bulan','Mars'],'Bintang yang menghasilkan cahaya sendiri.'],
+ ['Organ pemompa darah adalah…','Jantung',['Otak','Usus','Lambung'],'Denyutnya terasa di dada.'],
+ ['Organ utama pernapasan manusia adalah…','Paru-paru',['Hati','Ginjal','Lambung'],'Tempat pertukaran gas pernapasan.'],
+ ['Tumbuhan membuat makanan melalui…','Fotosintesis',['Erosi','Kondensasi','Evaporasi'],'Proses yang menggunakan energi cahaya.'],
+ ['Air membeku pada tekanan normal pada suhu…','0°C',['25°C','50°C','100°C'],'Nol dalam skala Celsius.'],
+ ['Air mendidih pada tekanan 1 atmosfer pada suhu…','100°C',['0°C','25°C','50°C'],'Tiga digit pada skala Celsius.'],
+ ['Gas yang dibutuhkan manusia untuk bernapas adalah…','Oksigen',['Helium','Neon','Hidrogen'],'Lambang unsurnya O.'],
+ ['Air cair menjadi uap disebut…','Penguapan',['Pembekuan','Pencairan','Pengendapan'],'Terjadi ketika pakaian basah mengering.'],
+ ['Bagian tumbuhan penyerap air adalah…','Akar',['Buah','Bunga','Daun'],'Biasanya di bawah tanah.'],
+ ['Hewan pemakan tumbuhan disebut…','Herbivora',['Karnivora','Omnivora','Insektivora'],'Sapi termasuk kelompok ini.'],
+ ['Benda yang ditarik magnet adalah…','Paku besi',['Kertas','Kaca','Kayu'],'Pilih bahan feromagnetik.'],
+ ['Energi benda bergerak disebut…','Energi kinetik',['Energi kimia','Energi nuklir','Energi potensial elastis'],'Berkaitan dengan gerakan.'],
+ ['Satuan panjang SI adalah…','Meter',['Liter','Kilogram','Sekon'],'Besaran yang diukur dengan penggaris.'],
+ ['Satuan massa SI adalah…','Kilogram',['Meter','Sekon','Kelvin'],'Besaran yang diukur dengan neraca.'],
+ ['Satu jam sama dengan…','60 menit',['30 menit','90 menit','100 menit'],'Sama dengan 3.600 detik.'],
+ ['Satu meter sama dengan…','100 sentimeter',['10 sentimeter','60 sentimeter','1.000 sentimeter'],'Senti berarti seperseratus.'],
+ ['Segitiga mempunyai berapa sisi?','3',['4','5','6'],'Namanya memuat kata tiga.'],
+ ['Jumlah sudut dalam segitiga datar adalah…','180°',['90°','270°','360°'],'Sama dengan sudut lurus.'],
+ ['Bangun bersisi empat sama panjang dan bersudut siku-siku adalah…','Persegi',['Lingkaran','Segitiga','Trapesium'],'Keempat sisinya sama panjang.'],
+ ['Pancasila memiliki berapa sila?','5',['3','4','6'],'Panca artinya lima.'],
+ ['Lambang negara Indonesia adalah…','Garuda Pancasila',['Komodo','Harimau','Elang laut'],'Burung yang membawa perisai Pancasila.'],
+ ['Warna bendera Indonesia adalah…','Merah dan putih',['Biru dan putih','Hijau dan putih','Merah dan kuning'],'Merah berada di bagian atas.'],
+ ['Hari Kemerdekaan Indonesia diperingati pada…','17 Agustus',['1 Juni','28 Oktober','10 November'],'Bulan kedelapan.'],
+ ['Arti Bhinneka Tunggal Ika adalah…','Berbeda-beda tetapi tetap satu',['Hemat pangkal kaya','Ilmu adalah kekuatan','Bersatu untuk berperang'],'Persatuan dalam keberagaman.'],
+ ['Saat teman berbeda pendapat, sebaiknya…','Mendengarkan dan menghargai',['Mengejek','Memaksa','Mengancam'],'Utamakan saling menghormati.'],
+ ['Sampah sebaiknya dibuang…','Di tempat sampah',['Di sungai','Di lantai','Di selokan'],'Jaga lingkungan tetap bersih.'],
+ ['Barang teman yang ditemukan sebaiknya…','Dikembalikan',['Dijual','Disembunyikan','Dibuang'],'Tunjukkan kejujuran.'],
+ ['Lawan kata panas adalah…','Dingin',['Hangat','Terang','Kering'],'Suhu lebih rendah.'],
+ ['Sinonim cerdas adalah…','Pintar',['Lelah','Kasar','Lambat'],'Mudah memahami pelajaran.'],
+ ['Kalimat tanya diakhiri tanda…','?',['.',',','!'],'Tanda untuk bertanya.'],
+ ['Awal kalimat memakai…','Huruf kapital',['Huruf kecil','Angka','Tanda kurung'],'Disebut huruf besar.'],
+ ['Kumpulan kalimat dengan satu gagasan utama adalah…','Paragraf',['Huruf','Suku kata','Judul'],'Satu bagian tulisan.'],
+ ['Alat pengukur suhu adalah…','Termometer',['Penggaris','Neraca','Kompas'],'Menunjukkan derajat Celsius.'],
+ ['Alat penunjuk arah mata angin adalah…','Kompas',['Termometer','Neraca','Jam pasir'],'Jarumnya mengikuti medan magnet Bumi.'],
+ ['Arah berlawanan dengan utara adalah…','Selatan',['Timur','Barat','Timur laut'],'Pasangan utara pada kompas.'],
+ ['Satu minggu terdiri dari…','7 hari',['5 hari','6 hari','8 hari'],'Dari Senin sampai Minggu.'],
+ ['Satu tahun biasa terdiri dari…','365 hari',['360 hari','366 hari','300 hari'],'Bukan tahun kabisat.'],
+ ['Bagian tubuh untuk melihat adalah…','Mata',['Telinga','Hidung','Lidah'],'Indra penglihatan.'],
+ ['Bagian tubuh untuk mendengar adalah…','Telinga',['Mata','Lidah','Kulit'],'Indra pendengaran.']
+ ].forEach(r=>add(...r));
+ for(let x=2;x<=13;x++)for(let y=2;y<=6;y++){let n=x*y;add(x+' × '+y+' = …',n,[n+1,n-1,n+x],'Perkalian adalah penjumlahan berulang.');n=x+y;add(x+' + '+y+' = …',n,[n-1,n+1,n+3],'Jumlahkan kedua bilangan dengan teliti.')}
+ return a;
+}
+const bank=makeBank();
+function parseBulk(text){const questions=[],errors=[],seen=new Set();text.split(/\r?\n/).forEach((line,i)=>{if(!line.trim())return;const p=line.split('|').map(s=>s.trim());if(p.length!==5||p.some(s=>!s)){errors.push('Baris '+(i+1)+': wajib tepat lima kolom terisi.');return}if(new Set(p.slice(1).map(s=>s.toLowerCase())).size!==4){errors.push('Baris '+(i+1)+': semua pilihan harus berbeda.');return}const id=p[0].toLowerCase();if(seen.has(id)){errors.push('Baris '+(i+1)+': pertanyaan duplikat.');return}seen.add(id);questions.push({q:p[0],answer:p[1],distractors:p.slice(2),hint:'Baca pertanyaan dan bandingkan keempat pilihan.',meaning:''})});return{questions,errors}}
+try{const text=localStorage.getItem(STORE)||'';$('custom').value=text;const p=parseBulk(text);if(!p.errors.length)customBank=p.questions}catch(e){}
+let pressTimer;
+function cancelPress(){clearTimeout(pressTimer)}
+$('title').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();cancelPress();$('title').setPointerCapture(e.pointerId);pressTimer=setTimeout(()=>{$('teacher').classList.remove('hidden');$('teacherStatus').textContent=customBank.length+' soal kustom aktif. Bank bawaan: '+bank.length+' soal.'},3000)});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('title').addEventListener(t,cancelPress));
+$('title').addEventListener('contextmenu',e=>e.preventDefault());
+$('closeTeacher').onclick=()=>$('teacher').classList.add('hidden');
+$('save').onclick=()=>{const text=$('custom').value.trim(),p=parseBulk(text);if(p.errors.length){$('teacherStatus').textContent=p.errors.slice(0,5).join(' ');return}customBank=p.questions;try{localStorage.setItem(STORE,text);$('teacherStatus').textContent='Tersimpan: '+customBank.length+' soal. Berlaku pada misi baru.'}catch(e){$('teacherStatus').textContent=customBank.length+' soal aktif sesi ini. Browser menolak localStorage; data tidak bertahan setelah ditutup.'}};
+$('clear').onclick=()=>{customBank=[];$('custom').value='';try{localStorage.removeItem(STORE);$('teacherStatus').textContent='Soal kustom dihapus. Misi baru menggunakan bank bawaan.'}catch(e){$('teacherStatus').textContent='Soal sesi ini dihapus. Penyimpanan browser tidak dapat diakses.'}};
+// Web Audio API: nada C–E–G, buzz, dan langkah noise lowpass.
+let audio,master,noise,muted=false;
+function audioStart(){try{if(!audio){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audio=new AC();master=audio.createGain();master.gain.value=muted?0:.3;master.connect(audio.destination);ambienceGain=audio.createGain();ambienceGain.gain.value=0;ambienceGain.connect(master);[43.65,65.41,87.8].forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type=i===1?"triangle":"sine";o.frequency.value=f;g.gain.value=i===0?.10:.025;o.connect(g);g.connect(ambienceGain);o.start();droneNodes.push(o,g)});noise=audio.createBuffer(1,Math.floor(audio.sampleRate*.14),audio.sampleRate);let a=noise.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1}if(audio.state==='suspended')audio.resume().catch(()=>{})}catch(e){}}
+function tone(f,t,d,type='sine',vol=.3){if(!audio||muted)return;let o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02)}
+function bling(){if(audio)[523.25,659.25,783.99].forEach((f,i)=>tone(f,audio.currentTime+i*.09,.3))}
+function buzz(){if(audio)tone(85,audio.currentTime,.3,'sawtooth',.22)}
+function footstep(){if(!audio||muted)return;let n=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain(),t=audio.currentTime;n.buffer=noise;f.type='lowpass';f.frequency.value=250+Math.random()*100;g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.0001,t+.12);n.connect(f);f.connect(g);g.connect(master);n.start();n.stop(t+.13)}
+$('sound').onclick=()=>{audioStart();muted=!muted;if(master)master.gain.value=muted?0:.3;$('sound').textContent=muted?'🔇 Suara: OFF':'🔊 Suara: ON'};
+const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.8,...extra});
+let wallMat,woodMat,metalMat,glassMat,tileTex,stairMat;
+function texture(kind){let c=document.createElement('canvas');c.width=c.height=256;let g=c.getContext('2d');g.fillStyle=kind==='tile'?'#313c3d':kind==='wall'?'#7a8170':'#5c493b';g.fillRect(0,0,256,256);if(kind==='tile'){for(let y=0;y<256;y+=64)for(let x=0;x<256;x+=64){g.fillStyle=(x+y)%128?'#758078':'#536362';g.fillRect(x+2,y+2,60,60);g.strokeStyle='#b1b69a40';g.strokeRect(x+4,y+4,55,55)}}else if(kind==='wall'){g.strokeStyle='#353d3960';g.lineWidth=3;for(let y=0;y<=256;y+=64){g.beginPath();g.moveTo(0,y);g.lineTo(256,y);g.stroke();for(let x=(y/64%2)*64;x<256;x+=128)g.strokeRect(x,y,128,64)}}else{for(let i=0;i<70;i++){g.fillStyle=i%2?'#e0a26270':'#77402340';g.fillRect(Math.random()*256,0,1+Math.random()*3,256)}}// Noda dan retakan prosedural tanpa gambar eksternal.
+for(let i=0;i<95;i++){g.fillStyle=i%2?'#111b1b18':'#b3b59c0c';g.fillRect(Math.random()*256,Math.random()*256,3+Math.random()*35,2+Math.random()*25)}
+if(kind!=='wood'){g.strokeStyle='#17242065';g.lineWidth=1;for(let k=0;k<5;k++){let x=Math.random()*256,y=Math.random()*256;g.beginPath();g.moveTo(x,y);for(let n=0;n<5;n++){x+=Math.random()*18-9;y+=9;g.lineTo(x,y)}g.stroke()}}
+let t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;return t}
+function box(w,h,d,x,y,z,m,solid=false,walk=false){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.receiveShadow=true;o.castShadow=solid;scene.add(o);if(solid)colliders.push({minX:x-w/2,maxX:x+w/2,minY:y-h/2,maxY:y+h/2,minZ:z-d/2,maxZ:z+d/2});if(walk)walkables.push(o);return o}
+function wall(w,h,d,x,y,z,m=wallMat){return box(w,h,d,x,y,z,m,true)}
+function slab(x1,x2,z1,z2,y){let t=tileTex.clone();t.needsUpdate=true;t.repeat.set((x2-x1)/4,(z2-z1)/4);box(x2-x1,.24,z2-z1,(x1+x2)/2,y-.12,(z1+z2)/2,mat(0xffffff,{map:t,roughness:.65}),true,true)}
+function label(text,w=256,bg='#172b29'){let c=document.createElement('canvas');c.width=w;c.height=80;let g=c.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,w,80);g.strokeStyle='#a9c29a';g.lineWidth=5;g.strokeRect(3,3,w-6,74);g.font='bold 27px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='white';g.fillText(text,w/2,42,w-15);let s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));s.scale.set(2.5,.78,1);return s}
+function school(){
+ box(120,.3,100,0,-.5,0,mat(0x1c302c),false,true);
+ box(22,.08,19,0,-.25,5,mat(0x273f32));
+ for(let f=0;f<4;f++){
+  let y=f*FH,accent=mat(colors[f]),lower=mat(0x4e95c2);
+  // Lubang tangga persis selebar lintasannya, tanpa bibir melintang.
+  slab(-24,-9,-15,-5,y);slab(9,24,-15,-5,y);
+  slab(-9,9,-15,-13,y);slab(-9,9,-9,-5,y);
+  slab(-24,-12,-5,15,y);slab(12,24,-5,15,y);
+  wall(48,4.26,.25,0,y+2.13,-15,accent);
+  wall(.25,4.26,10,-24,y+2.13,-10,accent);wall(.25,4.26,10,24,y+2.13,-10,accent);
+  for(let side of [-1,1]){
+   wall(12,4.26,.25,side*18,y+2.13,15,accent);
+   wall(.2,.95,20,side*12,y+.475,5,accent);
+   box(.3,.12,20,side*12,y+1,5,mat(0x8c9271));
+   for(let z=-5;z<=15;z+=5)wall(.35,4.26,.35,side*12,y+2.13,z,accent);
+   for(let j=0;j<5;j++){let z=-3+j*4;wall(.25,1.0,4,side*24,y+.5,z,accent);wall(.25,1.16,4,side*24,y+3.68,z,accent);wall(.28,2.1,.25,side*24,y+2.05,z-1.875,accent);box(.08,2.1,3.5,side*24,y+2.05,z,glassMat,true);box(.3,.09,3.6,side*24,y+2.05,z,metalMat)}
+   for(let r=0;r<3;r++){
+    let z1=-5+r*20/3,z2=z1+20/3,zc=(z1+z2)/2,x=side*20,doorX=side*16,num=f*6+(side<0?0:3)+r+1;
+    wall(8,4.26,.20,x,y+2.13,z1,wallMat);
+    let len=(20/3-1.9)/2;
+    wall(.2,4.26,len,doorX,y+2.13,z1+len/2);
+    wall(.2,4.26,len,doorX,y+2.13,z2-len/2);
+    wall(.2,1.26,1.9,doorX,y+3.63,zc,accent);
+    // Daun pintu terbuka, tidak menutupi jalur masuk.
+    wall(1.6,2.9,.10,doorX+side*.8,y+1.45,zc-.90,woodMat);
+    box(.12,.12,.15,doorX+side*1.4,y+1.3,zc-.8,mat(0x8c9271));
+    const s=label('KELAS '+String(num).padStart(2,'0'));s.position.set(doorX-side*.22,y+3.45,zc);s.scale.set(1.7,.53,1);scene.add(s);
+    box(.1,1.15,3.3,side*23.78,y+2.15,zc,mat(0x257466));
+    for(let dx of [-2.1,2.1])for(let dz of [-1.8,1.8]){
+     const tx=x+dx,tz=zc+dz;
+     wall(1.45,.12,.8,tx,y+.83,tz,woodMat);
+     for(let lx of [-.55,.55])for(let lz of [-.25,.25])box(.07,.77,.07,tx+lx,y+.385,tz+lz,metalMat);
+     wall(.6,.1,.53,tx,y+.47,tz+.73,accent);wall(.6,.5,.08,tx,y+.75,tz+.98,accent);
+     for(let lx of [-.23,.23])for(let lz of [.53,.95])box(.05,.43,.05,tx+lx,y+.215,tz+lz,metalMat);
+    }
+    slots.push({x,y,z:zc,floor:f,room:num});
+    safeRooms.push({floor:f,room:num,y,minX:side<0?-23.65:16.43,maxX:side<0?-16.43:23.65,minZ:z1+.32,maxZ:z2-.32});
+    box(.75,.015,1.65,doorX+side*.63,y+.015,zc,mat(0x6b9e7b,{emissive:0x294c33,emissiveIntensity:.35}));
+   }
+  }
+  wall(24,.95,.2,0,y+.475,-5,accent);box(24,.12,.32,0,y+1,-5,mat(0x8c9271));
+  const s=label('LANTAI '+(f+1)+' / 4',512);s.position.set(0,y+3.2,-14.7);s.scale.set(4.8,.75,1);scene.add(s);
+  // Jalur penghubung setiap lantai: dari kanan tangga kembali ke kiri.
+  for(let x=-7;x<=7;x+=3.5){const a=label('← NAIK',256,'#294841');a.position.set(x,y+.04,-6.8);a.scale.set(1.5,.46,1);scene.add(a)}
+  if(f<3){
+   // 30 anak tangga: injakan 0.60, kenaikan 0.15, tinggi total 4.50.
+   for(let i=0;i<30;i++){let h=(i+1)*.15;box(.6,.18,4,-9+(i+.5)*.6,y+h-.09,-11,stairMat,true,true);box(.48,.012,.08,-9+(i+.5)*.6,y+h+.007,-9.15,mat(0x6a6651))}
+   for(let z of [-13.12,-8.88]){
+    let rail=box(Math.hypot(18,FH),.10,.10,0,y+FH/2+1,z,metalMat);rail.rotation.z=Math.atan2(FH,18);
+    for(let i=0;i<=9;i++){let x=-9+i*2;box(.07,1,.07,x,y+(x+9)/18*FH+.5,z,metalMat)}
+   }
+   let a=label('NAIK →',256,'#4d5140');a.position.set(-10.7,y+2.5,-11);a.scale.set(2,.63,1);scene.add(a);
+  }
+  // Pagar hanya di sisi panjang; kedua ujung tangga dibiarkan terbuka.
+  wall(17.7,.85,.10,0,y+.425,-13.16,metalMat);
+  wall(17.7,.85,.10,0,y+.425,-8.84,metalMat);
+ }
+ const roof=mat(0x263940);box(48,.22,10,0,18,-10,roof);box(12,.22,20,-18,18,5,roof);box(12,.22,20,18,18,5,roof);
+ for(let x of [-7,7])for(let z of [2,11]){box(.45,2.3,.45,x,.8,z,woodMat);let m=new THREE.Mesh(new THREE.IcosahedronGeometry(1.8,0),mat(z===2?0x213d35:0x324735,{flatShading:true}));m.position.set(x,2.8,z);scene.add(m)}
+ for(let x of [-4,4]){box(2.6,.18,.7,x,.5,8,mat(0x665b47));box(2.6,.7,.12,x,.8,8.35,mat(0x56473d))}
+}
+
+const names=['01 · Murid Tanpa Wajah','02 · Penjaga Jam Mati','03 · Si Bayangan','04 · Siswi Melayang','05 · Pengawas Sunyi','06 · Kepala Terbalik','07 · Anak Kapur','08 · Seragam Kosong','09 · Sang Pengarsip'];
+function npcMake(slot,i,questions){
+ const g=new THREE.Group(),body=new THREE.Group();g.add(body);
+ const pale=mat(0xa5b4a9),dark=mat(0x10191d),cloth=mat([0x314742,0x3e3c4a,0x172128,0x737c74,0x343f42,0x454046,0xa5b5ac,0x37454c,0x50493e][i]);
+ const glow=mat(i%2?0xb4d9cb:0xd99c83,{emissive:i%2?0x7bbaab:0xb65034,emissiveIntensity:1.6});
+ function part(w,h,d,x,y,z,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;body.add(o);return o}
+ const head=part(.45,.49,.41,0,1.85,0,i===7?dark:pale);
+ part(.62,.77,.33,0,1.18,0,cloth);
+ for(const side of [-1,1]){
+  const arm=part(.13,i===2?.98:.76,.15,side*.43,1.08,0,cloth);arm.rotation.z=side*(i===4?.42:.08);
+  part(.12,.18,.15,side*.46,.59,0,pale);
+  if(i!==3&&i!==7)part(.20,.67,.24,side*.16,.46,0,dark);
+  if(i!==0&&i!==7)part(.06,.045,.026,side*.105,1.89,.213,glow);
+ }
+ if(i===0){part(.31,.34,.03,0,1.86,.22,pale);part(.38,.12,.4,0,2.14,0,dark)}
+ if(i===1){const clock=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.06,24),pale);clock.rotation.x=Math.PI/2;clock.position.set(0,1.26,.22);body.add(clock);part(.025,.20,.04,0,1.32,.27,dark);part(.15,.025,.04,.06,1.24,.27,dark)}
+ if(i===2){head.material=dark;body.scale.set(.78,1.22,.67)}
+ if(i===3){body.position.y=.30;part(.68,.64,.42,0,.59,0,cloth);part(.5,.25,.45,0,2.03,-.04,dark)}
+ if(i===4){part(.78,.10,.50,0,2.16,0,dark);part(.44,.18,.38,0,2.27,0,dark)}
+ if(i===5){head.rotation.z=Math.PI;part(.24,.035,.03,0,2.01,.22,glow)}
+ if(i===6){part(.34,.08,.03,0,1.7,.22,dark);for(let k=0;k<3;k++)part(.04,.15,.03,-.15+k*.15,1.38,.19,dark)}
+ if(i===7){head.visible=false;part(.26,.09,.25,0,1.63,0,pale);part(.58,.08,.34,0,.8,0,dark);body.position.y=.18}
+ if(i===8){part(.13,.23,.05,0,1.85,.23,dark);part(.05,.05,.05,0,1.86,.27,glow);part(.45,.12,.41,0,2.13,0,dark);part(.32,.39,.10,.41,.94,.14,mat(0x807053))}
+ const tag=label(names[i],512);tag.position.y=2.9;tag.scale.set(3,.47,1);g.add(tag);
+ g.position.set(slot.x,slot.y,slot.z);g.rotation.y=slot.x>0?-Math.PI/2:Math.PI/2;
+ scene.add(g);return{g,body,baseY:body.position.y,slot,name:names[i],tag,questions,index:0,done:false,discovered:false,seed:i*1.7};
+}
+
+function removeNPC(n){scene.remove(n.g);const gs=new Set(),ms=new Set(),ts=new Set();n.g.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material){ms.add(o.material);if(o.material.map)ts.add(o.material.map)}});gs.forEach(g=>g.dispose());ts.forEach(t=>t.dispose());ms.forEach(m=>m.dispose())}
+function populate(){npcs.forEach(n=>{if(!n.done)removeNPC(n)});let custom=shuffle(customBank),seen=new Set(custom.map(q=>q.q.toLowerCase().trim())),deck=shuffle(custom.concat(shuffle(bank.filter(q=>!seen.has(q.q.toLowerCase().trim())))).slice(0,63)).map(q=>{const options=shuffle([q.answer,...q.distractors]);return{...q,options,right:options.indexOf(q.answer)}});npcs=shuffle(slots).slice(0,9).map((s,i)=>npcMake(s,i,deck.slice(i*7,i*7+7)))}
+// PHYSICS_START
+function overlaps(c,x,z){return x+RADIUS>c.minX+.0001&&x-RADIUS<c.maxX-.0001&&z+RADIUS>c.minZ+.0001&&z-RADIUS<c.maxZ-.0001}
+function blocked(x,z,y){return colliders.some(c=>overlaps(c,x,z)&&y+HEIGHT>c.minY+.003&&y<c.maxY-.003)}
+// Lima ray di tapak pemain. Ray tepi mempertahankan pijakan yang baru dinaiki;
+// satu ray pusat saja akan menjatuhkan pemain kembali ke anak tangga sebelumnya.
+function supportAt(x,z,top,bottom){let best=-Infinity;const r=RADIUS+.012;for(const [dx,dz]of [[0,0],[r,0],[-r,0],[0,r],[0,-r]]){origin.set(x+dx,top,z+dz);ray.set(origin,down);ray.near=0;ray.far=Math.max(.001,top-bottom);for(const hit of ray.intersectObjects(walkables,false)){if(hit.face&&hit.face.normal.y>.5&&hit.point.y>best){best=hit.point.y;break}}}return best}
+function moveAxis(dx,dz){const x=player.x+dx,z=player.z+dz;if(Math.abs(x)>55||Math.abs(z)>45)return;let y=player.y;
+ if(grounded){const support=supportAt(x,z,y+STEP+.005,y-.32);if(Number.isFinite(support)&&support<=y+STEP+.006){const candidate=Math.max(y,support);if(!blocked(x,z,candidate+.006))y=candidate}}
+ if(!blocked(x,z,y+.006)){player.x=x;player.z=z;player.y=y}
+}
+function physics(dt){const ox=player.x,oz=player.z;let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)+touchMove.forward,s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+touchMove.strafe,n=Math.hypot(f,s),running=keys.ShiftLeft||keys.ShiftRight||touchRun;
+ if(n){f/=n;s/=n;const speed=(running?6.5:3.7)*Math.min(1,n),dx=(s*Math.cos(yaw)-f*Math.sin(yaw))*speed*dt,dz=(-f*Math.cos(yaw)-s*Math.sin(yaw))*speed*dt,count=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.055));for(let i=0;i<count;i++){moveAxis(dx/count,0);moveAxis(0,dz/count)}}
+ const old=player.y;vy=Math.max(-24,vy-18*dt);let target=old+vy*dt;
+ if(vy>0){for(const c of colliders){if(overlaps(c,player.x,player.z)&&old+HEIGHT<=c.minY+.004&&target+HEIGHT>=c.minY){target=Math.min(target,c.minY-HEIGHT-.006);vy=0}}}
+ if(vy<=0){const support=supportAt(player.x,player.z,old+.025,target-.06);if(Number.isFinite(support)&&support<=old+.03&&support>=target-.06){target=support;vy=0;grounded=true}else grounded=false}else grounded=false;
+ player.y=target;if(player.y< -8){player.set(0,0,-6.3);vy=0;grounded=true}
+ if(grounded&&Math.hypot(player.x-ox,player.z-oz)>.001){footClock+=dt;if(footClock>(running?.27:.4)){footstep();footClock=0}}else footClock=.2;
+}
+// PHYSICS_END
+function lineBlocked(a,b){const d={x:b.x-a.x,y:b.y-a.y,z:b.z-a.z};return colliders.some(c=>{let lo=0,hi=1;for(const [axis,min,max]of [['x',c.minX,c.maxX],['y',c.minY,c.maxY],['z',c.minZ,c.maxZ]]){if(Math.abs(d[axis])<1e-7){if(a[axis]<min||a[axis]>max)return false}else{let t1=(min-a[axis])/d[axis],t2=(max-a[axis])/d[axis];if(t1>t2)[t1,t2]=[t2,t1];lo=Math.max(lo,t1);hi=Math.min(hi,t2);if(lo>hi)return false}}return hi>.01&&lo<.99})}
+function nearest(){nearby=null;let best=2.7;for(const n of npcs){if(n.done||n.slot.floor!==floor()||Math.abs(player.y-n.slot.y)>.6)continue;const d=Math.hypot(player.x-n.slot.x,player.z-n.slot.z);if(d<best&&!lineBlocked({x:player.x,y:player.y+1.3,z:player.z},{x:n.slot.x,y:n.slot.y+1.3,z:n.slot.z})){nearby=n;best=d}}$('prompt').classList.toggle('hidden',!nearby);if(nearby)$('prompt').textContent='Tekan E · Selidiki '+nearby.name;updateItemFocus()}
+// SHARED_TOUCH_START
+function ended(){return won||(typeof failed!=='undefined'&&failed)}
+function chooseInputMode(){
+ const choice=$('inputMode').value;
+ touchMode=choice==='touch'||(choice==='auto'&&(window.matchMedia('(pointer: coarse)').matches||((navigator.maxTouchPoints||0)>0&&!window.matchMedia('(any-pointer: fine)').matches)));
+ document.body.classList.toggle('touch-ui',touchMode);
+ try{localStorage.setItem('english-quest-input-mode',choice)}catch(e){}
+ clearTouchInput();refreshViewport();
+}
+function clearTouchInput(){
+ touchMove.forward=touchMove.strafe=0;touchRun=false;stickPointer=lookPointer=null;
+ if($('stickKnob'))$('stickKnob').style.transform='translate(-50%,-50%)';
+ if($('touchRun')){$('touchRun').classList.remove('pressed');$('touchRun').textContent='Lari'}
+}
+function stopTouchSession(){touchSession=false;clearTouchInput();syncTouchUI()}
+function releasePointer(){
+ if(touchMode){stopTouchSession();if(started&&!active&&!ended())pause('Misi dijeda. Sentuh Lanjutkan Misi untuk bermain.');return}
+ if(document.pointerLockElement&&document.exitPointerLock)document.exitPointerLock();
+}
+function modalIsVisible(){return['start','quiz','teacher','win','fail'].some(id=>$(id)&&!$(id).classList.contains('hidden'))}
+function portraitGate(){return touchMode&&touchSession&&started&&!ended()&&!active&&!portraitAllowed&&innerHeight>innerWidth&&!modalIsVisible()}
+function syncTouchUI(){
+ const blocked=portraitGate(),showControls=touchMode&&touchSession&&started&&!ended()&&!active&&!document.hidden&&!blocked&&!modalIsVisible();
+ $('rotateScreen').classList.toggle('hidden',!blocked);
+ $('mobileControls').classList.toggle('hidden',!showControls);
+ $('cross').classList.toggle('hidden',!locked()||!!active||ended()||modalIsVisible());
+ if(!showControls)clearTouchInput();
+ if(touchMode){
+  const item=typeof nearItem!=='undefined'&&nearItem;
+  $('touchInteract').disabled=!(item||nearby)||!showControls;
+  $('touchInteract').textContent=item?'✋ Ambil item':nearby?'☏ Bicara':'✋ Interaksi';
+ }
+}
+function refreshViewport(){
+ const w=Math.max(1,window.innerWidth),h=Math.max(1,Math.round(window.visualViewport&&window.visualViewport.height||window.innerHeight));
+ document.documentElement.style.setProperty('--game-height',h+'px');
+ if(renderer&&camera){renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,touchMode?1.25:1.7));renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
+ syncTouchUI();
+}
+async function requestMobileDisplay(){
+ let full=false;
+ try{
+  const root=document.documentElement;
+  if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+   const request=root.requestFullscreen||root.webkitRequestFullscreen;
+   if(request)await request.call(root);
+  }
+  full=!!(document.fullscreenElement||document.webkitFullscreenElement);
+ }catch(e){}
+ try{if(window.screen&&screen.orientation&&typeof screen.orientation.lock==='function')await screen.orientation.lock('landscape')}catch(e){}
+ // Browser yang menolak fullscreen/orientasi tetap bisa memainkan game.
+ refreshViewport();return full;
+}
+function resumeTouch(){
+ touchSession=true;clearTouchInput();$('start').classList.add('hidden');previous=performance.now();
+ syncTouchUI();void requestMobileDisplay();
+}
+function mobilePause(){
+ if(!started||ended()||active)return;
+ stopTouchSession();pause('Misi dijeda. Sentuh Lanjutkan Misi untuk kembali bermain.');
+}
+function touchInteraction(){
+ if(!touchMode||!locked()||active||ended())return;
+ if(typeof nearItem!=='undefined'&&nearItem){collectItem(nearItem);return}
+ if(nearby)openQuiz(nearby);
+ clearTouchInput();syncTouchUI();
+}
+function touchJump(){if(locked()&&!active&&!ended()&&grounded){vy=6.6;grounded=false}}
+function updateStick(e){
+ if(e.pointerId!==stickPointer)return;e.preventDefault();
+ const rect=$('moveStick').getBoundingClientRect(),radius=rect.width*.34;
+ const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2),length=Math.hypot(dx,dy),clamp=length>radius?radius/length:1;
+ const x=dx*clamp,y=dy*clamp,magnitude=Math.min(1,length/radius),strength=Math.max(0,(magnitude-.12)/.88);
+ touchMove.strafe=length?dx/length*strength:0;touchMove.forward=length?-dy/length*strength:0;
+ $('stickKnob').style.transform='translate(calc(-50% + '+x+'px),calc(-50% + '+y+'px))';
+}
+function endStick(e){if(e.pointerId!==stickPointer)return;stickPointer=null;touchMove.forward=touchMove.strafe=0;$('stickKnob').style.transform='translate(-50%,-50%)'}
+function beginLook(e){
+ if(!touchMode||!locked()||active||ended()||e.clientX<innerWidth*.3||lookPointer!==null)return;
+ e.preventDefault();lookPointer=e.pointerId;lookX=e.clientX;lookY=e.clientY;
+ try{$('world').setPointerCapture(e.pointerId)}catch(err){}
+}
+function moveLook(e){
+ if(e.pointerId!==lookPointer||!locked()||active)return;e.preventDefault();
+ const sensitivity=Math.PI/Math.max(380,Math.min(innerWidth,innerHeight)*1.6);
+ yaw-=(e.clientX-lookX)*sensitivity;pitch=Math.max(-1.5,Math.min(1.5,pitch-(e.clientY-lookY)*sensitivity));lookX=e.clientX;lookY=e.clientY;
+}
+function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
+$('moveStick').addEventListener('pointerdown',e=>{
+ if(!locked()||active||ended()||stickPointer!==null)return;e.preventDefault();e.stopPropagation();stickPointer=e.pointerId;
+ try{$('moveStick').setPointerCapture(e.pointerId)}catch(err){}updateStick(e);
+});
+$('moveStick').addEventListener('pointermove',updateStick);
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('moveStick').addEventListener(t,endStick));
+$('world').addEventListener('pointerdown',beginLook);$('world').addEventListener('pointermove',moveLook);
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('world').addEventListener(t,endLook));
+$('mobileControls').addEventListener('pointerdown',e=>e.stopPropagation());
+$('mobileControls').addEventListener('contextmenu',e=>e.preventDefault());
+$('touchInteract').onclick=touchInteraction;$('touchJump').onclick=touchJump;
+$('touchRun').onclick=()=>{if(!locked())return;touchRun=!touchRun;$('touchRun').classList.toggle('pressed',touchRun);$('touchRun').textContent=touchRun?'Lari ON':'Lari'};
+$('touchFlash').onclick=()=>{if(typeof toggleFlash==='function')toggleFlash()};
+$('mobilePause').onclick=mobilePause;
+$('mobileFull').onclick=()=>void requestMobileDisplay();$('retryLandscape').onclick=()=>void requestMobileDisplay();
+$('playPortrait').onclick=()=>{portraitAllowed=true;refreshViewport()};
+$('mobileSound').onclick=()=>{$('sound').click();$('mobileSound').textContent=muted?'🔇':'🔊'};
+$('mobileTeacher').onclick=()=>{$('teacher').classList.remove('hidden');$('teacherStatus').textContent=customBank.length+' soal kustom aktif. Perubahan berlaku pada misi baru.'};
+$('inputMode').addEventListener('change',()=>{stopTouchSession();chooseInputMode()});
+window.addEventListener('resize',refreshViewport);
+window.addEventListener('orientationchange',()=>{clearKeys();clearTouchInput();refreshViewport()});
+document.addEventListener('fullscreenchange',()=>{refreshViewport()});
+window.addEventListener('blur',()=>{if(touchMode&&touchSession&&!active&&!ended())mobilePause();clearTouchInput()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTouchInput();if(touchMode&&touchSession&&!active&&!ended())mobilePause()}});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',refreshViewport);
+try{const saved=localStorage.getItem('english-quest-input-mode');if(['auto','touch','keyboard'].includes(saved))$('inputMode').value=saved}catch(e){}
+// SHARED_TOUCH_END
+
+function clearKeys(){Object.keys(keys).forEach(k=>delete keys[k]);clearTouchInput()}
+const locked=()=>touchMode?touchSession&&started&&!ended()&&!active&&!document.hidden&&!portraitGate()&&!modalIsVisible():document.pointerLockElement===$('world');
+function pause(message='Klik tombol untuk kembali menjelajah.'){if(active||won||failed)return;stopTouchSession();$('start').classList.remove('hidden');$('startButton').textContent=started?'Lanjutkan Misi':'Mulai Misi';$('status').textContent=message}
+function lock(){if(touchMode){resumeTouch();return}if(!$('world').requestPointerLock){pause('Mode mouse tidak tersedia. Pilih Joystick & layar sentuh pada Mode kontrol untuk bermain.');return}try{const p=$('world').requestPointerLock();if(p&&p.catch)p.catch(()=>pause('Klik tombol untuk mengaktifkan mouse.'))}catch(e){pause('Klik tombol untuk mencoba mengunci mouse lagi.')}}
+document.addEventListener('pointerlockchange',()=>{if(touchMode)return;$('cross').classList.toggle('hidden',!locked());if(locked()){$('start').classList.add('hidden');previous=performance.now()}else{clearKeys();$('prompt').classList.add('hidden');if(started&&!active&&!won)pause()}});
+document.addEventListener('pointerlockerror',()=>pause('Klik Lanjutkan Misi untuk mengaktifkan mouse.'));
+document.addEventListener('mousemove',e=>{if(touchMode||!locked()||active||won||failed)return;yaw-=e.movementX*.0022;pitch=Math.max(-1.5,Math.min(1.5,pitch-e.movementY*.0022))});
+document.addEventListener('keydown',e=>{if(e.target.matches('textarea,input'))return;if(started&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.repeat)return;if(e.code==='Space'&&locked()&&!active&&grounded){vy=6.6;grounded=false}if(e.code==='KeyF'&&locked()&&!active)toggleFlash();if(e.code==='KeyE'&&locked()&&!active&&!failed){if(nearItem)collectItem(nearItem);else if(nearby)openQuiz(nearby)}});
+document.addEventListener('keyup',e=>keys[e.code]=false);
+window.addEventListener('blur',()=>{clearKeys();cancelPress();if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.1);if(locked())releasePointer()});
+document.addEventListener('visibilitychange',()=>{previous=performance.now();if(document.hidden){if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.1);if(locked())releasePointer()}});
+function reset(){stopTouchSession();attemptToken++;clearTimeout(answerTimer);clearKeys();active=nearby=null;busy=false;elapsed=correct=wrong=finished=0;won=false;vy=0;grounded=true;yaw=pitch=0;flashOn=true;$('flashButton').textContent='F · Senter ON';player.set(0,0,-6.3);populate();resetSurvival();scene.updateMatrixWorld(true);['quiz','win','prompt','toast','fail'].forEach(id=>$(id).classList.add('hidden'));['hud','mapBox','bottom','missionTag','safePanel'].forEach(id=>$(id).classList.remove('hidden'));hud()}
+$('startButton').onclick=()=>{if(!ready)return;audioStart();if(!started){reset();started=true}$('start').classList.add('hidden');lock()};
+$('again').onclick=()=>{audioStart();reset();started=true;$('start').classList.add('hidden');lock()};
+function openQuiz(n){if(failed||won||!safeRoom()){showToast('Masuk lebih jauh ke dalam kelas untuk berbicara dengan aman.');return}n.discovered=true;active=n;busy=false;clearKeys();$('quiz').classList.remove('hidden');$('prompt').classList.add('hidden');if(locked())releasePointer();renderQuestion()}
+function renderQuestion(){if(!active)return;const q=active.questions[active.index];$('npcName').textContent=active.name+' · Kelas '+active.slot.room;$('questionNumber').textContent='Pertanyaan '+(active.index+1)+' dari 7';$('question').textContent=q.q;$('fill').style.width=active.index/7*100+'%';$('hint').textContent='💡 Hint: '+q.hint;$('meaning').textContent=q.meaning;$('meaning').classList.add('hidden');$('meaningButton').classList.toggle('hidden',!q.meaning);$('meaningButton').textContent='Tampilkan Arti';$('feedback').textContent='';$('answers').replaceChildren();$('leaveQuiz').disabled=false;busy=false;q.options.forEach((text,i)=>{const b=document.createElement('button');b.className='answer';const a=document.createElement('span');a.className='letter';a.textContent='ABCD'[i];const t=document.createElement('span');t.textContent=text;b.append(a,t);b.onclick=()=>answer(i);$('answers').appendChild(b)})}
+$('meaningButton').onclick=()=>{const h=$('meaning').classList.toggle('hidden');$('meaningButton').textContent=h?'Tampilkan Arti':'Sembunyikan Arti'};
+$('leaveQuiz').onclick=()=>{if(busy)return;active=null;$('quiz').classList.add('hidden');lock()};
+function answer(i){if(!active||busy||failed||won)return;const epoch=attemptToken;busy=true;const n=active,q=n.questions[n.index],ok=i===q.right,buttons=[...$('answers').children];buttons.forEach(b=>b.disabled=true);buttons[q.right].classList.add('right');$('leaveQuiz').disabled=true;audioStart();if(ok){correct++;bling();$('feedback').style.color='#83f5be';$('feedback').textContent='✓ Benar! Bagus sekali.'}else{wrong++;buzz();buttons[i].classList.add('wrong');$('feedback').style.color='#ffb4bd';$('feedback').textContent='✕ Jawaban benar: '+q.answer}n.index++;$('fill').style.width=n.index/7*100+'%';hud();answerTimer=setTimeout(()=>{if(epoch!==attemptToken||failed)return;busy=false;if(n.index<7)renderQuestion();else{n.done=true;removeNPC(n);finished++;active=nearby=null;$('quiz').classList.add('hidden');hud();if(!checkVictory())pause('Kuis '+n.name+' selesai. Anomali menghilang. Periksa koridor sebelum keluar kelas.')}},ok?900:1800)}
+function victory(){if(failed||won||finished!==9||foundItems!==5)return;won=true;if(locked())releasePointer();$('start').classList.add('hidden');$('cross').classList.add('hidden');$('prompt').classList.add('hidden');$('finalScore').textContent=correct+'/63';$('finalWrong').textContent=wrong;$('finalTime').textContent=time(elapsed);$('win').classList.remove('hidden');bling()}
+function hud(){$('floorHUD').textContent=(floor()+1)+'/4';$('npcHUD').textContent=finished+'/9';$('itemHUD').textContent=foundItems+'/5';$('correctHUD').textContent=correct;$('wrongHUD').textContent=wrong;$('timeHUD').textContent=time(elapsed);$('mapFloor').textContent='L'+(floor()+1)}
+
+function minimap(){
+ const g=$('map').getContext('2d'),sx=x=>163+x*5.8,sz=z=>120+z*5.8;
+ g.fillStyle='#0b171a';g.fillRect(0,0,326,240);
+ const rect=(x,z,w,d,c)=>{g.fillStyle=c;g.fillRect(sx(x),sz(z),w*5.8,d*5.8)};
+ rect(-24,-15,48,10,'#48605a');rect(-24,-5,12,20,'#48605a');rect(12,-5,12,20,'#48605a');rect(-24,-5,8,20,'#2b3b3a');rect(16,-5,8,20,'#2b3b3a');rect(-9,-13,18,4,'#7c8060');
+ g.strokeStyle='#718074';for(const side of [-1,1])for(let r=0;r<=3;r++){const z=-5+r*20/3;g.beginPath();g.moveTo(sx(side*16),sz(z));g.lineTo(sx(side*24),sz(z));g.stroke()}
+ g.font='bold 12px monospace';g.textAlign='center';g.fillStyle='#d0d9b0';g.fillText('NAIK →',sx(0),sz(-10.3));
+ for(const n of npcs)if(!n.done&&n.slot.floor===floor()&&(n.discovered||Math.hypot(n.slot.x-player.x,n.slot.z-player.z)<8)){g.fillStyle='#d3947d';g.beginPath();g.arc(sx(n.slot.x),sz(n.slot.z),4.8,0,7);g.fill()}
+ if(hunter&&Math.abs(hunter.g.position.y-player.y)<2.2&&Math.hypot(hunter.g.position.x-player.x,hunter.g.position.z-player.z)<19){g.fillStyle='#e29279';g.beginPath();g.arc(sx(hunter.g.position.x),sz(hunter.g.position.z),6,0,7);g.fill()}
+ g.save();g.translate(Math.max(8,Math.min(318,sx(player.x))),Math.max(8,Math.min(232,sz(player.z))));g.rotate(-yaw);g.beginPath();g.moveTo(0,-9);g.lineTo(-6,6);g.lineTo(0,3);g.lineTo(6,6);g.closePath();g.fillStyle='#b3d8a2';g.fill();g.restore();
+}
+// SURVIVAL_START
+function safeRoom(pos=player){
+ return safeRooms.find(r=>pos.x>=r.minX&&pos.x<=r.maxX&&pos.z>=r.minZ&&pos.z<=r.maxZ&&pos.y>=r.y-.12&&pos.y<=r.y+FH-1.15)||null;
+}
+function buildPatrolRoute(){
+ const forward=[];
+ const point=(x,y,z)=>{const last=forward[forward.length-1];if(!last||Math.hypot(last.x-x,last.y-y,last.z-z)>.001)forward.push({x,y,z})};
+ for(let f=0;f<4;f++){
+  const y=f*FH;
+  point(-14,y,-6.6);point(-14,y,13.3);point(-14,y,-6.6);
+  point(14,y,-6.6);point(14,y,13.3);point(14,y,-6.6);
+  if(f<3){
+   point(-10.2,y,-6.6);point(-10.2,y,-11);point(-9.4,y,-11);
+   for(let step=0;step<30;step++)point(-9+(step+.5)*.6,y+(step+1)*.15,-11);
+   point(10.2,y+FH,-11);point(10.2,y+FH,-6.6);
+  }
+ }
+ // Pulang melalui jalan yang sama, termasuk tangga fisik, tanpa teleport.
+ return forward.concat(forward.slice(1,-1).reverse());
+}
+function buildItemCandidates(){
+ const candidates=[];
+ for(const slot of slots){const z1=slot.z-10/3,z2=slot.z+10/3;
+  for(const x of [Math.sign(slot.x)*23.38,Math.sign(slot.x)*16.66])for(const z of [z1+.53,z2-.53])candidates.push({id:'room-'+slot.room+'-'+x+'-'+z,x,y:slot.y,z,floor:slot.floor,kind:'room',room:slot.room});
+ }
+ for(let f=0;f<4;f++)for(const side of [-1,1]){
+  for(const z of [-14.05,-5.75])candidates.push({id:'hall-back-'+f+'-'+side+'-'+z,x:side*22.8,y:f*FH,z,floor:f,kind:'hall'});
+  for(const x of [side*12.7,side*15.2])candidates.push({id:'hall-wing-'+f+'-'+x,x,y:f*FH,z:14.05,floor:f,kind:'hall'});
+ }
+ return candidates;
+}
+function chooseItemLocations(){
+ const floors=shuffle([0,1,2,3]),chosen=[],used=new Set(),startKind=Math.random()<.5?'room':'hall';
+ for(let i=0;i<4;i++){const kind=i%2===0?startKind:(startKind==='room'?'hall':'room');const options=itemCandidates.filter(p=>p.floor===floors[i]&&p.kind===kind);const pick=shuffle(options)[0];chosen.push(pick);used.add(pick.id)}
+ chosen.push(shuffle(itemCandidates.filter(p=>!used.has(p.id)))[0]);return shuffle(chosen);
+}
+function disposeGroup(group){
+ scene.remove(group);const geometries=new Set(),materials=new Set(),textures=new Set();group.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material){materials.add(o.material);if(o.material.map)textures.add(o.material.map)}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());
+}
+function makePickup(type,location,index){
+ const g=new THREE.Group(),body=new THREE.Group();g.add(body);const material=mat(type.color,{emissive:type.color,emissiveIntensity:.15}),dark=mat(0x35413e),paper=mat(0xc9c9ad);
+ function part(w,h,d,x,y,z,m=material){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);mesh.position.set(x,y,z);body.add(mesh);return mesh}
+ if(type.kind==='key'){const ring=new THREE.Mesh(new THREE.TorusGeometry(.15,.045,8,20),material);ring.position.y=.18;body.add(ring);part(.075,.35,.07,0,-.07,0);part(.16,.06,.07,.06,-.18,0);part(.14,.06,.07,.05,-.08,0)}
+ if(type.kind==='book'){part(.43,.07,.32,0,0,0,paper);part(.47,.025,.35,0,.055,0);part(.47,.025,.35,0,-.055,0);part(.035,.13,.35,-.23,0,0)}
+ if(type.kind==='watch'){const disk=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.065,24),material);disk.rotation.x=Math.PI/2;body.add(disk);part(.025,.17,.02,0,.045,.05,dark);part(.12,.025,.02,.04,-.015,.05,dark);part(.08,.10,.07,0,.23,0)}
+ if(type.kind==='candle'){const wax=new THREE.Mesh(new THREE.CylinderGeometry(.11,.12,.43,16),material);body.add(wax);part(.022,.08,.022,0,.25,0,dark);const flame=new THREE.Mesh(new THREE.SphereGeometry(.055,8,8),mat(0xffd18c,{emissive:0xe09f54,emissiveIntensity:.8}));flame.position.y=.32;flame.scale.y=1.5;body.add(flame)}
+ if(type.kind==='box'){part(.38,.27,.30,0,0,0);part(.43,.045,.34,0,.16,0);part(.10,.07,.04,0,.015,.17,paper);part(.18,.035,.035,.25,0,0);part(.035,.10,.035,.32,.035,0)}
+ const tag=label(type.name,384);tag.scale.set(1.65,.34,1);tag.position.y=.65;tag.visible=false;g.add(tag);
+ g.position.set(location.x,location.y+.37,location.z);g.rotation.y=Math.random()*Math.PI*2;scene.add(g);return{g,body,tag,type,location,index,done:false};
+}
+function makeHunter(){
+ const g=new THREE.Group(),body=new THREE.Group();g.add(body);
+ const pale=mat(0xa5b1a8),dress=mat(0x414449),hair=mat(0x192126),dark=mat(0x253138),eye=mat(0xe9ad8a,{emissive:0xcd6d49,emissiveIntensity:1.6});
+ function part(w,h,d,x,y,z,m){const a=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);a.position.set(x,y,z);a.castShadow=true;body.add(a);return a}
+ part(1.05,1.1,.57,0,2.12,0,dress);
+ const skirt=new THREE.Mesh(new THREE.CylinderGeometry(.47,.82,1.62,8),dress);skirt.position.set(0,1.1,0);skirt.castShadow=true;body.add(skirt);
+ part(.69,.75,.61,0,3.14,0,pale);part(.79,.23,.70,0,3.58,-.04,hair);part(.77,1.22,.28,0,2.98,-.30,hair);
+ const arms=[];for(const side of [-1,1]){const arm=part(.23,1.6,.27,side*.71,1.88,0,dress);arm.rotation.z=side*.09;arms.push(arm);part(.21,.38,.23,side*.79,.96,0,pale);part(.28,.20,.5,side*.29,.13,.08,dark);part(.10,.07,.03,side*.17,3.21,.315,eye)}
+ part(.21,.035,.025,0,2.99,.322,dark);
+ scene.add(g);return{g,body,arms,pathPosition:new THREE.Vector3(),index:0,footDistance:0,moved:0,state:'PATROL'};
+}
+function buildSurvival(){patrolRoute=buildPatrolRoute();itemCandidates=buildItemCandidates();hunter=makeHunter()}
+function resetSurvival(){
+ failed=false;foundItems=0;nearItem=null;hunterThreat=0;
+ for(const p of pickups)if(!p.done)disposeGroup(p.g);
+ const locations=chooseItemLocations();pickups=itemTypes.map((type,i)=>makePickup(type,locations[i],i));
+ const start=patrolRoute.findIndex(p=>p.x===14&&p.y===0&&p.z===13.3);
+ hunter.index=(start+1)%patrolRoute.length;hunter.g.position.set(patrolRoute[start].x,patrolRoute[start].y,patrolRoute[start].z);hunter.pathPosition.set(patrolRoute[start].x,patrolRoute[start].y,patrolRoute[start].z);hunter.g.visible=true;hunter.footDistance=0;hunter.moved=0;hunter.state='PATROL';
+ $('threatVignette').style.opacity='0';
+}
+function updateItemFocus(){
+ nearItem=null;let best=nearby?Math.hypot(player.x-nearby.slot.x,player.z-nearby.slot.z):1.85;
+ for(const item of pickups){if(item.done||Math.abs(player.y-item.location.y)>.65)continue;const distance=Math.hypot(player.x-item.location.x,player.z-item.location.z);if(distance<best&&!lineBlocked({x:player.x,y:player.y+1.2,z:player.z},{x:item.g.position.x,y:item.g.position.y+.14,z:item.g.position.z})){best=distance;nearItem=item}}
+ if(nearItem){$('prompt').classList.remove('hidden');$('prompt').textContent='Tekan E · Ambil '+nearItem.type.name}
+}
+function collectItem(item){
+ if(!started||won||failed||item.done||active)return;
+ if(Math.abs(player.y-item.location.y)>.65||Math.hypot(player.x-item.location.x,player.z-item.location.z)>1.85)return;
+ if(lineBlocked({x:player.x,y:player.y+1.2,z:player.z},{x:item.g.position.x,y:item.g.position.y+.14,z:item.g.position.z}))return;
+ item.done=true;disposeGroup(item.g);foundItems++;nearItem=null;bling();hud();showToast('✓ '+item.type.name+' — '+item.type.meaning+' ('+foundItems+'/5)');checkVictory();
+}
+function checkVictory(){if(!failed&&!won&&finished===9&&foundItems===5){victory();return true}return false}
+function animateItems(){for(const item of pickups)if(!item.done){const d=Math.hypot(player.x-item.location.x,player.z-item.location.z);item.body.position.y=Math.sin(elapsed*1.7+item.index)*.018;item.tag.visible=!failed&&!won&&Math.abs(player.y-item.location.y)<.8&&d<3.5&&!lineBlocked({x:player.x,y:player.y+1.2,z:player.z},{x:item.g.position.x,y:item.g.position.y+.14,z:item.g.position.z})}}
+function monsterDistance(){if(!hunter)return Infinity;return Math.hypot(hunter.g.position.x-player.x,hunter.g.position.z-player.z)}
+function hunterSeesPlayer(){
+ if(!hunter||safeRoom()||Math.abs(hunter.g.position.y-player.y)>1.6||monsterDistance()>10.5)return false;
+ return!lineBlocked({x:hunter.g.position.x,y:hunter.g.position.y+1.6,z:hunter.g.position.z},{x:player.x,y:player.y+1.3,z:player.z});
+}
+function heavyStep(){
+ if(!audio||muted||Math.abs(hunter.g.position.y-player.y)>5)return;
+ const proximity=Math.max(0,1-monsterDistance()/23);if(proximity<=0)return;
+ tone(49,audio.currentTime,.28,'triangle',.30*proximity);tone(73,audio.currentTime+.055,.19,'sine',.15*proximity);
+}
+function canCapture(){
+ if(!hunter||safeRoom()||failed||won||active)return false;
+ const m=hunter.g.position;if(monsterDistance()>1.38||player.y>=m.y+3.5||player.y+HEIGHT<=m.y+.12)return false;
+ return!lineBlocked({x:m.x,y:m.y+1.4,z:m.z},{x:player.x,y:player.y+1.3,z:player.z});
+}
+function updatePatrol(dt){
+ if(!hunter||failed||won||!started||document.hidden||(!locked()&&!active))return;
+ hunter.state=hunterSeesPlayer()?'ALERT':'PATROL';
+ let travel=(hunter.state==='ALERT'?3.8:2.6)*dt;
+ while(travel>1e-7){const target=patrolRoute[hunter.index],pos=hunter.pathPosition,dx=target.x-pos.x,dy=target.y-pos.y,dz=target.z-pos.z,d=Math.hypot(dx,dy,dz);if(d<.025){pos.set(target.x,target.y,target.z);hunter.index=(hunter.index+1)%patrolRoute.length;continue}
+  const step=Math.min(travel,d,.15);const x=pos.x+dx/d*step,z=pos.z+dz/d*step,y=pos.y+dy/d*step;
+  // Rute menaiki tangga nyata; ray lantai merapatkan kaki ke injakan.
+  // Posisi vertikal rute disimpan terpisah agar snapping tidak menahan rute.
+  pos.set(x,y,z);const floorY=supportAt(x,z,y+.25,y-.35);hunter.g.position.set(x,Number.isFinite(floorY)?floorY:y,z);if(Math.hypot(dx,dz)>.001)hunter.g.rotation.y=Math.atan2(dx,dz);
+  travel-=step;hunter.footDistance+=step;hunter.moved+=step;
+  if(canCapture()){failMission();return}
+ }
+ hunter.body.position.y=Math.sin(hunter.moved*3.5)*.035;hunter.body.rotation.z=Math.sin(hunter.moved*1.8)*.022;
+ hunter.arms.forEach((a,i)=>a.rotation.x=Math.sin(hunter.moved*3.5+i*Math.PI)*.12);
+ if(hunter.footDistance>.95){hunter.footDistance%=.95;heavyStep()}
+ if(canCapture())failMission();
+}
+function updateSurvivalHUD(){
+ const room=safeRoom(),sameHeight=hunter&&Math.abs(hunter.g.position.y-player.y)<2.1,d=monsterDistance();
+ hunterThreat=!failed&&!won&&sameHeight?Math.max(0,1-d/15):0;
+ $('safePanel').classList.toggle('safe',!!room);$('safeTitle').textContent=failed?'PERCOBAAN BERAKHIR':won?'SEMUA TUJUAN TUNTAS':room?'ZONA AMAN · KELAS '+room.room:'KORIDOR · WASPADA';
+ $('safeText').textContent=room?(sameHeight&&d<10?'Penjaga dekat. Tetap di kelas sampai ia lewat.':'Kelas melindungimu. Periksa koridor sebelum keluar.'):(sameHeight&&d<15?'Langkah berat mendekat. Masuk sepenuhnya ke ruang kelas!':'Cari 5 item di sudut kelas, koridor, dan tepi tembok.');
+ $('threatVignette').style.opacity=String(room?hunterThreat*.12:hunterThreat*.42);
+}
+function failMission(){
+ if(failed||won)return;const summary='Sebelum tertangkap: '+finished+'/9 anomali, '+foundItems+'/5 item, waktu '+time(elapsed)+'.';
+ clearTimeout(answerTimer);reset();failed=true;active=nearby=null;nearItem=null;clearKeys();
+ hideSurvivalPrompt();$('start').classList.add('hidden');$('failReason').textContent=summary;$('fail').classList.remove('hidden');
+ if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.12);
+ if(locked())releasePointer();hud();buzz();
+}
+function hideSurvivalPrompt(){$('cross').classList.add('hidden');$('prompt').classList.add('hidden')}
+$('retry').onclick=()=>{audioStart();reset();started=true;$('start').classList.add('hidden');lock()};
+// SURVIVAL_END
+
+function toggleFlash(){flashOn=!flashOn;$('flashButton').textContent='F · Senter '+(flashOn?'ON':'OFF')}
+$('flashButton').onclick=toggleFlash;
+function buildAtmosphere(){
+ flashlight=new THREE.SpotLight(0xe3edce,2.8,30,Math.PI/5.5,.55,1.25);
+ flashTarget=new THREE.Object3D();camera.add(flashlight,flashTarget);flashlight.position.set(.20,-.15,-.05);flashTarget.position.set(0,-.02,-10);flashlight.target=flashTarget;
+ flashlight.castShadow=true;flashlight.shadow.mapSize.set(touchMode?512:1024,touchMode?512:1024);flashlight.shadow.camera.near=.1;flashlight.shadow.camera.far=32;flashlight.shadow.bias=-.0007;
+ scene.add(camera);
+ for(let f=0;f<4;f++){
+  const light=new THREE.PointLight(f%2?0x8cbdab:0xc6b392,.65,29,1.4);light.position.set(0,f*FH+3.7,-6.3);scene.add(light);corridorLights.push(light);
+  const tubeMat=mat(0x7c9688,{emissive:0x739b8d,emissiveIntensity:.65});
+  box(3,.08,.35,0,f*FH+4.08,-6.5,tubeMat);
+  for(const x of [-14,14])for(const z of [-1,8])box(.25,.07,1.7,x,f*FH+4.04,z,tubeMat);
+ }
+ for(const slot of slots){
+  const fixture=mat(0x85998a,{emissive:0x588277,emissiveIntensity:.35});
+  box(2,.07,.22,slot.x,slot.y+4.05,slot.z,fixture);
+  // Pesan misterius di papan kelas.
+  const mark=label('JANGAN LUPA',512,'#19342e');mark.position.set(slot.x>0?23.6:-23.6,slot.y+2.1,slot.z);mark.scale.set(2.4,.38,1);scene.add(mark);
+ }
+ const geometry=new THREE.BufferGeometry(),positions=new Float32Array((touchMode?220:700)*3);
+ for(let i=0;i<(touchMode?220:700);i++){positions[i*3]=(Math.random()-.5)*48;positions[i*3+1]=Math.random()*17.8;positions[i*3+2]=(Math.random()-.5)*30}
+ geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+ dust=new THREE.Points(geometry,new THREE.PointsMaterial({color:0xb8cbb8,size:.035,transparent:true,opacity:.24,depthWrite:false}));scene.add(dust);
+}
+function mood(now){
+ const live=started&&!won&&!failed&&!document.hidden&&(locked()||active),t=elapsed;
+ if(flashlight)flashlight.intensity=started&&!won&&!failed&&flashOn?2.8:0;
+ // Perubahan cahaya perlahan.
+ corridorLights.forEach((l,i)=>{l.intensity=.48+.18*Math.sin(t*.8+i*2.1);if(Math.sin(t*.31+i*1.8)>.97)l.intensity*=.35});
+ let nearestDistance=100;
+ for(const n of npcs)if(!n.done){
+  const distance=Math.hypot(n.slot.x-player.x,n.slot.z-player.z);
+  if(n.slot.floor===floor())nearestDistance=Math.min(nearestDistance,distance);
+  n.body.position.y=n.baseY+Math.sin(t*1.1+n.seed)*.065;
+  n.body.rotation.z=Math.sin(t*.47+n.seed)*.025;
+  n.tag.position.y=2.9+Math.sin(t*.9+n.seed)*.04;
+  // Anomali tetap di kelasnya dan menoleh ke pemain yang mendekat.
+  if(distance<7)n.g.rotation.y=Math.atan2(player.x-n.slot.x,player.z-n.slot.z);
+ }
+ nearSignal=Math.max(0,1-nearestDistance/10);
+ if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(live?.32+nearSignal*.2:0,audio.currentTime,.25);
+ if(dust){dust.position.y=Math.sin(now*.00009)*.06;dust.material.opacity=.19+nearSignal*.06}
+ $('missionTag').textContent='ARSIP 09 / '+(won?'SEMUA TUJUAN TUNTAS':failed?'PERCOBAAN BERAKHIR':'ANOMALI '+finished+'/9 · ITEM '+foundItems+'/5');
+}
+
+
+function setup(){
+ renderer=new THREE.WebGLRenderer({canvas:$('world'),antialias:true,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,touchMode?1.25:1.7));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x070e16);scene.fog=new THREE.FogExp2(0x101e23,.027);
+ camera=new THREE.PerspectiveCamera(73,innerWidth/innerHeight,.07,150);camera.rotation.order='YXZ';
+ scene.add(new THREE.HemisphereLight(0x839fa9,0x29352e,.48));
+ const moon=new THREE.DirectionalLight(0x8faec5,.32);moon.position.set(-25,40,10);scene.add(moon);
+ tileTex=texture('tile');wallMat=mat(0xabb4a2,{map:texture('wall')});woodMat=mat(0x8b8676,{map:texture('wood')});metalMat=mat(0x455b59);glassMat=mat(0x638c96,{transparent:true,opacity:.28,depthWrite:false,roughness:.6});stairMat=mat(0x92917a);
+ school();buildAtmosphere();buildSurvival();scene.updateMatrixWorld(true);ready=true;$('status').textContent='Senter siap. Masuk dan temukan sembilan anomali.';requestAnimationFrame(animate);
+}
+
+
+function animate(now){
+ requestAnimationFrame(animate);const real=Math.max(0,(now-previous)/1000),dt=Math.min(real,.05);previous=now;
+ const playing=started&&!won&&!failed&&!document.hidden&&(locked()||active);
+ if(playing){elapsed+=Math.min(real,.25);if(locked()&&!active){const old=floor();physics(dt);if(floor()!==old)showToast('Lantai '+(floor()+1)+' · Periksa koridor. Kelas adalah zona aman.')}updatePatrol(dt);if(!failed&&!active&&locked())nearest()}
+ if(started){camera.position.set(player.x,player.y+EYE,player.z);camera.rotation.set(pitch,yaw,0,'YXZ');hud();minimap();updateSurvivalHUD();animateItems()}
+ else{camera.position.set(35,25,40);camera.lookAt(0,7,-1)}
+ mood(now);syncTouchUI();renderer.render(scene,camera);
+}
+
+
+chooseInputMode();try{setup()}catch(e){console.error(e);$('status').textContent='WebGL gagal diaktifkan. Coba browser desktop dengan akselerasi perangkat keras. '+e.message}
+})();
+</script>
+</body>
+</html>

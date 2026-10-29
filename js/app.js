@@ -20,7 +20,7 @@
     CURRENCY: 'IDR',
     LOCALE: 'id-ID',
     ADMIN_PASSCODE: 'eduspark2025',
-    GAME_PASSCODE: 'spark2025',
+    GAME_PASSCODE: 'umar123',
     SESSION_TTL: 1000 * 60 * 60 * 8 // 8 jam
   };
 

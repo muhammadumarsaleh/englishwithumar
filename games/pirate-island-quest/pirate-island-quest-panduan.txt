@@ -1,0 +1,75 @@
+ENGLISH QUEST: PIRATE ISLAND QUEST
+
+MULAI
+Buka pirate-island-quest.html lalu klik Mulai Misi. Tidak perlu server lokal.
+Internet diperlukan untuk memuat Three.js r128 melalui script CDN biasa.
+File HTML dapat diunggah ke hosting tanpa gambar atau audio tambahan.
+
+PETUALANGAN
+Jadilah bajak laut kecil di pulau tropis seluas 176 x 156 unit.
+Jelajahi pantai, kapal karam, dua gua harta, reruntuhan kuno,
+kebun kelapa, pasar bajak laut, dan pelabuhan.
+Temui 9 bajak laut kuis, dipilih acak dari 30 lokasi. Masing-masing
+memberikan 7 soal bahasa Inggris, total 63 pertanyaan.
+
+Cari juga 5 item: Golden Compass, Ancient Coin, Message Bottle,
+Treasure Key, Sapphire Gem. Lokasinya diacak dari lima habitat:
+gua/kamp, kapal karam, pelabuhan, reruntuhan, dan pantai.
+Menang setelah seluruh 9 kuis selesai DAN 5 item terkumpul.
+
+SEMBILAN KEPITING RAKSASA
+Claw, Coral, Ruby, Coco, Sandy, Pearl, Copper, Goldie, dan Captain Claw
+berpatroli bersamaan di wilayah masing-masing. Kepiting mempercepat
+gerakan ketika mendeteksi pemain yang dekat.
+Enam SAFE CAMP berada di pondok atau gua. Masuk sepenuhnya untuk aman.
+Saat mengerjakan kuis pemain terlindungi, dan setelah kuis ada waktu
+aman 3 detik. Tersentuh kepiting mengulang progres, skor, dan waktu.
+Soal kustom pengajar tetap tersimpan.
+
+KONTROL KOMPUTER
+WASD / Panah: berjalan. Mouse: melihat. Shift: lari. Space: lompat.
+E: temui karakter / ambil item ketika dekat.
+C / Kamera: pandangan pemain atau kamera mengikuti bajak laut.
+M / Peta Pulau: peta besar, menjeda pemain dan seluruh kepiting.
+Esc: jeda. Klik Lanjut untuk mengaktifkan mouse kembali.
+Naiki tangga di sisi barat kapal untuk mencapai dek kapal karam.
+Naiki tangga di sisi barat dermaga untuk mencapai pelabuhan.
+Tangga memakai pijakan fisik dan gravitasi, tanpa teleport.
+Pemain menjelajah daratan; laut di luar pulau adalah latar dan batas map.
+
+KONTROL HP
+Joystick kiri: berjalan. Geser area layar di luar tombol: melihat.
+Tombol Lompat, Lari, Kamera, dan Interaksi tersedia otomatis.
+Mode kontrol dapat dipilih manual pada layar awal.
+Layar penuh dan landscape dicoba setelah sentuhan pengguna.
+Jika rotasi ditolak browser, putar HP manual atau pilih Tetap main
+dalam portrait. Dukungan layar penuh berbeda antarbrowser.
+
+TEACHER MODE
+Klik Teacher Mode di layar awal atau tahan judul selama 3 detik.
+Satu pertanyaan per baris dengan tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does pirate mean? | Bajak laut | Kepiting | Kapal | Koin
+What does compass mean? | Kompas | Koin | Botol | Permata
+A pirate can ____. | jump | fly | read | write
+
+Klik Simpan Semua Soal, lalu mulai misi baru. Jawaban diacak.
+Duplikat pertanyaan, kolom kosong, dan pilihan sama ditolak dengan
+nomor baris. Soal kustom diprioritaskan; bila kurang dari 63,
+bank 100 soal bawaan melengkapi. Bila lebih, dipilih 63 secara acak.
+Tidak ada pertanyaan berulang antarkarakter dalam satu misi.
+Penyimpanan memakai localStorage browser/perangkat, bukan server.
+
+PETA
+Hijau: safe camp. Kuning: karakter kuis dekat/ditemukan.
+Merah: kepiting dekat. Segitiga putih: pemain.
+Peta besar menunjukkan landmark dan nama kepiting yang terdeteksi.
+Item tetap perlu ditemukan lewat penjelajahan.
+
+PENGUJIAN
+Lolos simulasi lokasi karakter/item, pijakan, gravitasi/lompat,
+tangga kapal dan dermaga, jalur patroli, perlindungan, reset oleh setiap
+kepiting, kontrol sentuh, peta, soal kustom, serta kemenangan.
+Tampilan WebGL langsung dan pengalaman di HP fisik belum diverifikasi.

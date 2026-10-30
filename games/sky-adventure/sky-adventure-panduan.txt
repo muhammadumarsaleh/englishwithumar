@@ -1,0 +1,75 @@
+ENGLISH QUEST: SKY ADVENTURE
+
+MULAI BERMAIN
+Buka sky-adventure.html dan klik Mulai Misi. Tidak perlu local server.
+Internet diperlukan untuk memuat Three.js r128 dari CDN. File HTML ini
+juga dapat diunggah ke hosting web tanpa file gambar atau suara terpisah.
+
+MISI
+Jadilah burung penjelajah di kepulauan langit seluas 176 x 156 meter.
+Terbang ke 30 lokasi potensial untuk mencari 9 burung pemberi kuis.
+Masing-masing memberikan 7 soal, total 63 pertanyaan bahasa Inggris.
+Cari juga lima benda: Golden Feather, Cloud Crystal, Sky Compass,
+Wind Bell, dan Star Fragment. Kelima lokasi item dipilih acak dari
+lima habitat: sarang, menara, kuil, taman, dan awan.
+Kemenangan membutuhkan 9 kuis selesai DAN 5 item terkumpul.
+
+SEMBILAN NAGA PENJAGA
+Setiap naga mengikuti jalur sendiri, dengan ketinggian yang berubah.
+Semua naga berpatroli bersamaan. Hindari tubuh mereka dengan mengubah
+arah atau ketinggian, atau masuk sepenuhnya ke sarang SAFE NEST.
+Terdapat enam sarang aman. Selama kuis pemain dilindungi; setelah kuis
+selesai ada waktu aman 3 detik. Bersentuhan dengan naga mengulang misi,
+skor, item, dan waktu. Soal kustom pengajar tetap tersimpan.
+
+KONTROL KOMPUTER
+WASD / Panah: terbang; Mouse: arah pandang.
+Terbang maju mengikuti arah pandang, termasuk saat menengadah/menunduk.
+Space atau R: naik. Q: turun. Shift: terbang cepat.
+E: temui burung atau ambil item ketika dekat.
+C / tombol Kamera: kamera mengikuti burung atau pandangan mata burung.
+M / Peta Langit: peta besar, menjeda penerbangan dan seluruh naga.
+Esc: jeda. Klik tombol Lanjut untuk kembali bermain.
+
+KONTROL HP
+Mode kontrol otomatis tersedia, dan dapat dipilih manual pada layar awal.
+Joystick kiri: terbang. Geser area layar di luar tombol: arah pandang.
+Tahan Naik / Turun: mengubah ketinggian. Cepat: ubah kecepatan.
+Interaksi: temui burung atau ambil item yang dekat.
+Game mencoba layar penuh dan landscape setelah sentuhan pengguna.
+Jika browser menolak rotasi otomatis, putar HP secara manual atau pilih
+Tetap main dalam portrait. Dukungan layar penuh berbeda antarbrowser.
+
+PETA DAN LOKASI
+Ada 14 pulau terapung, enam sarang, menara angin, kuil langit, taman
+bunga dan pohon ungu, dua gerbang pelangi, kincir, gerbang bulan sabit,
+balon udara, serta lapisan awan di bawah pulau.
+Emas: sarang aman. Kuning: burung kuis dekat/ditemukan.
+Ungu: naga dekat. Segitiga putih: pemain.
+Peta besar menunjukkan ketinggian burung dan naga yang terdeteksi.
+Lokasi item tetap harus ditemukan dengan menjelajah.
+Ketinggian HUD memakai dasar 100 m untuk kawasan langit. Ada batas
+terbang atas/bawah agar pemain tetap berada di kawasan permainan.
+
+TEACHER MODE / BULK SOAL
+Klik Teacher Mode di layar awal atau tahan judul selama 3 detik.
+Tulis satu soal per baris dengan tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does cloud mean? | Awan | Bintang | Bulan | Matahari
+A bird can ____. | fly | swim | read | write
+What does dragon mean? | Naga | Burung | Kucing | Kelinci
+
+Klik Simpan Semua Soal, lalu mulai misi baru agar perubahan berlaku.
+Pertanyaan duplikat, kolom kosong, dan pilihan yang sama ditolak dengan
+nomor baris. Posisi jawaban benar diacak. Soal kustom diprioritaskan;
+jika kurang dari 63, bank 100 soal bawaan melengkapi. Jika lebih,
+dipilih 63 secara acak. Satu pertanyaan tidak dibagikan ke dua burung.
+Penyimpanan memakai localStorage browser/perangkat, bukan server.
+
+PENGUJIAN
+Logika diperiksa dengan simulasi: lokasi burung dan item, rute 3D naga,
+kontrol terbang dan sentuh, batas ketinggian, tempat aman, peta, impor
+soal, reset, serta kemenangan. Tampilan WebGL langsung dan pengalaman
+pada HP fisik belum diverifikasi.

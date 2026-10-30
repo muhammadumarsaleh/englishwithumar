@@ -1,0 +1,53 @@
+PENGUIN SNOW QUEST — ENGLISH QUEST
+
+MEMULAI
+Ekstrak ZIP lalu klik dua kali penguin-snow-quest.html. Pilih kualitas gambar, lalu klik Mulai Misi. Tidak perlu local server atau instalasi. Internet diperlukan untuk memuat Three.js r128 dari CDN. Model 3D, tekstur, dan suara dibuat secara prosedural di dalam HTML.
+Untuk HP, unggah HTML ke hosting HTTPS, lalu buka tautannya di browser HP.
+
+DUNIA KUTUB
+Pemain adalah penguin. Peta terdiri dari dua daratan salju yang dipisahkan celah laut, dengan tiga jembatan es sebagai penyeberangan. Jelajahi gua es biru yang bisa dimasuki, kapal ekspedisi beku dengan tangga dan kabin, desa igloo, serta lengkung gletser.
+Grafis memakai es berwarna biru, salju bertekstur, kayu kapal lapuk, laut gelap, cahaya siang kutub, dan butiran salju bergerak. Pilihan HD menambah resolusi render dan bayangan; Ringan mengurangi beban grafis.
+
+MISI
+Cari 9 teman penguin di 9 lokasi berbeda dari 30 kemungkinan penempatan. Setiap penguin memberikan 7 pertanyaan bahasa Inggris: total 63 pertanyaan unik setiap misi.
+Kumpulkan juga 5 benda ekspedisi: Ice Crystal, Explorer Compass, Ship Anchor, Warm Lantern, dan Silver Fish. Lokasinya diacak pada lima wilayah, satu item pada tiap wilayah: gua, desa, kapal, jembatan, dan gletser. Kedua tujuan harus selesai untuk menang.
+Ada 9 anjing laut dengan rute patroli berbeda: gua, dataran barat, desa, sekitar kapal, dek kapal, teluk gletser, dan tiga jembatan. Tertangkap mengulang misi dari awal. Soal kustom tetap tersimpan.
+
+PERLINDUNGAN DAN TANTANGAN
+Masuki IGLOO SAFE untuk berlindung. Pemain terlindung selama kuis; layar jeda dan peta besar menghentikan permainan serta patroli.
+Jembatan dan kapal menggunakan tangga fisik, bukan teleportasi. Lantai kabin kapal dan dek bisa dijelajahi.
+Celah laut adalah bahaya dalam misi darat ini. Terjatuh ke air mengulang misi. Gunakan tiga jembatan untuk menyeberang.
+
+KONTROL LAPTOP
+WASD / Panah: berjalan
+Mouse: melihat sekeliling setelah masuk permainan
+Shift: bergerak cepat
+Space: lompat
+E: bicara / ambil benda dekat
+C: kamera orang ketiga / orang pertama
+M: peta besar
+Esc: jeda
+
+KONTROL HP
+Joystick kiri untuk bergerak; geser area layar lainnya untuk melihat. Gunakan tombol Lompat, Cepat, Kamera, dan Interaksi. Tombol Peta, Suara, serta Jeda tersedia di bagian atas.
+Mode sentuh dideteksi otomatis dan bisa dipilih manual pada layar awal.
+Game mencoba layar penuh dan landscape setelah sentuhan pengguna. Dukungan bergantung pada browser; jika ditolak, aktifkan rotasi otomatis lalu putar HP secara manual. Mode portrait juga tersedia.
+Gunakan Ringan bila perangkat kurang lancar. Performa bergantung pada perangkat.
+
+TEACHER MODE — BULK SOAL KUSTOM
+Klik Teacher Mode di layar awal, atau tahan judul selama 3 detik.
+Satu pertanyaan per baris, tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does snow mean? | Salju | Laut | Kapal | Gua
+The penguin is ____ the igloo. (di dalam) | in | on | under | behind
+Which word is the opposite of cold? | Warm | Blue | Small | Short
+
+Klik Simpan Semua Soal. Pertanyaan duplikat dan baris tidak valid akan dilaporkan. Keempat pilihan wajib berbeda. Posisi jawaban benar diacak ketika misi disusun.
+Soal kustom diprioritaskan. Jika kurang dari 63, bank bawaan melengkapi. Jika lebih, dipilih 63 secara acak. Bank bawaan berisi 100 soal kosakata kutub, hewan, benda ekspedisi, warna, posisi, hitungan, dan kalimat sederhana.
+Perubahan berlaku pada misi baru. localStorage menyimpan soal di browser/perangkat yang sama. Menghapus data browser atau berganti alamat game dapat menghilangkan atau memisahkan soal tersimpan.
+
+PEMERIKSAAN
+Logika diuji melalui simulasi JavaScript dengan DOM/Three.js tiruan: 30 lokasi memiliki lantai dan dapat dicapai dari igloo awal; pintu igloo awal bisa dilewati; tiga jembatan dua arah dan tangga kapal dapat dinaiki; sembilan rute patroli lengkap bebas penghalang; perlindungan dan tangkapan; jatuh ke laut; kontrol sentuh, kamera, jeda peta; 63 jawaban dan lima item hingga kemenangan; NPC dihapus dari scene; soal kustom tersimpan; serta mode HD/Ringan.
+Tampilan WebGL dan performa belum diuji langsung di browser nyata atau HP fisik. Model dan tekstur bersifat prosedural, bukan hasil pemindaian foto.

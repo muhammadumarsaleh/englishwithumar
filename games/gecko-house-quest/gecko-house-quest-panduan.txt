@@ -1,0 +1,101 @@
+ENGLISH QUEST: GECKO HOUSE QUEST — SURFACE EXPLORER HD
+
+MULAI
+Buka gecko-house-quest.html lalu klik Mulai Misi. Tidak perlu server lokal.
+Internet diperlukan untuk memuat Three.js r128 dari CDN script biasa.
+Model, tekstur, UI dan suara berada dalam satu HTML.
+
+MEKANIK CICAK
+Maju terus ketika mencapai pertemuan permukaan. Cicak otomatis merayap
+dari lantai ke dinding, lalu berjalan terbalik pada langit-langit.
+Pemain juga bisa mengikuti sisi, tepi, atas dan bagian bawah perabot.
+Perpindahan mempertahankan posisi serta arah gerak secara berkelanjutan;
+tidak menggunakan teleport antartitik. Kamera mengikuti orientasi pijakan.
+Space memberi lompatan kecil menjauhi permukaan, lalu kembali menempel.
+
+PETANYA
+Rumah raksasa dengan ruang tamu, kamar tidur, dapur, dan ruang belajar.
+Ada sofa bersandaran tinggi, lemari TV, meja kopi, kasur dan bantal,
+sepatu, buku, kulkas, meja dapur, meja makan, kursi, meja belajar,
+rak buku tinggi, monitor, jam dinding, serta area plafon.
+Perabot dan dinding pemisah menjadi jalur panjat, bukan sekadar latar.
+Material kayu/kain/plester memakai tekstur prosedural 1024 px.
+Ada bentuk membulat, pantulan bahan, pencahayaan, dan bayangan HD.
+
+MISI
+Cari 9 teman cicak dari 30 lokasi. Setiap cicak memberi 7 soal, total 63.
+Dalam setiap misi ada 3 karakter lantai, 2 dinding, 2 plafon, 2 perabot.
+Kumpulkan juga 5 benda: Golden Seed, Glass Bead, Tiny Ring, Blue Button,
+Amber Fragment. Item diacak dari lima kelompok: lantai, dinding, plafon,
+perabot, dan tempat rahasia (misalnya bawah meja atau kolong kasur).
+Kemampuan memanjat diperlukan karena selalu ada target di plafon.
+Menang memerlukan semua kuis selesai DAN kelima item terkumpul.
+Bank 100 soal bawaan mereview ruangan, benda rumah, anggota tubuh,
+gerak, arah, preposisi, dan kalimat dasar bahasa Inggris.
+
+PENJAGA DAN TEMPAT AMAN
+Sembilan laba-laba berpatroli bersamaan: empat di lantai ruangan,
+tiga di dinding, dan dua di plafon. Jarak tangkap diukur penuh dalam 3D;
+penjaga di bawah tidak dapat menangkap pemain yang jauh di plafon.
+Enam GECKO SAFE tersebar di lantai, dinding, atas dapur, dan plafon.
+Berada dekat tanda aman melindungi pemain. Saat kuis pemain juga aman,
+dan setelah kuis tersedia waktu aman 3 detik. Tertangkap mengulang
+progres, skor, dan waktu. Soal kustom tetap disimpan.
+
+KONTROL KOMPUTER
+WASD / Panah: merayap relatif terhadap pijakan dan arah pandang mendatar.
+Mouse: melihat. Shift: cepat. Space: lompatan kecil dari permukaan.
+E: temui cicak atau ambil item yang dekat.
+C / Kamera: pandangan mata cicak atau kamera mengikuti cicak.
+M / Peta Rumah: peta besar; pemain dan seluruh penjaga dijeda.
+Esc: jeda. Klik Lanjut untuk mengaktifkan mouse kembali.
+Saat memanjat, arah kamera dan karakter mengikuti dinding/plafon.
+HUD menampilkan nama pijakan dan ketinggian agar orientasi mudah dibaca.
+
+KONTROL HP
+Joystick kiri: merayap. Geser area layar di luar tombol: melihat.
+Tombol Lompatan, Cepat, Kamera, dan Interaksi tersedia otomatis.
+Mode kontrol dapat dipilih manual di layar awal.
+Layar penuh/landscape dicoba setelah sentuhan. Jika browser menolak,
+putar HP manual atau pilih Tetap main dalam portrait.
+
+KUALITAS GAMBAR
+Otomatis: HD di komputer, Ringan pada perangkat sentuh.
+HD: detail bayangan aktif dan resolusi render hingga rasio piksel 2.
+Ringan: tanpa bayangan dinamis dan rasio piksel maksimal 1.1.
+Geometri berulang pada arsitektur, jari, ekor, dan bagian karakter
+digabung dengan instancing untuk membantu performa.
+Ketajaman dan kelancaran tetap mengikuti kemampuan perangkat.
+
+PETA
+Peta adalah proyeksi dari atas. Perhatikan juga ketinggian dan pijakan.
+Kuning: karakter lantai/perabot. Biru: karakter dinding.
+Pink: karakter plafon. Hijau: tempat aman. Merah: laba-laba dekat.
+Segitiga putih: pemain. Peta besar memberi nama dan tinggi karakter
+yang sudah ditemukan atau terdeteksi dekat. Item tetap dicari lewat
+penjelajahan langsung.
+
+TEACHER MODE / BULK SOAL
+Klik Teacher Mode di layar awal atau tahan judul selama 3 detik.
+Tulis satu soal per baris dengan tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does ceiling mean? | Langit-langit | Lantai | Dinding | Pintu
+The gecko can ____ the wall. | climb | read | drink | write
+Which room is used for sleeping? | Bedroom | Kitchen | Garden | Bathroom
+
+Simpan, lalu mulai misi baru agar perubahan digunakan.
+Duplikat, kolom kosong, dan pilihan sama ditolak dengan nomor baris.
+Soal kustom diprioritaskan; bila kurang dari 63, bank bawaan melengkapi.
+Bila lebih, dipilih 63 acak. Jawaban diacak; tidak ada soal berulang
+antarkarakter dalam satu misi. Penyimpanan memakai localStorage
+browser/perangkat, bukan server.
+
+VERIFIKASI
+Lolos simulasi putaran lantai/dinding/plafon dengan perpindahan kontinu;
+naik/turun sofa; pindah dari bawah meja ke atasnya; lokasi karakter/item
+dan jalur penjaga bebas dari volume perabot; tangkap 3D; sembilan patroli;
+kontrol sentuh; kamera; peta; impor soal; penghapusan NPC; kemenangan;
+serta pilihan HD/Ringan.
+Tampilan WebGL langsung dan performa pada HP fisik belum diverifikasi.

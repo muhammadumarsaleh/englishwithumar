@@ -1,0 +1,53 @@
+MINI CASTLE ADVENTURE — ENGLISH QUEST
+
+MEMULAI
+Ekstrak ZIP lalu klik dua kali mini-castle-adventure.html. Pilih kualitas gambar dan klik Mulai Misi. Tidak perlu local server atau instalasi. Internet dibutuhkan untuk memuat Three.js r128 dari CDN; model, tekstur, dan audio dibuat secara prosedural di dalam HTML.
+Untuk HP, unggah HTML ke hosting HTTPS lalu buka tautannya melalui browser HP.
+
+DUNIA PERMAINAN
+Pemain adalah tikus kecil di kastel batu dengan perabot raksasa. Ada dapur berisi tungku, teko, meja potong, buah dan roti; perpustakaan dengan rak buku, tangga rak serta meja baca; ruang takhta dengan beludru, pilar dan panggung bertangga; galeri dengan meja jamuan dan lukisan; serta lorong tikus di balik dinding.
+Palet natural batu, kayu ek, kulit buku, kain merah, kuningan, dan warna bulu tikus/kucing. Jendela tinggi memasukkan cahaya siang. Pilihan HD mengaktifkan bayangan dan resolusi render lebih tinggi. Ringan mengurangi beban grafis.
+
+MISI
+Temukan 9 teman tikus di lokasi berbeda dari 30 titik penempatan acak. Selesaikan 7 soal per tikus, total 63 pertanyaan unik setiap misi. Temukan juga 5 benda: Golden Cheese, Royal Key, Ancient Scroll, Ruby Jewel, dan Tiny Crown.
+Lokasi item diacak pada lima wilayah, satu di dapur, perpustakaan, ruang takhta, galeri, dan lorong rahasia. Menang hanya setelah sembilan kuis serta lima item selesai.
+Ada 9 kucing kerajaan berpatroli dengan jalurnya masing-masing. Tertangkap mengulang seluruh misi dari awal; soal kustom tidak dihapus.
+
+LORONG RAHASIA DAN KEAMANAN
+Cari tanda MOUSE PASSAGE pada bagian bawah dinding. Lubang kecil menghubungkan ruangan dengan lorong melingkar di balik dinding. Pemain melewatinya dengan berjalan, tanpa teleportasi.
+Lorong tikus dan sarang MOUSE SAFE adalah tempat aman. Semua rute kucing tetap berada di ruang utama; kucing tidak masuk lorong rahasia.
+Selama kuis pemain terlindung. Peta besar dan layar jeda menghentikan permainan serta patroli. Ada masa persiapan di awal misi dan jeda singkat setelah kuis.
+Gunakan tangga fisik di depan panggung takhta untuk mencapai benda atau karakter di panggung.
+
+KONTROL LAPTOP
+WASD / Panah: berjalan
+Mouse: melihat setelah masuk permainan
+Shift: bergerak cepat
+Space: lompat
+E: bicara atau mengambil benda dekat
+C: kamera orang ketiga / orang pertama
+M: peta besar
+Esc: jeda
+
+KONTROL HP
+Joystick kiri untuk berjalan; geser bagian layar lainnya untuk melihat. Gunakan tombol Lompat, Cepat, Kamera, dan Interaksi. Tombol Peta, Suara, serta Jeda tersedia di bagian atas.
+Game mendeteksi kontrol sentuh secara otomatis; mode juga dapat dipilih manual di layar awal. Game mencoba layar penuh dan landscape setelah sentuhan pengguna. Jika browser menolak penguncian arah, aktifkan rotasi otomatis HP dan putar perangkat secara manual. Mode portrait juga tersedia.
+Pilih Ringan jika gerakan kurang lancar. Performa bergantung pada perangkat.
+
+TEACHER MODE — BULK SOAL KUSTOM
+Buka tombol Teacher Mode di layar awal, atau tahan judul selama 3 detik.
+Satu pertanyaan per baris, tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does castle mean? | Kastel | Dapur | Buku | Kucing
+The mouse is ____ the table. (di bawah) | under | on | behind | between
+Choose the correct plural of mouse. | mice | mouses | mousees | mices
+
+Klik Simpan Semua Soal. Baris tidak valid dan pertanyaan duplikat akan dilaporkan. Keempat pilihan wajib berbeda. Posisi jawaban benar diacak dalam misi.
+Soal kustom diprioritaskan. Jika kurang dari 63, bank bawaan melengkapi; jika lebih, 63 soal dipilih acak. Bank bawaan berisi 100 soal kosakata kastel, ruangan, benda, makanan, warna, posisi, hitungan dan kalimat sederhana.
+Perubahan berlaku pada misi baru. localStorage menyimpan soal di browser/perangkat yang sama. Menghapus data browser, berpindah browser, atau berganti alamat game bisa memisahkan atau menghapus data tersimpan.
+
+PEMERIKSAAN
+Logika diverifikasi melalui simulasi JavaScript dengan DOM/Three.js tiruan: 30 lokasi memiliki lantai dan dapat dicapai dari sarang awal; tangga panggung dua arah; lubang rahasia; penghalang pandangan; sembilan rute patroli lengkap bebas penghalang; tempat aman dan tangkapan; kontrol sentuh, kamera dan jeda peta; 63 jawaban dan lima item hingga kemenangan; NPC dihapus dari scene; soal kustom tersimpan; serta mode HD/Ringan.
+Tampilan WebGL dan performa belum diuji langsung di browser nyata atau HP fisik. Grafis memakai model serta tekstur prosedural, bukan hasil pemindaian foto.

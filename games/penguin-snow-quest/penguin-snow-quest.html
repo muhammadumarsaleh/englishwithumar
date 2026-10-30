@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Penguin Snow Quest — Polar Expedition HD</title>
+<style>
+:root{color-scheme:dark;--mint:#83f5be;--ink:#102948}*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#8ed7ff;color:#fff;font:15px system-ui,sans-serif}button,textarea{font:inherit}button{border:0;border-radius:12px;padding:12px 18px;background:#345987;color:white;cursor:pointer;font-weight:700}button:hover{filter:brightness(1.15)}button:disabled{opacity:.75;cursor:default}button:focus-visible,textarea:focus-visible{outline:3px solid #ffdc6b;outline-offset:3px}.primary{background:var(--mint);color:var(--ink)}.hidden{display:none!important}.overlay{position:fixed;inset:0;z-index:20;background:#102449b8;backdrop-filter:blur(7px);display:grid;place-items:center;padding:20px}.card{width:min(650px,100%);max-height:93vh;overflow:auto;background:#102c50f5;border:2px solid #80cfff55;border-radius:25px;padding:30px;box-shadow:0 25px 90px #10294855}h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:12px 0}h2{font-size:24px;line-height:1.4}p{color:#c8def6;line-height:1.65}.eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#ffdc6b;font-weight:900}.badges,.actions{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0}.badge{background:#ffffff12;padding:7px 10px;border-radius:9px;font-size:12px}.help{font-size:13px;line-height:2;border-block:1px solid #ffffff25;padding:15px 0}#title{touch-action:none;user-select:none;-webkit-user-select:none}#hud{position:fixed;left:16px;top:16px;display:flex;flex-wrap:wrap;gap:7px;max-width:calc(100% - 220px);pointer-events:none;z-index:3}.stat{background:#102c50e8;border:1px solid #fff3;border-radius:12px;padding:10px 12px;font-size:13px}.stat b{color:#ffdc6b;margin-left:5px}#mapBox{position:fixed;right:16px;top:16px;width:185px;border:1px solid #fff5;background:#102c50eb;padding:10px;border-radius:16px;z-index:4}#mapBox header{font-size:11px;display:flex;justify-content:space-between;margin-bottom:6px;color:#c8def6}#map{width:163px;height:120px;display:block;border-radius:8px}#sound{width:100%;padding:8px;margin-top:7px;font-size:12px}#cross{position:fixed;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:white;box-shadow:0 0 0 3px #10294855;transform:translate(-50%,-50%);pointer-events:none}#prompt,#bottom{position:fixed;left:50%;transform:translateX(-50%);background:#102c50ed;border-radius:12px;padding:11px 17px;z-index:4;text-align:center;pointer-events:none}#prompt{bottom:80px;border:1px solid var(--mint)}#bottom{bottom:18px;font-size:12px;white-space:nowrap}#quiz{z-index:30}.quizhead{display:flex;justify-content:space-between;align-items:center;gap:12px}#progress{height:6px;background:#ffffff18;border-radius:9px;margin:18px 0}#fill{height:100%;background:var(--mint);border-radius:9px}#answers{display:grid;gap:10px;margin:20px 0}.answer{text-align:left;display:flex;gap:13px;align-items:center;background:#294c77;border:2px solid transparent}.letter{background:#ffffff18;border-radius:7px;padding:5px 10px}.right{background:#216447!important;border-color:#83f5be!important}.wrong{background:#873851!important;border-color:#ffb4bd!important}#hint{margin-top:15px;background:#ffdc6b14;border-left:3px solid #ffdc6b;padding:12px;color:#ffe7a2;font-size:13px;line-height:1.6}#feedback{min-height:28px;margin-top:14px;font-weight:700}#meaning{margin-top:12px;color:#8ee5ff}#teacher{z-index:40}textarea{width:100%;min-height:230px;resize:vertical;background:#081f3b;color:white;border:1px solid #89b8e7;border-radius:12px;padding:12px;line-height:1.7;font-size:13px}.small{font-size:12px}#teacherStatus,#status{font-size:13px;color:#ffdf84}.results{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}.result{background:#ffffff12;border-radius:12px;padding:20px 8px;text-align:center}.result strong{display:block;font-size:25px;color:var(--mint)}.result small{color:#c8def6}canvas#world{display:block}#toast{position:fixed;bottom:125px;left:50%;transform:translateX(-50%);z-index:5;background:#102c50ee;padding:12px 20px;border-radius:12px;pointer-events:none}@media(max-width:640px){.card{padding:21px}#mapBox{width:135px;right:8px;top:8px;padding:7px}#map{width:119px;height:88px}#hud{left:8px;top:8px;max-width:calc(100% - 150px);gap:4px}.stat{font-size:10px;padding:7px}#bottom{white-space:normal;width:93%;font-size:10px}.result strong{font-size:20px}}
+
+/* Tema malam: panel arsip, fosfor hijau, aksen merah tembaga. */
+:root{--mint:#b1d69b;--ink:#111a17}
+body{background:#060b10;color:#e1e6da}button{background:#303e3a;color:#dce5d6;border:1px solid #83917a40;border-radius:5px}
+.overlay{background:#03080dc9}.card{background:linear-gradient(145deg,#15201ff7,#0c1419fa);border:1px solid #8caa824d;border-radius:10px;box-shadow:0 25px 100px #0009}
+h1{letter-spacing:-.04em}p{color:#b0beb7}.eyebrow{color:#c79379}.badge{border:1px solid #9aac8d33;background:#a3b3940b;border-radius:3px}
+.stat,#mapBox,#prompt,#bottom,#toast{background:#0d1719ed;border-color:#94ab8055;border-radius:5px}.stat b,#status,#teacherStatus{color:#c5d4a7}
+.answer{background:#243430;border-radius:5px}.right{background:#284e3d!important}.wrong{background:#663736!important}
+#hint{color:#c8c6a3;background:#bdb7870d;border-color:#a69b68}textarea{background:#091314;border-color:#637760}#mapBox header{color:#adbdaf}
+#atmosphere{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at center,transparent 24%,#0004 70%,#000a 100%);box-shadow:inset 0 0 100px #0007}
+#atmosphere:after{content:'';position:absolute;inset:0;opacity:.055;background:repeating-linear-gradient(0deg,#fff 0px,#fff 1px,transparent 1px,transparent 4px)}
+#missionTag{position:fixed;left:18px;bottom:72px;color:#a7b29c;font:11px monospace;letter-spacing:.12em;z-index:3;pointer-events:none}
+#mapBox #flashButton{width:100%;font-size:11px;padding:7px;margin-top:6px}
+
+#safePanel{position:fixed;left:18px;bottom:82px;z-index:5;pointer-events:none;background:#131c20ee;border:1px solid #c6987455;border-radius:7px;padding:11px 15px;max-width:320px;box-shadow:0 8px 30px #0004}
+#safePanel strong{display:block;font-size:12px;letter-spacing:.09em;color:#e2bd92}#safePanel span{display:block;font-size:11px;line-height:1.6;color:#b5c3b9;margin-top:3px}
+#safePanel.safe{border-color:#8ac19c88;background:#12251fee}#safePanel.safe strong{color:#a5ddaf}
+#threatVignette{position:fixed;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 0 100px #b4573d;opacity:0;transition:opacity .3s}
+#fail{z-index:45}.failIcon{font-size:48px;color:#d5a18e;margin-bottom:12px}.objectives{padding:13px 16px;border:1px solid #a9bd8a44;border-radius:10px;color:#c4d1be;line-height:1.8;font-size:13px;background:#a3b98709}
+#itemSummary{font-size:12px;color:#b5c6ad;line-height:1.7}#hud{max-width:calc(100% - 235px)}#hud .stat{font-size:12px}#bottom{bottom:16px}#missionTag{bottom:65px}
+@media(max-width:650px){#safePanel{left:10px;bottom:92px;padding:8px 10px;max-width:220px}#safePanel strong{font-size:10px}#safePanel span{font-size:10px}#hud{max-width:calc(100% - 150px)}#hud .stat{font-size:9px;padding:7px}#prompt{bottom:170px;font-size:12px;max-width:94%}}
+/* Shared responsive controls: no user-scalable=no and no CSS rotation hack. */
+html,body{width:100%;height:var(--game-height,100dvh);overscroll-behavior:none}
+#world{width:100%;height:var(--game-height,100dvh);touch-action:none}
+.overlay{height:var(--game-height,100dvh);padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overflow:hidden}
+.card{max-height:calc(var(--game-height,100dvh) - 28px);overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+textarea,input,select{font-size:16px!important}button,select{touch-action:manipulation}
+.inputTools{margin:13px 0 18px;padding:13px;border:1px solid #b8d7c033;border-radius:12px;background:#ffffff06}
+.inputTools label{font-size:12px;display:block;margin-bottom:7px;color:#cad8d5}.inputTools select{width:100%;padding:10px;border-radius:8px;background:#182d43;color:#fff;border:1px solid #8caaa866;min-height:44px}.inputTools button{margin-top:9px;min-height:44px;font-size:12px}
+#mobileControls{position:fixed;inset:0;pointer-events:none;z-index:10;user-select:none;-webkit-user-select:none}
+#moveStick{pointer-events:auto;position:absolute;left:calc(env(safe-area-inset-left) + 20px);bottom:calc(env(safe-area-inset-bottom) + 20px);width:128px;height:128px;border:2px solid #d0e9e36b;border-radius:50%;background:radial-gradient(circle,#c9ded615,#19312c9c);box-shadow:0 6px 30px #0003;touch-action:none}
+#moveStick:before,#moveStick:after{content:'';position:absolute;background:#d7eee32b;pointer-events:none}#moveStick:before{width:1px;height:90%;top:5%;left:50%}#moveStick:after{height:1px;width:90%;left:5%;top:50%}
+#stickKnob{position:absolute;left:50%;top:50%;width:52px;height:52px;transform:translate(-50%,-50%);border:2px solid #d1f6e6bd;border-radius:50%;background:#83bca69c;box-shadow:0 3px 12px #0003;pointer-events:none}
+.stickLabel{position:absolute;top:-24px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.12em;color:#d4e7da;text-shadow:0 1px 5px #000}
+#touchActions{position:absolute;right:calc(env(safe-area-inset-right) + 15px);bottom:calc(env(safe-area-inset-bottom) + 18px);display:grid;grid-template-columns:repeat(3,52px);gap:7px;pointer-events:auto}
+#touchActions button{min-width:48px;min-height:49px;padding:8px 4px;border:1px solid #cce4d777;color:#fff;background:#14292edb;border-radius:50%;font-size:11px;line-height:1.2;touch-action:none;box-shadow:0 3px 16px #0003}
+#touchActions #touchInteract{grid-column:1/-1;border-radius:13px;background:#8bbba6;color:#102a23;min-height:44px;font-size:14px;font-weight:800}#touchInteract:disabled{opacity:.5}#touchRun.pressed{background:#d2b974;color:#29251b;border-color:#f9e7b8}
+#mobileUtility{position:absolute;right:calc(env(safe-area-inset-right) + 10px);top:calc(env(safe-area-inset-top) + 8px);display:flex;gap:6px;pointer-events:auto}#mobileUtility button{min-width:43px;min-height:42px;padding:7px;background:#14292ee8;border:1px solid #b0d4c366;border-radius:11px;color:white;font-size:17px}
+#lookHint{position:absolute;right:calc(env(safe-area-inset-right) + 30px);bottom:calc(env(safe-area-inset-bottom) + 137px);font-size:10px;color:#d7e9e0;text-shadow:0 1px 6px #000;pointer-events:none}
+#rotateScreen{z-index:44;background:#09141cf5}.rotateCard{text-align:center;max-width:420px}.rotateIcon{font-size:54px;line-height:1.2;margin-bottom:16px;transform:rotate(-25deg)}.rotateCard p{font-size:14px;line-height:1.7}.rotateCard button{display:block;width:100%;min-height:46px;margin-top:10px}
+.touch-ui #bottom,.touch-ui #missionTag{display:none!important}
+.touch-ui #hud{left:calc(env(safe-area-inset-left) + 9px)!important;top:calc(env(safe-area-inset-top) + 8px)!important;max-width:calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right) - 166px)!important;gap:4px}
+.touch-ui #hud .stat{font-size:11px!important;padding:6px 8px!important;border-radius:7px}.touch-ui .stat b{margin-left:4px}
+.touch-ui #mapBox{top:calc(env(safe-area-inset-top) + 58px);right:calc(env(safe-area-inset-right) + 10px);width:114px;padding:6px;border-radius:9px}.touch-ui #mapBox header{font-size:8px;margin-bottom:4px}.touch-ui #map{width:100px;height:74px}.touch-ui #mapBox #sound,.touch-ui #mapBox #flashButton{display:none}
+.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 150px)!important;padding:8px 12px;max-width:70%;font-size:12px;border-radius:8px}
+.touch-ui #toast{bottom:calc(env(safe-area-inset-bottom) + 190px);font-size:12px;max-width:80%;padding:9px 13px}
+.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 162px);bottom:calc(env(safe-area-inset-bottom) + 18px);width:min(240px,calc(100vw - 370px));max-width:240px;padding:8px 10px}.touch-ui #safePanel strong{font-size:10px}.touch-ui #safePanel span{font-size:10px;line-height:1.5}
+.touch-ui .card{width:min(700px,100%);padding:20px}.touch-ui #question{font-size:20px}.touch-ui .answer{min-height:48px;font-size:16px;padding:10px 12px}.touch-ui .quizhead{position:sticky;top:-20px;background:inherit;padding:8px 0;z-index:2}.touch-ui #closeTeacher,.touch-ui #leaveQuiz{min-height:44px}.touch-ui #hint{font-size:13px}
+@media(max-height:510px) and (orientation:landscape){.touch-ui .card{padding:17px 22px}.touch-ui h1{font-size:30px;margin:8px 0}.touch-ui .badges{margin:10px 0}.touch-ui .help{margin:9px 0;padding:9px 0;font-size:12px;line-height:1.7}.touch-ui #answers{grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.touch-ui #question{font-size:20px;margin:8px 0 12px}.touch-ui #progress{margin:10px 0}.touch-ui .answer{min-height:48px;font-size:15px}.touch-ui #hint{padding:9px;margin-top:10px}.touch-ui .results{margin:13px 0}.touch-ui .result{padding:12px 8px}.touch-ui .quizhead{top:-17px}.touch-ui #safePanel span{max-height:31px;overflow:hidden}}
+@media(max-width:540px) and (orientation:portrait){.touch-ui #hud{max-width:calc(100% - 160px)!important}.touch-ui #hud .stat{font-size:10px!important;padding:6px!important}.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 12px);bottom:calc(env(safe-area-inset-bottom) + 176px);width:calc(100% - 24px);max-width:none}.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 244px)!important;max-width:92%}.touch-ui #toast{bottom:calc(env(safe-area-inset-bottom) + 300px)}.touch-ui #moveStick{width:116px;height:116px;left:calc(env(safe-area-inset-left) + 14px)}.touch-ui #touchActions{right:calc(env(safe-area-inset-right) + 12px);grid-template-columns:repeat(3,48px);gap:6px}.touch-ui #lookHint{bottom:calc(env(safe-area-inset-bottom) + 138px)}.touch-ui h1{font-size:31px}.touch-ui .card{padding:19px}.touch-ui #answers{grid-template-columns:1fr}}
+@media(max-width:600px) and (orientation:landscape){.touch-ui #moveStick{width:112px;height:112px;left:calc(env(safe-area-inset-left) + 12px)}.touch-ui #touchActions{grid-template-columns:repeat(3,46px);gap:5px;right:calc(env(safe-area-inset-right) + 10px)}.touch-ui #safePanel{left:calc(env(safe-area-inset-left) + 135px);width:calc(100vw - 315px)}.touch-ui #hud .stat{font-size:10px!important}.touch-ui #prompt{bottom:calc(env(safe-area-inset-bottom) + 140px)!important}.touch-ui #mapBox{width:100px}.touch-ui #map{width:86px;height:63px}}
+
+#worldMapButton{width:100%;padding:9px 5px;font-size:12px;margin:6px 0;background:#455e49;border:1px solid #a5c19c55}#forestMap{z-index:36}.forestMapCard{width:min(900px,100%)}#bigMap{display:block;width:100%;height:auto;max-height:65dvh;object-fit:contain;border:1px solid #8aa28655;border-radius:10px;background:#101f20}.touch-ui #worldMapButton{min-height:35px;font-size:10px;padding:6px}.touch-ui #hud .stat:first-child{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.touch-ui #bigMap{max-height:55dvh}#floorHUD{color:#b4d6a1}
+
+body{background:#6bc9df;color:#173e58}:root{--mint:#8ce2c5;--ink:#153d52}.overlay{background:#207e9a6b}.card{background:linear-gradient(145deg,#fbfffdf7,#e8f9f9f7);color:#173e58;border-color:#c3e6e2;box-shadow:0 20px 80px #175b7338}p,.small{color:#507484}.eyebrow{color:#1e879b}.badge{background:#d4f1ea;color:#246277;border-color:#a8d5d2}button{background:#278da2;color:white;border-color:#58aeb8}button.primary{background:#8ce2c5;color:#174e51}#answers .answer{background:#d9eff3;color:#214c64;border-color:#b9dfe5}#answers .answer.right{background:#bceacb!important;color:#174b33;border-color:#5cbe8b!important}#answers .answer.wrong{background:#fce1ba!important;color:#704522;border-color:#ecc08a!important}.letter{background:#fff9}#hint{background:#fff3d2;color:#77613a;border-color:#e7c969}#meaning{color:#246f8c}#feedback{color:#20795b}#status,#teacherStatus{color:#35718a}.inputTools{background:#d9efed;border-color:#acd6cf}.inputTools label{color:#3f6e7c}.inputTools select,textarea{background:white;color:#1d5366;border-color:#9fcdd1}.help{border-color:#b7dadc}.objectives{background:#dcefe6;color:#2e7568;border-color:#a0cebc}#atmosphere{background:linear-gradient(0deg,#228aaa13,transparent 70%);box-shadow:inset 0 0 90px #3ca3c81a}#atmosphere:after{display:none}#threatVignette{box-shadow:inset 0 0 85px #e2b76c}#safePanel{background:#17677ddc;border-color:#8bd3d1}#safePanel.safe{background:#207f76df}#safePanel strong,#safePanel span,#safePanel.safe strong{color:#e9fff5}#hud .stat,#mapBox{background:#155d79e8}#floorHUD{color:#ecf6be}#forestMap #bigMap{background:#72c8d0;border-color:#9bd8d5}.result{background:#d9eeea}.result strong{color:#197c86}.result small{color:#52788a}#fail{background:#3288aaad}#touchActions button,#mobileUtility button{background:#17617cde;border-color:#b5eeed}#moveStick{background:radial-gradient(circle,#c3ffef44,#1e7e9ca9);border-color:#d0fff2}#stickKnob{background:#a1ead5c9;border-color:#e8fff6}#lookHint,.stickLabel{color:white}.rotateCard{color:#173e58}#rotateScreen{background:#226f8ef2}.touch-ui #safePanel{max-height:80px}.failIcon{color:#3b95ac}
+body{background:#075d7f}#hud .stat{color:#e2f3f6;background:#083d55ed;border:1px solid #5b9da877}#hud .stat b{color:#ffe29b}#bottom{color:#e2f4f7;background:#062b40e8}#missionTag{color:#c8edf0}#mapBox{background:#07384fed;color:#e0f4f4}#mapBox header{color:#b9dfe5}#atmosphere{background:linear-gradient(0deg,#003e6422,transparent 65%);box-shadow:inset 0 0 95px #00385435}#safePanel{background:#084358ed}#safePanel.safe{background:#125e50ed}body{background:#5598c5}.overlay{background:#233a697a}.card{background:linear-gradient(145deg,#fff8eaf7,#e7effaf7);border-color:#b3c1dc}button{background:#48668f}button.primary{background:#edc979;color:#3e3e56}.eyebrow{color:#776092}#mapBox{background:#233e65ed}#hud .stat{background:#243f65ed}#atmosphere{background:linear-gradient(0deg,#4e6fae12,transparent 70%);box-shadow:inset 0 0 90px #315a8c20}#safePanel{background:#304d78ec}#safePanel.safe{background:#366959ed}#moveStick{background:radial-gradient(circle,#e4eaff44,#4d65a6a9)}#stickKnob{background:#efd18fd0}#touchActions button,#mobileUtility button{background:#314d7be8}.badge{background:#e3e7f3;color:#515d80}#worldMapButton{background:#566e97}#start h1 span{color:#61739b!important}body{background:#9c7754}.eyebrow{color:#866443}button{background:#74644b}button.primary{background:#e3bd74;color:#4a3b29}#hud .stat,#mapBox{background:#493d30ed}#safePanel{background:#65513ded}#atmosphere{background:linear-gradient(0deg,#6a422515,transparent 70%);box-shadow:inset 0 0 85px #6b4d2920}.badge{background:#eee1c8;color:#705943}#worldMapButton{background:#776348}body{background:#307b91}.card{background:linear-gradient(145deg,#fff6def7,#e7ead5f7);border-color:#c6ad75}.eyebrow{color:#6a6945}button{background:#4c756c}button.primary{background:#e4be65;color:#4b422c}#hud .stat,#mapBox{background:#214e58ed}#safePanel{background:#3e6955ed}#atmosphere{background:linear-gradient(0deg,#418b9312,transparent 70%);box-shadow:inset 0 0 90px #2a6d7a20}.badge{background:#e8dec0;color:#6a5937}#worldMapButton{background:#567a69}body{background:#b77b9b}.card{background:linear-gradient(145deg,#fff2e8f7,#f1dcebf7);border-color:#d3a2c0}.eyebrow{color:#975c83}button{background:#9b6688}button.primary{background:#e4b765;color:#62433b}#hud .stat,#mapBox{background:#694960ed}#safePanel{background:#7a5576ed}#safePanel.safe{background:#497b68ed}.badge{background:#ead1df;color:#7c4c69}#worldMapButton{background:#946889}#atmosphere{background:linear-gradient(0deg,#c889ae12,transparent 70%);box-shadow:inset 0 0 85px #9b648320}body{background:#a5bbc3}.overlay{background:#263f5c99}.card{background:linear-gradient(145deg,#f7f2e8f7,#e4edf1f7);border-color:#afc2cd}.eyebrow{color:#527c9c}button{background:#507da0}button.primary{background:#e2af55;color:#263f59}#hud .stat,#mapBox{background:#294c6ced}#safePanel{background:#4b657bed}#safePanel.safe{background:#39816ced}.badge{background:#e1ebf0;color:#4c7690}#worldMapButton{background:#6487a0}#start h1 span{color:#527c9c!important}.card{color:#233f58;border-radius:22px}.card p,.card .small,.card .result small{color:#486174}.card .inputTools label{color:#42617a}.card #status,.card #teacherStatus{color:#596d37}.card #hint{color:#5a5035;background:#eedfac88}.card #meaning{color:#27668c}.card .result strong{color:#356c86}.card .answer{color:#fff;background:#50718e}.card .inputTools{border-color:#91a9b955;background:#4a789012}.card #progress{background:#c2cfd5}.card #fill{background:#438c83}.card .letter{color:#fff}.card .help{border-color:#a8bac766}#hud .stat,#mapBox,#safePanel,#prompt,#toast,#bottom{color:#edf5f6}#atmosphere{background:linear-gradient(0deg,#304c6310,transparent 70%);box-shadow:inset 0 0 80px #38547215}#atmosphere:after{display:none}body{background:#777d6d}.overlay{background:#172c2799}.card{background:linear-gradient(145deg,#eee9daf8,#dce4d9f8);border-color:#a8b29b}.eyebrow{color:#77704c}button{background:#586f64}button.primary{background:#d3b479;color:#303f35}.card .answer{background:#4d695f}#hud .stat,#mapBox{background:#2c443bed}#safePanel{background:#475a43ed}#safePanel.safe{background:#347358ed}.badge{background:#e2dec7;color:#5e6546}#worldMapButton{background:#65745b}#start h1 span{color:#667952!important}#atmosphere{background:linear-gradient(0deg,#3d342010,transparent 75%);box-shadow:inset 0 0 70px #26372b1c}body{background:#82abc3}.overlay{background:#173f60a0}.card{background:linear-gradient(145deg,#eaf1f3f8,#dce8edf8);border-color:#a3bdcd}.eyebrow{color:#497894}button{background:#486f8b}button.primary{background:#d7bb7e;color:#244c64}.badge{background:#d6e6ed;color:#39637d}.card .answer{background:#416d89}#hud .stat,#mapBox{background:#214961ed}#safePanel{background:#355c74ed}#safePanel.safe{background:#337b83ed}#worldMapButton{background:#557e96}#start h1 span{color:#417591!important}#atmosphere{background:linear-gradient(0deg,#42668b16,transparent 70%);box-shadow:inset 0 0 75px #315e7a18}</style>
+</head>
+<body>
+<canvas id="world"></canvas>
+<div id="mobileControls" class="hidden" aria-label="Kontrol sentuh"><div id="moveStick" role="group" aria-label="Joystick untuk bergerak"><span class="stickLabel">GERAK</span><div id="stickKnob"></div></div><div id="touchActions"><button id="touchInteract" disabled>✋ Interaksi</button><button id="touchRun">Lari</button><button id="touchJump">↑<br>Lompat</button><button id="touchFlash" >☀<br>Senter</button></div><div id="mobileUtility"><button id="mobileFull" aria-label="Layar penuh">⛶</button><button id="mobilePause" aria-label="Jeda">Ⅱ</button><button id="mobileSound" aria-label="Aktifkan atau matikan suara">🔊</button></div><span id="lookHint">GESER LAYAR UNTUK MELIHAT</span></div>
+<div id="rotateScreen" class="overlay hidden"><div class="card rotateCard"><div class="rotateIcon" aria-hidden="true">▯ ↻</div><h2>Putar HP ke landscape</h2><p>Game mencoba mengatur layar mendatar. Jika browser tidak mengizinkan, putar perangkat secara manual dan aktifkan rotasi otomatis HP.</p><button id="retryLandscape" class="primary">Coba layar penuh &amp; landscape</button><button id="playPortrait">Tetap main dalam portrait</button><p class="small">Saat layar ini muncul, permainan dan penjaga dijeda.</p></div></div><div id="threatVignette"></div><div id="safePanel" class="hidden"><strong id="safeTitle">JELAJAHI KUTUB</strong><span id="safeText">Cari IGLOO SAFE untuk berlindung.</span></div><div id="atmosphere"></div><div id="missionTag" class="hidden">PENGUIN SNOW / PENGUIN 0/9 · ITEM 0/5</div>
+<div id="hud" class="hidden"><div class="stat">Area <b id="floorHUD">Desa Salju</b></div><div class="stat">Penguin dituntaskan <b id="npcHUD">0/9</b></div><div class="stat">Item ditemukan <b id="itemHUD">0/5</b></div><div class="stat">Benar <b id="correctHUD">0</b></div><div class="stat">❌ Kesalahan <b id="wrongHUD">0</b></div><div class="stat">Waktu <b id="timeHUD">00:00</b></div></div>
+<div id="mapBox" class="hidden"><header><span>PETA KUTUB</span><span id="mapFloor">L1</span></header><canvas id="map" width="326" height="240"></canvas><button id="worldMapButton">⌖ Peta Kutub</button><button id="sound">🔊 Suara: ON</button><button id="flashButton">C · Kamera: Ikuti penguin</button></div>
+<div id="cross" class="hidden"></div><div id="prompt" class="hidden"></div><div id="toast" class="hidden"></div><div id="bottom" class="hidden">WASD / Panah Berjalan · Space Lompat · Shift Cepat · E Interaksi · C Kamera · M Peta</div>
+<div id="start" class="overlay"><div class="card"><div class="eyebrow">ENGLISH QUEST · POLAR EXPEDITION EDITION</div><h1 id="title">Penguin Snow Quest<br><span style="font-size:.43em;letter-spacing:.04em;color:#267b97">ENGLISH QUEST</span></h1><p>Jadilah penguin penjelajah di dunia kutub! Masuki gua es biru, jelajahi desa igloo, naiki kapal beku, dan seberangi tiga jembatan es di atas laut gelap. Temui 9 teman penguin, jawab 63 pertanyaan bahasa Inggris, dan kumpulkan 5 benda ekspedisi sambil menghindari 9 anjing laut patroli.</p><div class="badges"><span class="badge">Gua Es · Kapal · Desa Salju</span><span class="badge">9 penguin · 63 soal</span><span class="badge">5 item acak</span><span class="badge">9 anjing laut · 9 rute patroli</span></div><p class="help">WASD / Panah: berjalan · Mouse / geser: melihat<br>Shift: cepat · Space: lompat · E: bicara / ambil · C: kamera · M: peta · Esc: jeda<br><b>HP:</b> joystick, geser layar, tombol Lompat, Cepat, Kamera, dan Interaksi.<br>Berlindung di <b>IGLOO SAFE</b> saat anjing laut mendekat. Ikuti tangga es untuk menaiki jembatan dan kapal. Celah laut berbahaya untuk misi darat ini—gunakan jembatan. Kamu terlindung selama kuis.</p><div class="inputTools"><label for="royalQuality">Kualitas gambar</label><select id="royalQuality"><option value="auto">Otomatis sesuai perangkat</option><option value="hd">HD · Detail &amp; bayangan</option><option value="lite">Ringan · Lebih lancar</option></select><label for="inputMode">Mode kontrol</label><select id="inputMode"><option value="auto">Otomatis sesuai perangkat</option><option value="touch">Joystick &amp; layar sentuh</option><option value="keyboard">Keyboard &amp; mouse</option></select><button id="mobileTeacher" type="button">Teacher Mode · Soal kustom</button><p class="small">HP: joystick kiri untuk berjalan, geser layar untuk melihat, dan gunakan tombol sentuh. Laptop: WASD / panah, mouse, E, Shift, Space.</p></div><button id="startButton" class="primary">Mulai Misi</button><p id="status" role="status">Memuat Three.js…</p><p class="small">Untuk pengajar: tahan judul di atas selama 3 detik untuk membuka input soal massal.</p></div></div>
+<div id="quiz" class="overlay hidden"><div class="card"><div class="quizhead"><div><div id="npcName" class="eyebrow"></div><p id="questionNumber" class="small"></p></div><button id="leaveQuiz">Lanjut nanti</button></div><div id="progress"><div id="fill"></div></div><h2 id="question"></h2><div id="answers"></div><button id="meaningButton">Tampilkan Arti</button><div id="meaning" class="hidden"></div><div id="hint"></div><div id="feedback" role="status" aria-live="polite"></div></div></div>
+<div id="forestMap" class="overlay hidden"><div class="card forestMapCard"><div class="quizhead"><div><div class="eyebrow">PENGUIN SNOW MAP</div><h2>Peta Kutub</h2></div><button id="closeForestMap">Tutup &amp; lanjut</button></div><canvas id="bigMap" width="900" height="780"></canvas><p class="small">Hijau: IGLOO SAFE · Kuning: penguin kuis dekat · Merah: anjing laut dekat · Segitiga: pemain. Perhatikan juga posisi saat mencari penguin atau item.</p><p class="small">Anjing laut berpatroli di gua, desa, dataran, dek kapal, gletser, dan tiga jembatan. Laut biru gelap berbahaya: gunakan penyeberangan es. Semua patroli dijeda saat peta terbuka.</p></div></div><div id="teacher" class="overlay hidden"><div class="card"><div class="eyebrow">Bulk custom questions</div><h2>Teacher Mode</h2><p class="small">Masukkan satu soal per baris. Tepat lima kolom, dipisahkan tanda |:<br><b>pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah</b></p><textarea id="custom" aria-label="Soal kustom massal" spellcheck="false" placeholder="What does snow mean? | Salju | Laut | Kapal | Gua&#10;Which word is the opposite of cold? | Warm | Blue | Small | Short"></textarea><p class="small">Posisi jawaban benar diacak. Soal kustom diprioritaskan; jika kurang dari 63, bank bawaan melengkapi. Jika lebih dari 63, dipilih acak. Tidak ada soal berulang antarnpc. Perubahan berlaku pada misi baru.</p><div class="actions"><button id="save" class="primary">Simpan Semua Soal</button><button id="clear">Hapus Kustom</button><button id="closeTeacher">Tutup</button></div><p id="teacherStatus" role="status"></p></div></div>
+<div id="win" class="overlay hidden"><div class="card"><div class="eyebrow">Misi tuntas</div><h1>Snow mission complete!</h1><p>Kamu berhasil bertemu 9 penguin pemberi kuis, menyelesaikan 63 pertanyaan, dan mengumpulkan kelima benda ekspedisi. Hebat, penguin penjelajah!</p><div class="objectives">✓ 9 / 9 penguin dituntaskan<br>✓ 5 / 5 item ditemukan</div><div class="results"><div class="result"><strong id="finalScore"></strong><small>Benar / Total</small></div><div class="result"><strong id="finalWrong"></strong><small>Total kesalahan</small></div><div class="result"><strong id="finalTime"></strong><small>Waktu bermain</small></div></div><button id="again" class="primary">Main Lagi</button></div></div>
+<div id="fail" class="overlay hidden"><div class="card"><div class="eyebrow">MISI PERLU DIULANG</div><div class="failIcon">◉</div><h1>Ayo coba lagi, penguin kecil!</h1><p id="failReason"></p><div class="objectives">Seluruh progres telah direset: penguin 0/9, item 0/5, jawaban 0/63. Soal kustom pengajar tetap tersimpan.</div><p class="small">Pada percobaan berikutnya, gunakan jembatan es dan berlindung di IGLOO SAFE. Tunggu anjing laut lewat sebelum berjalan kembali.</p><button id="retry" class="primary">Ulang dari awal</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="document.getElementById('status').textContent='CDN gagal dimuat. Periksa internet lalu buka ulang file.'"></script>
+<script>
+'use strict';
+(()=>{
+const $=id=>document.getElementById(id);
+if(!window.THREE)return;
+const FH=4.5,EYE=.65,RADIUS=.42,HEIGHT=1.25,STEP=.23,STORE='penguin-snow-quest-custom-v1';
+let touchMode=false,touchSession=false,portraitAllowed=false,touchRun=false,stickPointer=null,lookPointer=null,lookX=0,lookY=0;
+const touchMove={forward:0,strafe:0};let touchUp=false,touchDown=false,upPointer=null,downPointer=null,playerFish=null,swimClock=0,firstPerson=false;const oceanDecor=[];
+let renderer,scene,camera,ready=false,started=false,won=false,yaw=0,pitch=0,vy=0,grounded=true;
+let elapsed=0,correct=0,wrong=0,finished=0,active=null,nearby=null,busy=false,answerTimer,toastTimer;
+let previous=performance.now(),footClock=0,customBank=[],npcs=[];
+const player=new THREE.Vector3(-66,0,62),keys={},colliders=[],walkables=[],slots=[];
+const ray=new THREE.Raycaster(),origin=new THREE.Vector3(),down=new THREE.Vector3(0,-1,0);
+const colors=[0x4d5d58,0x53616a,0x605663,0x655d4e];
+let flashlight,flashTarget,flashOn=true,ambienceGain,droneNodes=[],dust,nearSignal=0;
+const corridorLights=[];
+// Keadaan percobaan terpisah dari bank soal pengajar.
+let failed=false,attemptToken=0,foundItems=0,nearItem=null,hunter=null;const hunters=[];
+let pickups=[],itemCandidates=[],patrolRoute=[],hunterThreat=0;
+const safeRooms=[];let riverMesh=null,forestTreeCount=0,mapWasPlaying=false,graceUntil=8;
+const itemTypes=[{name:'Ice Crystal',meaning:'Kristal es',color:0x70afca},{name:'Explorer Compass',meaning:'Kompas penjelajah',color:0xb49e68},{name:'Ship Anchor',meaning:'Jangkar kapal',color:0x6c8795},{name:'Warm Lantern',meaning:'Lentera hangat',color:0xc2a16b},{name:'Silver Fish',meaning:'Ikan perak',color:0xa4b9bd}];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function time(s){s=Math.floor(s);return(s>=3600?String(Math.floor(s/3600)).padStart(2,'0')+':':'')+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function floor(){return 0}
+function showToast(text){$('toast').textContent=text;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),3500)}
+// Bank soal berupa Array of Objects; 184 soal bawaan berbeda.
+
+function makeBank(){
+ const words=[["penguin","penguin"],["seal","anjing laut"],["snow","salju"],["ice","es"],["cold","dingin"],["warm","hangat"],["cave","gua"],["ship","kapal"],["bridge","jembatan"],["village","desa"],["igloo","rumah es"],["sea","laut"],["fish","ikan"],["crystal","kristal"],["compass","kompas"],["anchor","jangkar"],["lantern","lentera"],["rope","tali"],["sail","layar kapal"],["deck","dek kapal"],["captain","kapten"],["flag","bendera"],["flipper","sirip"],["beak","paruh"],["foot","kaki"],["eye","mata"],["blue","biru"],["white","putih"],["black","hitam"],["yellow","kuning"],["big","besar"],["small","kecil"],["long","panjang"],["short","pendek"],["walk","berjalan"],["run","berlari"],["jump","melompat"],["slide","meluncur"],["hide","bersembunyi"],["find","menemukan"]];
+ const result=[];
+ words.forEach((w,i)=>{
+  result.push({q:'What does "'+w[0]+'" mean in Indonesian?',answer:w[1],distractors:[words[(i+7)%words.length][1],words[(i+17)%words.length][1],words[(i+29)%words.length][1]],hint:'Ingat kosakata alam dan benda di sekitarmu.',meaning:w[0]+' = '+w[1]});
+  result.push({q:'Which English word means "'+w[1]+'"?',answer:w[0],distractors:[words[(i+5)%words.length][0],words[(i+13)%words.length][0],words[(i+23)%words.length][0]],hint:'Pilih kosakata bahasa Inggris yang sesuai.',meaning:w[1]+' = '+w[0]});
+ });
+ const sentences=[['The penguin is ____ the igloo. (di dalam)','in',['on','under','behind'],'In = di dalam.'],['The seal is ____ the bridge. (di bawah)','under',['on','between','behind'],'Under = di bawah.'],['The fish is ____ the box. (di atas)','on',['in','under','between'],'On = di atas permukaan.'],['The igloo is ____ the flag. (di belakang)','behind',['under','in','between'],'Behind = di belakang.'],['There ____ three penguins.','are',['is','am','be'],'Benda jamak memakai are.'],['There ____ one seal.','is',['are','am','be'],'Satu benda memakai is.'],['She ____ a yellow lantern.','has',['have','having','are'],'She memakai has.'],['I ____ a blue compass.','have',['has','having','is'],'I memakai have.'],['Two plus three equals ____.','five',['four','six','seven'],'2 + 3 = 5.'],['Five minus two equals ____.','three',['two','four','six'],'5 - 2 = 3.'],['What color is snow?','white',['red','green','purple'],'Snow = salju.'],['A penguin uses its ____ to swim.','flippers',['books','lanterns','anchors'],'Flippers = sirip.'],['Which word is the opposite of cold?','warm',['blue','small','short'],'Cold berlawanan dengan warm.'],['Which word is the opposite of big?','small',['long','cold','blue'],'Big berlawanan dengan small.'],['Which word means di antara?','between',['behind','under','on'],'Between = di antara.'],['Choose the correct plural of foot.','feet',['foots','footes','feets'],'Bentuk jamak foot adalah feet.'],['Which sentence is correct?','The penguin is small.',['The penguin are small.','The penguin am small.','The penguin be small.'],'The penguin memakai is.'],['What does "Turn left" mean?','Belok kiri',['Belok kanan','Jalan lurus','Berhenti'],'Left = kiri.'],['What does "Be careful" mean?','Hati-hati',['Selamat pagi','Terima kasih','Sampai jumpa'],'Be careful = hati-hati.'],['What do you say after receiving help?','Thank you.',['Good night.','I am a ship.','Go away.'],'Thank you = terima kasih.']];
+
+ sentences.forEach(([q,answer,distractors,hint])=>result.push({q,answer,distractors,hint,meaning:hint}));return result;
+}
+
+
+const bank=makeBank();
+function parseBulk(text){const questions=[],errors=[],seen=new Set();text.split(/\r?\n/).forEach((line,i)=>{if(!line.trim())return;const p=line.split('|').map(s=>s.trim());if(p.length!==5||p.some(s=>!s)){errors.push('Baris '+(i+1)+': wajib tepat lima kolom terisi.');return}if(new Set(p.slice(1).map(s=>s.toLowerCase())).size!==4){errors.push('Baris '+(i+1)+': semua pilihan harus berbeda.');return}const id=p[0].toLowerCase();if(seen.has(id)){errors.push('Baris '+(i+1)+': pertanyaan duplikat.');return}seen.add(id);questions.push({q:p[0],answer:p[1],distractors:p.slice(2),hint:'Baca pertanyaan dan bandingkan keempat pilihan.',meaning:''})});return{questions,errors}}
+try{const text=localStorage.getItem(STORE)||'';$('custom').value=text;const p=parseBulk(text);if(!p.errors.length)customBank=p.questions}catch(e){}
+let pressTimer;
+function cancelPress(){clearTimeout(pressTimer)}
+$('title').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;e.preventDefault();cancelPress();$('title').setPointerCapture(e.pointerId);pressTimer=setTimeout(()=>{$('teacher').classList.remove('hidden');$('teacherStatus').textContent=customBank.length+' soal kustom aktif. Bank bawaan: '+bank.length+' soal.'},3000)});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('title').addEventListener(t,cancelPress));
+$('title').addEventListener('contextmenu',e=>e.preventDefault());
+$('closeTeacher').onclick=()=>$('teacher').classList.add('hidden');
+$('save').onclick=()=>{const text=$('custom').value.trim(),p=parseBulk(text);if(p.errors.length){$('teacherStatus').textContent=p.errors.slice(0,5).join(' ');return}customBank=p.questions;try{localStorage.setItem(STORE,text);$('teacherStatus').textContent='Tersimpan: '+customBank.length+' soal. Berlaku pada misi baru.'}catch(e){$('teacherStatus').textContent=customBank.length+' soal aktif sesi ini. Browser menolak localStorage; data tidak bertahan setelah ditutup.'}};
+$('clear').onclick=()=>{customBank=[];$('custom').value='';try{localStorage.removeItem(STORE);$('teacherStatus').textContent='Soal kustom dihapus. Misi baru menggunakan bank bawaan.'}catch(e){$('teacherStatus').textContent='Soal sesi ini dihapus. Penyimpanan browser tidak dapat diakses.'}};
+// Web Audio API: nada C–E–G, buzz, dan langkah noise lowpass.
+let audio,master,noise,muted=false;
+function audioStart(){try{if(!audio){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audio=new AC();master=audio.createGain();master.gain.value=muted?0:.3;master.connect(audio.destination);ambienceGain=audio.createGain();ambienceGain.gain.value=0;ambienceGain.connect(master);[261.63,329.63,392].forEach((f,i)=>{const o=audio.createOscillator(),g=audio.createGain();o.type="sine";o.frequency.value=f;g.gain.value=i===0?.015:.008;o.connect(g);g.connect(ambienceGain);o.start();droneNodes.push(o,g)});noise=audio.createBuffer(1,Math.floor(audio.sampleRate*.14),audio.sampleRate);let a=noise.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1}if(audio.state==='suspended')audio.resume().catch(()=>{})}catch(e){}}
+function tone(f,t,d,type='sine',vol=.3){if(!audio||muted)return;let o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02)}
+function bling(){if(audio)[523.25,659.25,783.99].forEach((f,i)=>tone(f,audio.currentTime+i*.09,.3))}
+function buzz(){if(audio)tone(85,audio.currentTime,.3,'sawtooth',.22)}
+function footstep(){if(!audio||muted)return;let n=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain(),t=audio.currentTime;n.buffer=noise;f.type='lowpass';f.frequency.value=250+Math.random()*100;g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.0001,t+.12);n.connect(f);f.connect(g);g.connect(master);n.start();n.stop(t+.13)}
+$('sound').onclick=()=>{audioStart();muted=!muted;if(master)master.gain.value=muted?0:.3;$('sound').textContent=muted?'🔇 Suara: OFF':'🔊 Suara: ON'};
+const mat=(color,extra={})=>new THREE.MeshStandardMaterial({color,roughness:.8,...extra});
+let wallMat,woodMat,metalMat,glassMat,tileTex,stairMat;
+function texture(kind){let c=document.createElement('canvas');c.width=c.height=256;let g=c.getContext('2d');g.fillStyle=kind==='tile'?'#313c3d':kind==='wall'?'#7a8170':'#5c493b';g.fillRect(0,0,256,256);if(kind==='tile'){for(let y=0;y<256;y+=64)for(let x=0;x<256;x+=64){g.fillStyle=(x+y)%128?'#758078':'#536362';g.fillRect(x+2,y+2,60,60);g.strokeStyle='#b1b69a40';g.strokeRect(x+4,y+4,55,55)}}else if(kind==='wall'){g.strokeStyle='#353d3960';g.lineWidth=3;for(let y=0;y<=256;y+=64){g.beginPath();g.moveTo(0,y);g.lineTo(256,y);g.stroke();for(let x=(y/64%2)*64;x<256;x+=128)g.strokeRect(x,y,128,64)}}else{for(let i=0;i<70;i++){g.fillStyle=i%2?'#e0a26270':'#77402340';g.fillRect(Math.random()*256,0,1+Math.random()*3,256)}}// Noda dan retakan prosedural tanpa gambar eksternal.
+for(let i=0;i<95;i++){g.fillStyle=i%2?'#111b1b18':'#b3b59c0c';g.fillRect(Math.random()*256,Math.random()*256,3+Math.random()*35,2+Math.random()*25)}
+if(kind!=='wood'){g.strokeStyle='#17242065';g.lineWidth=1;for(let k=0;k<5;k++){let x=Math.random()*256,y=Math.random()*256;g.beginPath();g.moveTo(x,y);for(let n=0;n<5;n++){x+=Math.random()*18-9;y+=9;g.lineTo(x,y)}g.stroke()}}
+let t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.encoding=THREE.sRGBEncoding;return t}
+function box(w,h,d,x,y,z,m,solid=false,walk=false){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.receiveShadow=true;o.castShadow=solid;scene.add(o);if(solid)colliders.push({minX:x-w/2,maxX:x+w/2,minY:y-h/2,maxY:y+h/2,minZ:z-d/2,maxZ:z+d/2});if(walk)walkables.push(o);return o}
+function wall(w,h,d,x,y,z,m=wallMat){return box(w,h,d,x,y,z,m,true)}
+function slab(x1,x2,z1,z2,y){let t=tileTex.clone();t.needsUpdate=true;t.repeat.set((x2-x1)/4,(z2-z1)/4);box(x2-x1,.24,z2-z1,(x1+x2)/2,y-.12,(z1+z2)/2,mat(0xffffff,{map:t,roughness:.65}),true,true)}
+function label(text,w=256,bg='#172b29'){let c=document.createElement('canvas');c.width=w;c.height=80;let g=c.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,w,80);g.strokeStyle='#a9c29a';g.lineWidth=5;g.strokeRect(3,3,w-6,74);g.font='bold 27px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='white';g.fillText(text,w/2,42,w-15);let s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));s.scale.set(2.5,.78,1);return s}
+const royalMaterials={},royalTextures={},royalGeometries=new Map();let royalEnv=null;
+
+function makeRoyalEnvironment(){if(!THREE.CubeTexture)return null;const faces=[];for(let n=0;n<6;n++){const c=document.createElement('canvas');c.width=c.height=128;const t=c.getContext('2d'),gr=t.createLinearGradient(0,0,0,128);gr.addColorStop(0,'#b7c7e0');gr.addColorStop(.48,'#bfd0d6');gr.addColorStop(1,'#496779');t.fillStyle=gr;t.fillRect(0,0,128,128);faces.push(c)}const e=new THREE.CubeTexture(faces);e.encoding=THREE.sRGBEncoding;e.needsUpdate=true;return e}
+function royalMat(color,roughness=.42,extra={}){const key=color+'-'+roughness+'-'+Object.keys(extra).sort().map(k=>k+':'+(extra[k]&&typeof extra[k]==='object'?(extra[k].uuid||extra[k].id||k):extra[k])).join('|');if(!royalMaterials[key])royalMaterials[key]=new THREE.MeshStandardMaterial({color,roughness,metalness:.035,envMap:royalEnv,envMapIntensity:.42,...extra});royalMaterials[key].royalShared=true;return royalMaterials[key]}
+function roundGeometry(w,h,d,r=.15){r=Math.min(r,w/2,h/2,d/2);const key=[w,h,d,r].join(',');if(royalGeometries.has(key))return royalGeometries.get(key);const geo=new THREE.BoxGeometry(w,h,d,5,5,5),a=geo.attributes?.position,n=geo.attributes?.normal;if(a){for(let i=0;i<a.count;i++){const x=a.getX(i),y=a.getY(i),z=a.getZ(i),ix=Math.max(-w/2+r,Math.min(w/2-r,x)),iy=Math.max(-h/2+r,Math.min(h/2-r,y)),iz=Math.max(-d/2+r,Math.min(d/2-r,z)),dx=x-ix,dy=y-iy,dz=z-iz,len=Math.hypot(dx,dy,dz)||1;a.setXYZ(i,ix+dx/len*r,iy+dy/len*r,iz+dz/len*r);if(n)n.setXYZ(i,dx/len,dy/len,dz/len)}if(!n)geo.computeVertexNormals()}geo.royalShared=true;geo.royalShape=key;royalGeometries.set(key,geo);return geo}
+function royalBox(w,h,d,x,y,z,m,r=.12,solid=false,walk=false,parent=scene){const o=new THREE.Mesh(roundGeometry(w,h,d,r),m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);if(solid)colliders.push({minX:x-w/2,maxX:x+w/2,minY:y-h/2,maxY:y+h/2,minZ:z-d/2,maxZ:z+d/2});if(walk)walkables.push(o);return o}
+function royalSphere(rx,ry,rz,x,y,z,m,parent=scene){const o=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),m);o.scale.set(rx,ry,rz);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o}
+function royalCylinder(rt,rb,h,x,y,z,m,parent=scene){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,32),m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o}
+function royalRing(r,t,x,y,z,m,angle=Math.PI*2,parent=scene){const o=new THREE.Mesh(new THREE.TorusGeometry(r,t,10,48,angle),m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;parent.add(o);return o}
+
+function roomSign(text,x,y,z,w=5){const sign=label(text,512,'#85556e');sign.position.set(x,y,z);sign.scale.set(w,.7,1);scene.add(sign)}
+// PENGUIN_WORLD_START
+const WORLD={halfX:88,halfZ:78,top:65},bridgeZ=[-42,0,42],bridgeX=[],skyRotors=[],greatTrees=[];
+function floorAt(x,z){return Math.abs(x)<9?-2:0}function terrainAt(x,z){return floorAt(x,z)}
+function inChocolate(p=player){return Math.abs(p.x)<8.8&&p.y<-.08}
+const cabinDefinitions=[{name:'Igloo Awal',x:-66,z:62,y:0},{name:'Igloo Gua Biru',x:-76,z:-65,y:0},{name:'Igloo Desa',x:-40,z:46,y:0},{name:'Igloo Kapal',x:74,z:-68,y:0},{name:'Igloo Teluk',x:62,z:60,y:0},{name:'Igloo Gletser',x:43,z:12,y:0}];
+const F=(x,z,name,zone,y=0)=>({x,y:y+.65,z,name,zone});
+const forestSites=[...cabinDefinitions.map(h=>F(h.x,h.z,h.name,'refuge')),F(-63,-46,'Ruang Gua Barat','cave'),F(-49,-46,'Ruang Gua Timur','cave'),F(-56,-34,'Jantung Gua Biru','cave'),F(-56,-21,'Mulut Gua','cave'),F(-65,24,'Igloo Nelayan','village'),F(-38,31,'Tiang Bendera Desa','village'),F(-52,54,'Jalan Desa Salju','village'),F(-26,60,'Sudut Peti Desa','village'),F(43,-38,'Dek Kapal Barat','ship',1.6),F(63,-38,'Dek Kapal Timur','ship',1.6),F(53,-51,'Kabin Kapten','ship',1.6),F(53,-33,'Tangga Dek','ship',1.6),...bridgeZ.flatMap((z,i)=>[F(-3,z+1.2,'Jembatan '+(i+1)+' Barat','bridge',1.2),F(3,z-1.2,'Jembatan '+(i+1)+' Timur','bridge',1.2)]),F(53,38,'Lengkung Gletser','glacier'),F(34,52,'Bukit Kristal','glacier'),F(74,36,'Tepi Teluk','glacier'),F(26,65,'Padang Salju','glacier'),F(29,19,'Batas Gletser','glacier'),F(74,5,'Dataran Es Timur','glacier')];
+const landmarks=[{x:-56,z:-40,w:30,d:28,n:'GUA ES BIRU'},{x:-53,z:43,w:54,d:54,n:'DESA SALJU'},{x:53,z:-44,w:30,d:42,n:'KAPAL BEKU'},{x:53,z:38,w:36,d:35,n:'TELUK GLETSER'}],greatRocks=landmarks.map(p=>({x:p.x,z:p.z}));
+function regionName(p=player){if(Math.abs(p.x)<20)return'Jembatan Es';if(p.x<0)return p.z< -20?'Gua Es Biru':p.z>15?'Desa Salju':'Dataran Kutub Barat';return p.z< -18?'Kapal Beku':p.z>20?'Teluk Gletser':'Dataran Kutub Timur'}
+function buildPatrolRoute(){return guardRegions.flatMap(r=>r.points.map(([x,y,z])=>({x,y,z})))}
+function safeRoom(p=player){return safeRooms.find(r=>p.x>=r.minX&&p.x<=r.maxX&&p.z>=r.minZ&&p.z<=r.maxZ&&p.y>=r.minY&&p.y+HEIGHT<=r.maxY)||null}
+function buildItemCandidates(){return forestSites.filter(p=>p.zone!=='refuge').map((p,i)=>({...p,id:'snow-'+i,kind:'snow',floor:0}))}
+function chooseItemLocations(){return shuffle(['cave','village','ship','bridge','glacier'].map(zone=>shuffle(itemCandidates.filter(p=>p.zone===zone))[0]))}
+let snowPoints=null,seaTexture=null;
+function polarTexture(kind){if(royalTextures['polar-'+kind])return royalTextures['polar-'+kind];const c=document.createElement('canvas');c.width=c.height=1024;const t=c.getContext('2d');t.fillStyle=kind==='snow'?'#c6d9df':kind==='ice'?'#598caa':kind==='wood'?'#746b5f':kind==='fur'?'#8d979a':kind==='water'?'#153e59':'#707d84';t.fillRect(0,0,1024,1024);let seed=613;const rnd=()=>{seed=seed*16807%2147483647;return seed/2147483647};for(let i=0;i<17000;i++){t.fillStyle=i%2?'#f5fcff15':'#243b4b13';t.fillRect(rnd()*1024,rnd()*1024,.5+rnd()*3,kind==='wood'?8+rnd()*90:kind==='fur'?1+rnd()*8:1+rnd()*2)}if(kind==='ice'){t.strokeStyle='#c2ecf388';t.lineWidth=1.2;for(let i=0;i<32;i++){let x=rnd()*1024,y=rnd()*1024;t.beginPath();t.moveTo(x,y);for(let j=0;j<5;j++){x+=(rnd()-.5)*120;y+=rnd()*80;t.lineTo(x,y)}t.stroke()}}if(kind==='snow'){t.strokeStyle='#668e9c22';t.lineWidth=2;for(let i=0;i<160;i++){t.beginPath();const x=rnd()*1024,y=rnd()*1024;t.moveTo(x,y);t.quadraticCurveTo(x+30,y-8,x+70,y+3);t.stroke()}}if(kind==='wood'){t.strokeStyle='#3d4242';t.lineWidth=4;for(let x=0;x<1024;x+=128){t.beginPath();t.moveTo(x,0);t.lineTo(x,1024);t.stroke()}}if(kind==='water'){t.strokeStyle='#6190a566';t.lineWidth=2;for(let i=0;i<100;i++){const x=rnd()*1024,y=rnd()*1024;t.beginPath();t.moveTo(x,y);t.quadraticCurveTo(x+40,y-10,x+100,y);t.stroke()}}const tex=new THREE.CanvasTexture(c);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(kind==='snow'?12:kind==='water'?2:2,kind==='snow'?12:kind==='water'?18:2);tex.encoding=THREE.sRGBEncoding;if(renderer?.capabilities?.getMaxAnisotropy)tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());royalTextures['polar-'+kind]=tex;return tex}
+const snowMat=()=>royalMat(0xbfd8e1,.91,{map:polarTexture('snow'),bumpMap:polarTexture('snow'),bumpScale:.07});
+const iceMat=(c=0x69a8c6)=>royalMat(c,.27,{map:polarTexture('ice'),bumpMap:polarTexture('ice'),bumpScale:.035,envMapIntensity:.65});
+const timberMat=()=>royalMat(0x9b9485,.8,{map:polarTexture('wood'),bumpMap:polarTexture('wood'),bumpScale:.05});
+function polarBeam(a,b,r,m,parent=scene){const dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z,h=Math.hypot(dx,dy,dz),o=royalCylinder(r,r,h,(a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2,m,parent);if(o.quaternion?.setFromUnitVectors)o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(dx/h,dy/h,dz/h));return o}
+function fishModel(color,parent,scale=1,seal=false,kind=0){const g=new THREE.Group();g.scale.set(scale,scale,scale);parent.add(g);const black=royalMat(seal?color:0x273941,.78,{bumpMap:polarTexture('fur'),bumpScale:.012}),white=royalMat(0xc8d7d6,.86),beak=royalMat(0xaa7748,.7),dark=royalMat(0x122832,.4),pink=royalMat(0x9f968b,.82),legs=[];const sp=(rx,ry,rz,x,y,z,m=black,p=g)=>royalSphere(rx,ry,rz,x,y,z,m,p);
+ if(seal){sp(1.25,1.12,2.75,0,1.20,-.30);sp(.91,.87,1.15,0,1.8,1.85);sp(.69,.46,.50,0,1.53,2.72,pink);for(const side of [-1,1]){sp(.12,.13,.055,side*.47,2.02,2.69,dark);sp(.03,.035,.02,side*.49,2.06,2.74,white);sp(.30,.23,.30,side*.30,1.51,2.96,pink);const fin=new THREE.Group();fin.position.set(side*1.07,.48,.32);g.add(fin);const fl=sp(.36,.14,1.08,side*.42,0,0,black,fin);fl.rotation.y=side*.66;legs.push(fin);for(let i=0;i<4;i++)polarBeam({x:side*.33,y:1.53+i*.06,z:3.0},{x:side*1.35,y:1.50+i*.12,z:2.86},.011,white,g)}sp(.17,.11,.08,0,1.66,3.12,dark);for(let i=0;i<28;i++){const a=i*2.399,y=1.32+Math.sin(i*1.9)*.62,z=-2.15+(i%9)*.44;sp(.09,.035,.18,Math.sin(a)*1.03,y,z,royalMat(kind%2?0x5d737b:0x87928f,.9))}
+ }else{sp(.37,.57,.31,0,-.04,0);sp(.30,.43,.10,0,-.04,.26,white);sp(.29,.28,.28,0,.57,.02);sp(.18,.20,.055,0,.53,.27,white);for(const side of [-1,1]){sp(.038,.05,.022,side*.14,.63,.27,dark);sp(.012,.015,.01,side*.15,.65,.29,white);sp(.16,.06,.24,side*.20,-.60,.14,beak);const flipper=new THREE.Group();flipper.position.set(side*.34,.07,0);g.add(flipper);const fin=sp(.09,.42,.11,side*.10,-.25,0,black,flipper);fin.rotation.z=side*.25;legs.push(flipper);sp(.075,.18,.028,side*.24,.39,.23,royalMat(kind%3?0xb5a276:0xc2aa6b,.83))}const cone=new THREE.Mesh(new THREE.ConeGeometry(.09,.30,10),beak);cone.position.set(0,.49,.39);cone.rotation.x=Math.PI/2;g.add(cone)}
+ const tail=new THREE.Group();tail.position.set(0,seal?.48:-.36,seal?-2.85:-.30);g.add(tail);if(seal)for(const side of [-1,1])sp(.48,.12,.82,side*.38,0,-.5,black,tail);else sp(.13,.08,.23,0,0,-.12,black,tail);g.userData={tail,legs,seal};batchCreatureParts(g);return g}
+function animateWings(g,phase,speed=4){g?.userData?.legs?.forEach((l,i)=>{if(g.userData.seal)l.rotation.y=Math.sin(phase*speed+i*Math.PI)*.16;else l.rotation.z=(i?1:-1)*(.14+Math.sin(phase*speed)*.12)})}
+function igloo(h){const firstChild=scene.children.length,firstCollider=colliders.length;const m=snowMat(),ice=iceMat();const x=h.x,z=h.z;for(let row=0;row<5;row++){const r=5*Math.sqrt(1-(row/5)**2),count=Math.max(10,24-row*2),yy=.7+row*1.15;for(let i=0;i<count;i++){const a=i/count*Math.PI*2+(row%2)*Math.PI/count,dx=Math.sin(a)*r,dz=Math.cos(a)*r;if(row<3&&dz>3&&Math.abs(dx)<2.1)continue;const block=royalBox(1.35,1.05,1.12,x+dx,yy,z+dz,m,.18);block.rotation.y=a}}royalSphere(2.2,.85,2.2,x,5.9,z,m);for(const side of [-1,1])royalBox(.75,2.4,3,x+side*2.2,1.2,z+5.4,ice,.2,true);royalBox(5.2,.6,3,x,2.7,z+5.4,m,.2,true);colliders.push({minX:x-5.6,maxX:x-4.4,minY:0,maxY:5,minZ:z-5,maxZ:z+5},{minX:x+4.4,maxX:x+5.6,minY:0,maxY:5,minZ:z-5,maxZ:z+5},{minX:x-5,maxX:x+5,minY:0,maxY:5,minZ:z-5.6,maxZ:z-4.4},{minX:x-4.4,maxX:x-2,minY:0,maxY:3,minZ:z+4.4,maxZ:z+5.6},{minX:x+2,maxX:x+4.4,minY:0,maxY:3,minZ:z+4.4,maxZ:z+5.6});safeRooms.push({room:h.name,minX:x-3.8,maxX:x+3.8,minZ:z-3.8,maxZ:z+3.8,minY:-.05,maxY:3.8});roomSign('IGLOO SAFE',x,7.5,z+1,5);const light=new THREE.PointLight(0xf3cea1,.22,14,2);light.position.set(x,3,z);scene.add(light);if(h.name==='Igloo Awal'){for(const o of scene.children.slice(firstChild)){o.position.x=2*x-o.position.x;o.position.z=2*z-o.position.z;o.rotation.y+=Math.PI}for(const c of colliders.slice(firstCollider)){const ax=c.minX,az=c.minZ;c.minX=2*x-c.maxX;c.maxX=2*x-ax;c.minZ=2*z-c.maxZ;c.maxZ=2*z-az}}}
+function iceCave(){const m=iceMat(0x609cbc),snow=snowMat();for(const x of [-70,-42]){royalBox(3,15,30,x,7.5,-40,m,.8,true);for(let i=0;i<8;i++){const o=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),m);o.scale.set(2.2,6+i%3,2.8);o.position.set(x,6.5,-52+i*3.4);o.rotation.y=i*.6;scene.add(o)}}royalBox(30,14,3,-56,7,-54,m,.7,true);royalBox(31,4,30,-56,15,-40,snow,1,true);for(const x of [-66,-46])royalBox(10,12,2,x,6,-26,m,.6,true);royalBox(10,3,2,-56,13,-26,m,.6,true);for(let i=0;i<24;i++){const icicle=new THREE.Mesh(new THREE.ConeGeometry(.18+i%3*.12,1.2+i%5*.60,10),iceMat(0x8dbbc9));icicle.rotation.z=Math.PI;icicle.position.set(-67+(i%6)*4.3,12.1,-50+Math.floor(i/6)*6);scene.add(icicle)}royalBox(25,.025,24,-56,.025,-40,iceMat(0x81b4cc),.01);const glow=new THREE.PointLight(0x89c4e0,.65,36,2);glow.position.set(-56,7,-42);scene.add(glow);roomSign('BLUE ICE CAVE',-56,17,-25,12)}
+function iceBridge(z){const m=iceMat(0x79b4ce);box(20,1.2,7,0,.6,z,m,true,true);for(const side of [-1,1])for(let i=0;i<6;i++){const h=.2*(i+1);box(1,h,7,side*(15.5-i),h/2,z,m,true,true)}for(const side of [-1,1]){royalBox(30,.4,.45,0,2.9,z+side*3.3,iceMat(0x6a9ab5),.1,true);for(let x=-14;x<=14;x+=4)royalCylinder(.15,.23,2.2,x,1.8,z+side*3.3,m)}roomSign('ICE BRIDGE',0,5.4,z,8)}
+function frozenShip(){const wood=timberMat(),steel=royalMat(0x647b87,.6,{metalness:.45});box(28,1.6,36,53,.8,-44,wood,true,true);for(const x of [39,67])royalBox(.8,3.7,36,x,1.85,-44,royalMat(0x4d758d,.68,{map:polarTexture('wood')}),.15,true);royalBox(28,3.7,1,53,1.85,-62,steel,.15,true);for(const x of [44,62])royalBox(10,3.7,1,x,1.85,-26,steel,.15,true);for(let i=0;i<8;i++){const h=.2*(i+1);box(8,h,1,53,h/2,-18.5-i,iceMat(),true,true)}const bow=new THREE.Mesh(new THREE.ConeGeometry(14,7,3),wood);bow.rotation.x=Math.PI/2;bow.rotation.y=Math.PI;bow.scale.y=.35;bow.position.set(53,1,-65);scene.add(bow);for(const x of [47,59])royalBox(.7,7,10,x,5.1,-52,wood,.15,true);royalBox(12,7,.7,53,5.1,-57,wood,.15,true);for(const x of [48.5,57.5])royalBox(3,7,.7,x,5.1,-47,wood,.1,true);royalBox(6,3,.7,53,7.1,-47,wood,.1,true);royalBox(14,1,12,53,9.2,-52,snowMat(),.4,true);royalBox(3,2,.1,53,6.7,-46.6,royalMat(0x8cb7c7,.24,{emissive:0x4b849f,emissiveIntensity:.3}),.08);for(const z of [-40,-59]){royalCylinder(.30,.5,28,53,15.6,z,wood);colliders.push({minX:52.5,maxX:53.5,minY:1.6,maxY:30,minZ:z-.5,maxZ:z+.5});polarBeam({x:43,y:20,z},{x:63,y:20,z},.19,wood);const sail=royalBox(16,11,.08,53,18,z,snowMat(),.1);sail.rotation.y=.12;polarBeam({x:40,y:2,z:z+8},{x:53,y:27,z},.035,steel);polarBeam({x:66,y:2,z:z+8},{x:53,y:27,z},.035,steel)}for(let i=0;i<18;i++){const o=new THREE.Mesh(new THREE.ConeGeometry(.12,1.2+i%4*.3,8),iceMat());o.rotation.z=Math.PI;o.position.set(i%2?39:67,1.1,-59+Math.floor(i/2)*3.5);scene.add(o)}roomSign('FROZEN EXPLORER',53,13,-25,14)}
+function glacier(){const m=iceMat(0x5b9aba);for(const x of [42,64]){royalBox(4,13,7,x,6.5,38,m,.9,true);const rock=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),m);rock.scale.set(3.5,8,4.3);rock.position.set(x,7,38);scene.add(rock)}royalBox(24,4,7,53,14,38,iceMat(0x8ebacb),.8,true);for(const [x,z,s]of [[76,56,4],[25,31,3],[33,68,3],[-28,-59,4],[-80,0,3]]){const rock=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),m);rock.position.set(x,s*.7,z);rock.scale.set(s,s*1.1,s*.8);scene.add(rock);colliders.push({minX:x-s*.75,maxX:x+s*.75,minY:0,maxY:s*1.5,minZ:z-s*.65,maxZ:z+s*.65})}roomSign('GLACIER BAY',53,18,39,12)}
+function village(){const h={name:'Igloo Nelayan',x:-65,z:24,y:0};igloo(h);for(const [x,z]of [[-32,27],[-30,56]]){royalBox(5,2.4,4,x,1.2,z,timberMat(),.15,true);royalBox(5.2,.35,4.2,x,2.6,z,snowMat(),.15)}royalCylinder(.13,.2,10,-37,5,32,timberMat());royalBox(4,2.5,.08,-34.9,8.5,32,royalMat(0x9e655c,.9),.1);for(let i=0;i<5;i++)royalBox(2,.18,.65,-48+i*2.5,.12,38,royalMat(0x80969f,.8),.05);roomSign('SNOW VILLAGE',-52,10,48,13)}
+function forest(){royalEnv=makeRoyalEnvironment();for(const side of [-1,1]){box(79,1,156,side*48.5,-.5,0,snowMat(),true,true);royalBox(1.2,1.4,156,side*9.4,-.8,0,iceMat(0x5287a2),.2)}seaTexture=polarTexture('water');const water=box(18,.10,156,0,-.60,0,royalMat(0x245777,.22,{map:seaTexture,envMapIntensity:.65}));water.receiveShadow=false;for(const z of bridgeZ)iceBridge(z);iceCave();frozenShip();glacier();village();cabinDefinitions.forEach(igloo);for(let i=0;i<42;i++){const a=i/42*Math.PI*2,x=Math.cos(a)*100,z=Math.sin(a)*90,s=9+(i%7)*1.5;const mountain=new THREE.Mesh(new THREE.IcosahedronGeometry(1,1),i%3?iceMat(0x749bad):snowMat());mountain.scale.set(s,s*(1.4+i%3*.3),s*.8);mountain.position.set(x,s*.5-1,z);mountain.rotation.y=i*.8;scene.add(mountain)}forestSites.forEach((p,i)=>slots.push({...p,floor:0,room:p.name,site:i}));forestTreeCount=0;playerFish=fishModel(0x273941,scene,1,false,0);playerFish.visible=false;}
+function buildAtmosphere(){scene.add(camera);const p=new Float32Array(180*3);for(let i=0;i<p.length;i+=3){p[i]=-88+Math.random()*176;p[i+1]=2+Math.random()*38;p[i+2]=-78+Math.random()*156}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));snowPoints=new THREE.Points(g,new THREE.PointsMaterial({color:0xc5deed,size:.06,transparent:true,opacity:.3,depthWrite:false}));scene.add(snowPoints)}
+
+function batchCreatureParts(root){for(const child of [...root.children])if(child.isGroup)batchCreatureParts(child);const groups=new Map();for(const o of [...root.children]){if(!o.isMesh||o.isInstancedMesh||!o.geometry.parameters||Array.isArray(o.material))continue;const k=o.geometry.type+JSON.stringify(o.geometry.parameters)+'/'+(o.geometry.royalShape||'')+'/'+o.material.id;const a=groups.get(k)||[];a.push(o);groups.set(k,a)}for(const a of groups.values()){if(a.length<2)continue;const b=new THREE.InstancedMesh(a[0].geometry,a[0].material,a.length);a.forEach((o,i)=>{o.updateMatrix();b.setMatrixAt(i,o.matrix);root.remove(o)});b.castShadow=b.receiveShadow=true;b.frustumCulled=false;root.add(b)}}
+
+function updateItemFocus(){nearItem=null;let best=nearby?Math.hypot(player.x-nearby.slot.x,player.y+.65-nearby.slot.y,player.z-nearby.slot.z):2.4;for(const item of pickups){if(item.done)continue;const distance=Math.hypot(player.x-item.location.x,player.y+.65-item.location.y,player.z-item.location.z);if(distance<best&&!lineBlocked({x:player.x,y:player.y+.65,z:player.z},item.g.position)){best=distance;nearItem=item}}if(nearItem){$('prompt').classList.remove('hidden');$('prompt').textContent='E / Sentuh · Ambil '+nearItem.type.name}}
+function collectItem(item){if(!started||won||failed||active||item.done)return;if(Math.hypot(player.x-item.location.x,player.y+.65-item.location.y,player.z-item.location.z)>2.4||lineBlocked({x:player.x,y:player.y+.65,z:player.z},item.g.position))return;item.done=true;disposeGroup(item.g);foundItems++;nearItem=null;bling();hud();showToast('✓ '+item.type.name+' — '+item.type.meaning+' ('+foundItems+'/5)');checkVictory()}
+function makePickup(type,location,index){const g=new THREE.Group(),body=new THREE.Group();g.add(body);const m=royalMat(type.color,index===0?.18:.45,{metalness:index===0?0:.45});if(index===0){const crystal=new THREE.Mesh(new THREE.IcosahedronGeometry(.26,0),m);crystal.scale.y=1.6;body.add(crystal)}else if(index===1){royalRing(.23,.045,0,0,0,m,Math.PI*2,body);const needle=new THREE.Mesh(new THREE.ConeGeometry(.06,.35,3),royalMat(0x9a665f,.7));body.add(needle)}else if(index===2){royalRing(.08,.025,0,.25,0,m,Math.PI*2,body);royalBox(.06,.48,.06,0,0,0,m,.02,false,false,body);royalBox(.35,.05,.05,0,.07,0,m,.01,false,false,body);royalRing(.21,.035,0,-.02,0,m,Math.PI,body).rotation.z=Math.PI;for(const side of [-1,1]){const tip=new THREE.Mesh(new THREE.ConeGeometry(.06,.12,3),m);tip.position.set(side*.21,-.04,0);body.add(tip)}}else if(index===3){royalBox(.28,.38,.28,0,0,0,royalMat(0xd3b980,.4,{emissive:0x8d6329,emissiveIntensity:.45}),.04,false,false,body);for(const y of [-.20,.20])royalBox(.35,.06,.35,0,y,0,m,.02,false,false,body);royalRing(.11,.025,0,.34,0,m,Math.PI*2,body)}else{royalSphere(.25,.12,.10,0,0,0,m,body);const tail=new THREE.Mesh(new THREE.ConeGeometry(.13,.22,3),m);tail.rotation.z=-Math.PI/2;tail.position.x=-.29;body.add(tail);royalSphere(.03,.03,.015,.15,.02,.10,royalMat(0x263f4b,.5),body)}const tag=label(type.name,384,'#3e718b');tag.position.y=.75;tag.scale.set(1.9,.38,1);tag.visible=false;g.add(tag);g.position.set(location.x,location.y,location.z);scene.add(g);return{g,body,tag,type,location,index,done:false}}
+
+function animateItems(){for(const p of pickups)if(!p.done){p.body.position.y=Math.sin(elapsed*1.8+p.index)*.06;p.tag.visible=Math.hypot(player.x-p.location.x,player.y+.65-p.location.y,player.z-p.location.z)<5.5&&!lineBlocked({x:player.x,y:player.y+.65,z:player.z},p.g.position)}}
+function nearest(){nearby=null;let best=3.8;for(const n of npcs){if(n.done)continue;const d=Math.hypot(player.x-n.slot.x,player.y+.65-n.slot.y,player.z-n.slot.z);if(d<best&&!lineBlocked({x:player.x,y:player.y+.65,z:player.z},n.g.position)){nearby=n;best=d}}$('prompt').classList.toggle('hidden',!nearby);if(nearby)$('prompt').textContent='E / Sentuh · Temui '+nearby.name;updateItemFocus()}
+function moveAxis(dx,dz){const x=player.x+dx,z=player.z+dz;if(Math.abs(x)>87.3||Math.abs(z)>77.3)return;let y=player.y;
+ if(grounded){const support=supportAt(x,z,y+STEP+.005,y-.32);if(Number.isFinite(support)&&support<=y+STEP+.006){const candidate=Math.max(y,support);if(!blocked(x,z,candidate+.006))y=candidate}}
+ if(!blocked(x,z,y+.006)){player.x=x;player.z=z;player.y=y}
+}
+function physics(dt){const ox=player.x,oz=player.z;let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)+touchMove.forward,s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+touchMove.strafe,n=Math.hypot(f,s),running=keys.ShiftLeft||keys.ShiftRight||touchRun;
+ if(n){f/=n;s/=n;const speed=(running?7.8:4.5)*Math.min(1,n),dx=(s*Math.cos(yaw)-f*Math.sin(yaw))*speed*dt,dz=(-f*Math.cos(yaw)-s*Math.sin(yaw))*speed*dt,count=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.055));for(let i=0;i<count;i++){moveAxis(dx/count,0);moveAxis(0,dz/count)}}
+ const old=player.y;vy=Math.max(-24,vy-18*dt);let target=old+vy*dt;
+ if(vy>0){for(const c of colliders){if(overlaps(c,player.x,player.z)&&old+HEIGHT<=c.minY+.004&&target+HEIGHT>=c.minY){target=Math.min(target,c.minY-HEIGHT-.006);vy=0}}}
+ if(vy<=0){const support=supportAt(player.x,player.z,old+.025,target-.06);if(Number.isFinite(support)&&support<=old+.03&&support>=target-.06){target=support;vy=0;grounded=true}else grounded=false}else grounded=false;
+ player.y=target;if(inChocolate()){failMission('Air kutub terlalu dingin! Gunakan jembatan es untuk menyeberangi celah laut.');return}if(player.y< -8){player.set(-66,0,62);vy=0;grounded=true}
+ if(grounded&&Math.hypot(player.x-ox,player.z-oz)>.001){footClock+=dt;if(footClock>(running?.27:.4)){footstep();footClock=0}}else footClock=.2;
+
+}
+function cameraPointBlocked(p){return colliders.some(c=>p.x>c.minX-.18&&p.x<c.maxX+.18&&p.z>c.minZ-.18&&p.z<c.maxZ+.18&&p.y>c.minY-.18&&p.y<c.maxY+.18)}
+function updateOceanCamera(dt){
+ const focus={x:player.x,y:player.y+.65,z:player.z},dir={x:-Math.sin(yaw)*Math.cos(pitch),y:Math.sin(pitch),z:-Math.cos(yaw)*Math.cos(pitch)};
+ if(firstPerson){playerFish.visible=false;camera.position.set(focus.x,focus.y,focus.z);camera.rotation.set(pitch,yaw,0,'YXZ');return}
+ playerFish.visible=true;let distance=6;for(let t=.35;t<=6;t+=.25){const p={x:focus.x-dir.x*t,y:Math.max(.2,Math.min(48,focus.y-dir.y*t+1.4)),z:focus.z-dir.z*t};if(cameraPointBlocked(p)){distance=Math.max(.35,t-.3);break}}
+ const target=new THREE.Vector3(focus.x-dir.x*distance,Math.max(.2,Math.min(48,focus.y-dir.y*distance+1.4)),focus.z-dir.z*distance);camera.position.lerp(target,1-Math.exp(-dt*12));camera.lookAt(focus.x+dir.x*4,focus.y+dir.y*4,focus.z+dir.z*4);
+}
+function toggleFlash(){firstPerson=!firstPerson;$('flashButton').textContent='C · Kamera: '+(firstPerson?'Mata penguin':'Ikuti penguin')}
+function bindSwimmingControls(){$('flashButton').onclick=toggleFlash;$('touchRun').textContent='Lari';$('touchJump').textContent='↑ Lompat';$('touchFlash').textContent='◉ Kamera';$('touchJump').onclick=touchJump;$('touchFlash').onclick=toggleFlash;}
+function minimap(target=$('map'),large=false){const c=target.getContext('2d'),W=target.width,H=target.height,s=Math.min((W-25)/176,(H-25)/156),px=x=>W/2+x*s,pz=z=>H/2+z*s;c.fillStyle='#244b64';c.fillRect(0,0,W,H);c.fillStyle='#b7d0d9';c.fillRect(px(-88),pz(-78),176*s,156*s);c.fillStyle='#245a78';c.fillRect(px(-9),pz(-78),18*s,156*s);for(const z of bridgeZ){c.fillStyle='#7db1c9';c.fillRect(px(-16),pz(z-3.5),32*s,7*s)}for(const p of landmarks){c.fillStyle=p.n.includes('KAPAL')?'#7c8e97':'#90b5c5';c.fillRect(px(p.x-p.w/2),pz(p.z-p.d/2),p.w*s,p.d*s);if(large){c.fillStyle='#28526b';c.font='bold 14px sans-serif';c.textAlign='center';c.fillText(p.n,px(p.x),pz(p.z))}}for(const h of cabinDefinitions){c.fillStyle='#4b9b9a';c.beginPath();c.arc(px(h.x),pz(h.z),4*s,0,7);c.fill()}for(const n of npcs)if(!n.done&&(n.discovered||Math.hypot(n.slot.x-player.x,n.slot.z-player.z)<24)){c.fillStyle='#fff0ad';c.beginPath();c.arc(px(n.slot.x),pz(n.slot.z),large?6:3.5,0,7);c.fill()}for(const h of hunters)if(monsterDistance(h)<30){c.fillStyle='#af6f63';c.beginPath();c.arc(px(h.g.position.x),pz(h.g.position.z),large?7:4,0,7);c.fill()}c.save();c.translate(px(player.x),pz(player.z));c.rotate(-yaw);c.beginPath();c.moveTo(0,large?-10:-6);c.lineTo(large?-7:-4,large?7:4);c.lineTo(large?7:4,large?7:4);c.closePath();c.fillStyle='#ffeec2';c.fill();c.restore()}
+
+function openForestMap(){if(!started||ended()||active)return;mapWasPlaying=locked();clearKeys();stopTouchSession();if(document.pointerLockElement)releasePointer();$('forestMap').classList.remove('hidden');$('start').classList.add('hidden');minimap($('bigMap'),true)}
+function closeForestMap(){$('forestMap').classList.add('hidden');$('start').classList.add('hidden');if(mapWasPlaying)lock();else pause()}
+function updateSurvivalHUD(){const refuge=safeRoom(),d=monsterDistance(),grace=elapsed<graceUntil;$('safePanel').classList.toggle('safe',!!refuge||!!active||grace);$('safeTitle').textContent=won?'MISI KUTUB TUNTAS':failed?'AYO COBA LAGI':active?'KUIS · AMAN':refuge?'IGLOO SAFE · '+refuge.room:grace?'BERSIAP · '+Math.ceil(graceUntil-elapsed)+' DETIK':'JELAJAHI KUTUB';$('safeText').textContent=refuge?'Periksa semua anjing laut terdekat sebelum keluar dari tempat aman.':d<20?'Dekat: '+(closestGuardian()?.name||'anjing laut')+'. Cari IGLOO SAFE atau menjauhlah!':'Cari penguin dan benda ekspedisi di gua, desa, kapal, jembatan, dan gletser.';hunterThreat=Math.max(0,1-d/20);$('threatVignette').style.opacity=String(refuge||active||grace?0:hunterThreat*.16)}
+
+
+
+
+
+// PENGUIN_WORLD_END
+// FOREST_WORLD_END
+
+
+const names=['01 · Pip si Penguin','02 · Luna si Penguin','03 · Finn si Penguin','04 · Nori si Penguin','05 · Poppy si Penguin','06 · Kai si Penguin','07 · Skye si Penguin','08 · Miko si Penguin','09 · Lumi si Penguin'];
+function npcMake(slot,i,questions){const g=new THREE.Group();scene.add(g);const body=fishModel([0x8c8274,0x9b8b79,0x797b72,0x94816c,0xa1937d,0x817d74,0x8d8171,0xa19a87,0x726e66][i],g,.95,false,i);const tag=label(names[i],512,'#227d94');tag.position.y=1.45;tag.scale.set(3,.58,1);g.add(tag);g.position.set(slot.x,slot.y,slot.z);return{g,body,baseY:0,slot,name:names[i],tag,questions,index:0,done:false,discovered:false,seed:i*1.7}}
+
+function removeNPC(n){scene.remove(n.g);const gs=new Set(),ms=new Set(),ts=new Set();n.g.traverse(o=>{if(o.geometry&&!o.geometry.royalShared)gs.add(o.geometry);if(o.material&&!o.material.royalShared){ms.add(o.material);if(o.material.map)ts.add(o.material.map)}});gs.forEach(g=>g.dispose());ts.forEach(t=>t.dispose());ms.forEach(m=>m.dispose())}
+function populate(){npcs.forEach(n=>{if(!n.done)removeNPC(n)});let custom=shuffle(customBank),seen=new Set(custom.map(q=>q.q.toLowerCase().trim())),deck=shuffle(custom.concat(shuffle(bank.filter(q=>!seen.has(q.q.toLowerCase().trim())))).slice(0,63)).map(q=>{const options=shuffle([q.answer,...q.distractors]);return{...q,options,right:options.indexOf(q.answer)}});npcs=shuffle(slots).slice(0,9).map((s,i)=>npcMake(s,i,deck.slice(i*7,i*7+7)))}
+// PHYSICS_START
+function overlaps(c,x,z){return x+RADIUS>c.minX+.0001&&x-RADIUS<c.maxX-.0001&&z+RADIUS>c.minZ+.0001&&z-RADIUS<c.maxZ-.0001}
+function blocked(x,z,y){return colliders.some(c=>overlaps(c,x,z)&&y+HEIGHT>c.minY+.003&&y<c.maxY-.003)}
+// Lima ray di tapak pemain. Ray tepi mempertahankan pijakan yang baru dinaiki;
+// satu ray pusat saja akan menjatuhkan pemain kembali ke anak tangga sebelumnya.
+function supportAt(x,z,top,bottom){let best=-Infinity;const r=RADIUS+.012;for(const [dx,dz]of [[0,0],[r,0],[-r,0],[0,r],[0,-r]]){const base=floorAt(x+dx,z+dz);if(base<=top+.001&&base>=bottom-.001)best=Math.max(best,base);origin.set(x+dx,top,z+dz);ray.set(origin,down);ray.near=0;ray.far=Math.max(.001,top-bottom);for(const hit of ray.intersectObjects(walkables,false)){if(hit.face&&hit.face.normal.y>.5&&hit.point.y>best){best=hit.point.y;break}}}return best}
+function moveAxis(dx,dz){const x=player.x+dx,z=player.z+dz;if(Math.abs(x)>87.3||Math.abs(z)>77.3)return;let y=player.y;
+ if(grounded){const support=supportAt(x,z,y+STEP+.005,y-.32);if(Number.isFinite(support)&&support<=y+STEP+.006){const candidate=Math.max(y,support);if(!blocked(x,z,candidate+.006))y=candidate}}
+ if(!blocked(x,z,y+.006)){player.x=x;player.z=z;player.y=y}
+}
+
+// PHYSICS_END
+function lineBlocked(a,b){const d={x:b.x-a.x,y:b.y-a.y,z:b.z-a.z};return colliders.some(c=>{let lo=0,hi=1;for(const [axis,min,max]of [['x',c.minX,c.maxX],['y',c.minY,c.maxY],['z',c.minZ,c.maxZ]]){if(Math.abs(d[axis])<1e-7){if(a[axis]<min||a[axis]>max)return false}else{let t1=(min-a[axis])/d[axis],t2=(max-a[axis])/d[axis];if(t1>t2)[t1,t2]=[t2,t1];lo=Math.max(lo,t1);hi=Math.min(hi,t2);if(lo>hi)return false}}return hi>.01&&lo<.99})}
+
+// SHARED_TOUCH_START
+function ended(){return won||(typeof failed!=='undefined'&&failed)}
+function chooseInputMode(){
+ const choice=$('inputMode').value;
+ touchMode=choice==='touch'||(choice==='auto'&&(window.matchMedia('(pointer: coarse)').matches||((navigator.maxTouchPoints||0)>0&&!window.matchMedia('(any-pointer: fine)').matches)));
+ document.body.classList.toggle('touch-ui',touchMode);
+ try{localStorage.setItem('english-quest-input-mode',choice)}catch(e){}
+ clearTouchInput();refreshViewport();
+}
+function clearTouchInput(){touchUp=touchDown=false;upPointer=downPointer=null;
+ touchMove.forward=touchMove.strafe=0;touchRun=false;stickPointer=lookPointer=null;
+ if($('stickKnob'))$('stickKnob').style.transform='translate(-50%,-50%)';
+ if($('touchRun')){$('touchRun').classList.remove('pressed');$('touchRun').textContent='Cepat'}
+}
+function stopTouchSession(){touchSession=false;clearTouchInput();syncTouchUI()}
+function releasePointer(){
+ if(touchMode){stopTouchSession();if(started&&!active&&!ended())pause('Misi dijeda. Sentuh Lanjutkan Misi untuk bermain.');return}
+ if(document.pointerLockElement&&document.exitPointerLock)document.exitPointerLock();
+}
+function modalIsVisible(){return['start','quiz','teacher','win','fail','forestMap'].some(id=>$(id)&&!$(id).classList.contains('hidden'))}
+function portraitGate(){return touchMode&&touchSession&&started&&!ended()&&!active&&!portraitAllowed&&innerHeight>innerWidth&&!modalIsVisible()}
+function syncTouchUI(){
+ const blocked=portraitGate(),showControls=touchMode&&touchSession&&started&&!ended()&&!active&&!document.hidden&&!blocked&&!modalIsVisible();
+ $('rotateScreen').classList.toggle('hidden',!blocked);
+ $('mobileControls').classList.toggle('hidden',!showControls);
+ $('cross').classList.toggle('hidden',!locked()||!!active||ended()||modalIsVisible());
+ if(!showControls)clearTouchInput();
+ if(touchMode){
+  const item=typeof nearItem!=='undefined'&&nearItem;
+  $('touchInteract').disabled=!(item||nearby)||!showControls;
+  $('touchInteract').textContent=item?'✋ Ambil item':nearby?'☏ Bicara':'✋ Interaksi';
+ }
+}
+function refreshViewport(){
+ const w=Math.max(1,window.innerWidth),h=Math.max(1,Math.round(window.visualViewport&&window.visualViewport.height||window.innerHeight));
+ document.documentElement.style.setProperty('--game-height',h+'px');
+ if(renderer&&camera){renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,touchMode?1.25:1.7));renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();if(typeof applyRoyalQuality==='function')applyRoyalQuality()}
+ syncTouchUI();
+}
+async function requestMobileDisplay(){
+ let full=false;
+ try{
+  const root=document.documentElement;
+  if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+   const request=root.requestFullscreen||root.webkitRequestFullscreen;
+   if(request)await request.call(root);
+  }
+  full=!!(document.fullscreenElement||document.webkitFullscreenElement);
+ }catch(e){}
+ try{if(window.screen&&screen.orientation&&typeof screen.orientation.lock==='function')await screen.orientation.lock('landscape')}catch(e){}
+ // Browser yang menolak fullscreen/orientasi tetap bisa memainkan game.
+ refreshViewport();return full;
+}
+function resumeTouch(){
+ touchSession=true;clearTouchInput();$('start').classList.add('hidden');previous=performance.now();
+ syncTouchUI();void requestMobileDisplay();
+}
+function mobilePause(){
+ if(!started||ended()||active)return;
+ stopTouchSession();pause('Misi dijeda. Sentuh Lanjutkan Misi untuk kembali bermain.');
+}
+function touchInteraction(){
+ if(!touchMode||!locked()||active||ended())return;
+ if(typeof nearItem!=='undefined'&&nearItem){collectItem(nearItem);return}
+ if(nearby)openQuiz(nearby);
+ clearTouchInput();syncTouchUI();
+}
+function touchJump(){if(locked()&&!active&&!ended()&&grounded){vy=6.2;grounded=false}}
+function updateStick(e){
+ if(e.pointerId!==stickPointer)return;e.preventDefault();
+ const rect=$('moveStick').getBoundingClientRect(),radius=rect.width*.34;
+ const dx=e.clientX-(rect.left+rect.width/2),dy=e.clientY-(rect.top+rect.height/2),length=Math.hypot(dx,dy),clamp=length>radius?radius/length:1;
+ const x=dx*clamp,y=dy*clamp,magnitude=Math.min(1,length/radius),strength=Math.max(0,(magnitude-.12)/.88);
+ touchMove.strafe=length?dx/length*strength:0;touchMove.forward=length?-dy/length*strength:0;
+ $('stickKnob').style.transform='translate(calc(-50% + '+x+'px),calc(-50% + '+y+'px))';
+}
+function endStick(e){if(e.pointerId!==stickPointer)return;stickPointer=null;touchMove.forward=touchMove.strafe=0;$('stickKnob').style.transform='translate(-50%,-50%)'}
+function beginLook(e){
+ if(!touchMode||!locked()||active||ended()||e.clientX<innerWidth*.3||lookPointer!==null)return;
+ e.preventDefault();lookPointer=e.pointerId;lookX=e.clientX;lookY=e.clientY;
+ try{$('world').setPointerCapture(e.pointerId)}catch(err){}
+}
+function moveLook(e){
+ if(e.pointerId!==lookPointer||!locked()||active)return;e.preventDefault();
+ const sensitivity=Math.PI/Math.max(380,Math.min(innerWidth,innerHeight)*1.6);
+ yaw-=(e.clientX-lookX)*sensitivity;pitch=Math.max(-1.5,Math.min(1.5,pitch-(e.clientY-lookY)*sensitivity));lookX=e.clientX;lookY=e.clientY;
+}
+function endLook(e){if(e.pointerId===lookPointer)lookPointer=null}
+$('moveStick').addEventListener('pointerdown',e=>{
+ if(!locked()||active||ended()||stickPointer!==null)return;e.preventDefault();e.stopPropagation();stickPointer=e.pointerId;
+ try{$('moveStick').setPointerCapture(e.pointerId)}catch(err){}updateStick(e);
+});
+$('moveStick').addEventListener('pointermove',updateStick);
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('moveStick').addEventListener(t,endStick));
+$('world').addEventListener('pointerdown',beginLook);$('world').addEventListener('pointermove',moveLook);
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>$('world').addEventListener(t,endLook));
+$('mobileControls').addEventListener('pointerdown',e=>e.stopPropagation());
+$('mobileControls').addEventListener('contextmenu',e=>e.preventDefault());
+$('touchInteract').onclick=touchInteraction;$('touchJump').onclick=touchJump;
+$('touchRun').onclick=()=>{if(!locked())return;touchRun=!touchRun;$('touchRun').classList.toggle('pressed',touchRun);$('touchRun').textContent=touchRun?'Cepat ON':'Cepat'};
+$('touchFlash').onclick=()=>{if(typeof toggleFlash==='function')toggleFlash()};
+$('mobilePause').onclick=mobilePause;
+$('mobileFull').onclick=()=>void requestMobileDisplay();$('retryLandscape').onclick=()=>void requestMobileDisplay();
+$('playPortrait').onclick=()=>{portraitAllowed=true;refreshViewport()};
+$('mobileSound').onclick=()=>{$('sound').click();$('mobileSound').textContent=muted?'🔇':'🔊'};
+$('mobileTeacher').onclick=()=>{$('teacher').classList.remove('hidden');$('teacherStatus').textContent=customBank.length+' soal kustom aktif. Perubahan berlaku pada misi baru.'};
+$('inputMode').addEventListener('change',()=>{stopTouchSession();chooseInputMode()});
+window.addEventListener('resize',refreshViewport);
+window.addEventListener('orientationchange',()=>{clearKeys();clearTouchInput();refreshViewport()});
+document.addEventListener('fullscreenchange',()=>{refreshViewport()});
+window.addEventListener('blur',()=>{if(touchMode&&touchSession&&!active&&!ended())mobilePause();clearTouchInput()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearTouchInput();if(touchMode&&touchSession&&!active&&!ended())mobilePause()}});
+if(window.visualViewport)window.visualViewport.addEventListener('resize',refreshViewport);
+try{const saved=localStorage.getItem('english-quest-input-mode');if(['auto','touch','keyboard'].includes(saved))$('inputMode').value=saved}catch(e){}
+// SHARED_TOUCH_END
+
+function clearKeys(){Object.keys(keys).forEach(k=>delete keys[k]);clearTouchInput()}
+const locked=()=>touchMode?touchSession&&started&&!ended()&&!active&&!document.hidden&&!portraitGate()&&!modalIsVisible():document.pointerLockElement===$('world');
+function pause(message='Klik tombol untuk kembali menjelajah.'){if(active||won||failed)return;stopTouchSession();$('start').classList.remove('hidden');$('startButton').textContent=started?'Lanjutkan Misi':'Mulai Misi';$('status').textContent=message}
+function lock(){if(touchMode){resumeTouch();return}if(!$('world').requestPointerLock){pause('Mode mouse tidak tersedia. Pilih Joystick & layar sentuh pada Mode kontrol untuk bermain.');return}try{const p=$('world').requestPointerLock();if(p&&p.catch)p.catch(()=>pause('Klik tombol untuk mengaktifkan mouse.'))}catch(e){pause('Klik tombol untuk mencoba mengunci mouse lagi.')}}
+document.addEventListener('pointerlockchange',()=>{if(touchMode)return;$('cross').classList.toggle('hidden',!locked());if(locked()){$('start').classList.add('hidden');previous=performance.now()}else{clearKeys();$('prompt').classList.add('hidden');if(started&&!active&&!won)pause()}});
+document.addEventListener('pointerlockerror',()=>pause('Klik Lanjutkan Misi untuk mengaktifkan mouse.'));
+document.addEventListener('mousemove',e=>{if(touchMode||!locked()||active||won||failed)return;yaw-=e.movementX*.0022;pitch=Math.max(-1.5,Math.min(1.5,pitch-e.movementY*.0022))});
+document.addEventListener('keydown',e=>{if(e.target.matches('textarea,input'))return;if(started&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();keys[e.code]=true;if(e.repeat)return;if(e.code==='KeyC'&&locked()&&!active)toggleFlash();if(e.code==='Space'&&locked()&&!active&&grounded){vy=6.2;grounded=false};if(e.code==='KeyE'&&locked()&&!active&&!failed){if(nearItem)collectItem(nearItem);else if(nearby)openQuiz(nearby)}});
+document.addEventListener('keyup',e=>keys[e.code]=false);
+window.addEventListener('blur',()=>{clearKeys();cancelPress();if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.1);if(locked())releasePointer()});
+document.addEventListener('visibilitychange',()=>{previous=performance.now();if(document.hidden){if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.1);if(locked())releasePointer()}});
+function reset(){stopTouchSession();attemptToken++;clearTimeout(answerTimer);clearKeys();active=nearby=null;busy=false;elapsed=correct=wrong=finished=0;won=false;vy=0;grounded=true;yaw=0;pitch=0;flashOn=true;$('flashButton').textContent='C · Kamera: '+(firstPerson?'Mata penguin':'Ikuti penguin');player.set(-66,0,62);populate();resetSurvival();scene.updateMatrixWorld(true);updateOceanCamera(1);['quiz','win','prompt','toast','fail','forestMap'].forEach(id=>$(id).classList.add('hidden'));['hud','mapBox','bottom','missionTag','safePanel'].forEach(id=>$(id).classList.remove('hidden'));hud()}
+$('startButton').onclick=()=>{if(!ready)return;audioStart();if(!started){reset();started=true}$('start').classList.add('hidden');lock()};
+$('again').onclick=()=>{audioStart();reset();started=true;$('start').classList.add('hidden');lock()};
+function openQuiz(n){if(failed||won)return;n.discovered=true;active=n;busy=false;clearKeys();$('quiz').classList.remove('hidden');$('prompt').classList.add('hidden');if(locked())releasePointer();renderQuestion()}
+function renderQuestion(){if(!active)return;const q=active.questions[active.index];$('npcName').textContent=active.name+' · '+active.slot.room;$('questionNumber').textContent='Pertanyaan '+(active.index+1)+' dari 7';$('question').textContent=q.q;$('fill').style.width=active.index/7*100+'%';$('hint').textContent='💡 Hint: '+q.hint;$('meaning').textContent=q.meaning;$('meaning').classList.add('hidden');$('meaningButton').classList.toggle('hidden',!q.meaning);$('meaningButton').textContent='Tampilkan Arti';$('feedback').textContent='';$('answers').replaceChildren();$('leaveQuiz').disabled=false;busy=false;q.options.forEach((text,i)=>{const b=document.createElement('button');b.className='answer';const a=document.createElement('span');a.className='letter';a.textContent='ABCD'[i];const t=document.createElement('span');t.textContent=text;b.append(a,t);b.onclick=()=>answer(i);$('answers').appendChild(b)})}
+$('meaningButton').onclick=()=>{const h=$('meaning').classList.toggle('hidden');$('meaningButton').textContent=h?'Tampilkan Arti':'Sembunyikan Arti'};
+$('leaveQuiz').onclick=()=>{if(busy)return;graceUntil=elapsed+3;active=null;$('quiz').classList.add('hidden');lock()};
+function answer(i){if(!active||busy||failed||won)return;const epoch=attemptToken;busy=true;const n=active,q=n.questions[n.index],ok=i===q.right,buttons=[...$('answers').children];buttons.forEach(b=>b.disabled=true);buttons[q.right].classList.add('right');$('leaveQuiz').disabled=true;audioStart();if(ok){correct++;bling();$('feedback').style.color='#20795b';$('feedback').textContent='✓ Benar! Bagus sekali.'}else{wrong++;buzz();buttons[i].classList.add('wrong');$('feedback').style.color='#9a5927';$('feedback').textContent='✕ Jawaban benar: '+q.answer}n.index++;$('fill').style.width=n.index/7*100+'%';hud();answerTimer=setTimeout(()=>{if(epoch!==attemptToken||failed)return;busy=false;if(n.index<7)renderQuestion();else{n.done=true;removeNPC(n);finished++;graceUntil=elapsed+3;active=nearby=null;$('quiz').classList.add('hidden');hud();if(!checkVictory())pause('Kuis '+n.name+' selesai. Penguin berterima kasih! Temui penguin berikutnya dan cari benda ekspedisi.')}},ok?900:1800)}
+function victory(){if(failed||won||finished!==9||foundItems!==5)return;won=true;if(locked())releasePointer();$('start').classList.add('hidden');$('cross').classList.add('hidden');$('prompt').classList.add('hidden');$('finalScore').textContent=correct+'/63';$('finalWrong').textContent=wrong;$('finalTime').textContent=time(elapsed);$('win').classList.remove('hidden');bling()}
+function hud(){$('floorHUD').textContent=regionName();$('npcHUD').textContent=finished+'/9';$('itemHUD').textContent=foundItems+'/5';$('correctHUD').textContent=correct;$('wrongHUD').textContent=wrong;$('timeHUD').textContent=time(elapsed);$('mapFloor').textContent='UTARA ↑'}
+
+
+// REGION_GUARDS_START
+const guardRegions=[{"name":"Harbor · Gua Es","zone":"Gua Es Biru","points":[[-64,0,-48],[-48,0,-48],[-48,0,-34],[-64,0,-34]]},{"name":"Pebble · Dataran Barat","zone":"Dataran Barat","points":[[-76,0,-16],[-22,0,-16],[-22,0,8],[-76,0,8]]},{"name":"Frost · Desa Salju","zone":"Desa Salju","points":[[-78,0,16],[-22,0,16],[-22,0,73],[-78,0,73]]},{"name":"Silver · Kapal Utara","zone":"Kapal dan Teluk Utara","points":[[24,0,-76],[83,0,-76],[83,0,-12],[24,0,-12]]},{"name":"Captain · Dek Beku","zone":"Dek Kapal","points":[[43,0,-60.5],[63,0,-60.5],[63,0,-32],[43,0,-32]]},{"name":"Wave · Gletser","zone":"Teluk Gletser","points":[[20,0,24],[82,0,24],[82,0,73],[20,0,73]]},{"name":"Drift · Jembatan Utara","zone":"Jembatan Es","points":[[-21,0,-42],[21,0,-42]]},{"name":"Flint · Jembatan Tengah","zone":"Jembatan Es","points":[[-21,0,0],[21,0,0]]},{"name":"Misty · Jembatan Selatan","zone":"Jembatan Es","points":[[-21,0,42],[21,0,42]]}];
+function closestGuardian(){let closest=null,best=Infinity;for(const guard of hunters){const d=monsterDistance(guard);if(d<best){closest=guard;best=d}}return closest}
+function resetRegionalGuards(){
+ hunters.forEach((guard,i)=>{
+  const choices=guard.route.map((p,index)=>({p,index})).filter(({p})=>Math.hypot(p.x-player.x,p.z-player.z)>18);
+  const pick=shuffle(choices.length?choices:guard.route.map((p,index)=>({p,index})))[0];
+  const p=pick.p;guard.index=(pick.index+1)%guard.route.length;guard.g.position.set(p.x,supportAt(p.x,p.z,20,-5),p.z);guard.pathPosition.set(p.x,p.y,p.z);guard.g.visible=true;guard.footDistance=i*.08;guard.moved=0;guard.state='PATROL';
+ });
+ hunter=closestGuardian();
+}
+function updatePatrol(dt){
+ if(failed||won||!started||document.hidden||(!locked()&&!active))return;
+ // Each guardian updates only its own route; capture by any guardian fails the run.
+ for(const guard of hunters){hunter=guard;updateOnePatrol(dt);if(failed||won)return}
+ hunter=closestGuardian();
+}
+// REGION_GUARDS_END
+
+// SURVIVAL_START
+
+function disposeGroup(group){
+ scene.remove(group);const geometries=new Set(),materials=new Set(),textures=new Set();group.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material){materials.add(o.material);if(o.material.map)textures.add(o.material.map)}});geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());materials.forEach(m=>m.dispose());
+}
+function makeHunter(index=0){const g=new THREE.Group();scene.add(g);const body=fishModel([0x6f858e,0x7f8f92,0x657e89,0x91a0a3,0x748892,0x82959a,0x617b86,0x8a999c,0x6b828c][index%9],g,1,true,index);return{g,body,arms:[],pathPosition:new THREE.Vector3(),index:0,footDistance:0,moved:0,state:'PATROL'}}
+function buildSurvival(){patrolRoute=buildPatrolRoute();itemCandidates=buildItemCandidates();guardRegions.forEach((region,i)=>{const guard=makeHunter(i);guard.id=i;guard.name=region.name;guard.zone=region.zone;guard.route=region.points.map(([x,y,z])=>({x,y,z}));hunters.push(guard)});hunter=hunters[0]}
+function resetSurvival(){
+ failed=false;foundItems=0;nearItem=null;hunterThreat=0;graceUntil=elapsed+8;
+ for(const p of pickups)if(!p.done)disposeGroup(p.g);
+ const locations=chooseItemLocations();pickups=itemTypes.map((type,i)=>makePickup(type,locations[i],i));
+ resetRegionalGuards();
+ $('threatVignette').style.opacity='0';
+}
+
+function checkVictory(){if(!failed&&!won&&finished===9&&foundItems===5){victory();return true}return false}
+
+function monsterDistance(guard=null){const d=g=>Math.hypot(g.g.position.x-player.x,g.g.position.z-player.z);return guard?d(guard):Math.min(...hunters.map(d))}
+function hunterSeesPlayer(){return!!hunter&&!safeRoom()&&!active&&monsterDistance(hunter)<23&&!lineBlocked({x:hunter.g.position.x,y:hunter.g.position.y+1.1,z:hunter.g.position.z},{x:player.x,y:player.y+.65,z:player.z})}
+function heavyStep(){if(audio&&!muted&&monsterDistance(hunter)<20)tone(650,audio.currentTime,.12,'sine',.022*(1-monsterDistance(hunter)/20))}
+function canCapture(){return!!hunter&&!safeRoom()&&!ended()&&!active&&elapsed>=graceUntil&&Math.abs(player.y-hunter.g.position.y)<3.4&&monsterDistance(hunter)<2.6&&!lineBlocked({x:hunter.g.position.x,y:hunter.g.position.y+1.1,z:hunter.g.position.z},{x:player.x,y:player.y+.65,z:player.z})}
+
+function updateOnePatrol(dt){
+ if(!hunter||failed||won||!started||document.hidden||(!locked()&&!active))return;
+ hunter.state=hunterSeesPlayer()?'ALERT':'PATROL';
+ let travel=(hunter.state==='ALERT'?7.4:4.8)*dt;
+ while(travel>1e-7){const target=hunter.route[hunter.index],pos=hunter.pathPosition,dx=target.x-pos.x,dy=target.y-pos.y,dz=target.z-pos.z,d=Math.hypot(dx,dy,dz);if(d<.025){pos.set(target.x,target.y,target.z);hunter.index=(hunter.index+1)%hunter.route.length;continue}
+  const step=Math.min(travel,d,.15);const x=pos.x+dx/d*step,z=pos.z+dz/d*step,y=pos.y+dy/d*step;
+  // Rute menaiki tangga nyata; ray lantai merapatkan kaki ke injakan.
+  // Posisi vertikal rute disimpan terpisah agar snapping tidak menahan rute.
+  pos.set(x,y,z);const fy=supportAt(x,z,20,-5);hunter.g.position.set(x,Number.isFinite(fy)?fy:floorAt(x,z),z);if(Math.hypot(dx,dz)>.001)hunter.g.rotation.y=Math.atan2(dx,dz);
+  travel-=step;hunter.footDistance+=step;hunter.moved+=step;
+  if(canCapture()){failMission();return}
+ }
+ hunter.body.position.y=Math.sin(hunter.moved*2)*.06;hunter.body.rotation.z=Math.sin(hunter.moved*1.7)*.025;hunter.body.userData.tail.rotation.y=Math.sin(hunter.moved*2)*.18;animateWings(hunter.body,elapsed+hunter.id,2.2);
+ hunter.arms.forEach((a,i)=>a.rotation.x=Math.sin(hunter.moved*3.5+i*Math.PI)*.12);
+ if(hunter.footDistance>.95){hunter.footDistance%=.95;heavyStep()}
+ if(canCapture())failMission();
+}
+function failMission(reason){
+ if(failed||won)return;const summary='Sebelum tertangkap: '+finished+'/9 penguin, '+foundItems+'/5 item, waktu '+time(elapsed)+'.';
+ clearTimeout(answerTimer);reset();failed=true;active=nearby=null;nearItem=null;clearKeys();
+ hideSurvivalPrompt();$('start').classList.add('hidden');$('failReason').textContent=(reason?reason+' ':'')+summary;$('fail').classList.remove('hidden');
+ if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(0,audio.currentTime,.12);
+ if(locked())releasePointer();hud();buzz();
+}
+function hideSurvivalPrompt(){$('cross').classList.add('hidden');$('prompt').classList.add('hidden')}
+$('retry').onclick=()=>{audioStart();reset();started=true;$('start').classList.add('hidden');lock()};
+// SURVIVAL_END
+
+
+
+function mood(now){const live=started&&!ended()&&!document.hidden&&(locked()||active);for(const n of npcs)if(!n.done){n.body.position.y=Math.sin(elapsed+n.seed)*.02;animateWings(n.body,elapsed+n.seed,2);n.tag.position.y=1.45+Math.sin(elapsed+n.seed)*.02;if(Math.hypot(n.slot.x-player.x,n.slot.z-player.z)<10)n.g.rotation.y=Math.atan2(player.x-n.slot.x,player.z-n.slot.z)}if(snowPoints){snowPoints.position.y=-(elapsed*.48%7);snowPoints.position.x=Math.sin(elapsed*.1)*2}if(seaTexture?.offset)seaTexture.offset.y=elapsed*.025%1;if(ambienceGain&&audio)ambienceGain.gain.setTargetAtTime(live?.12:0,audio.currentTime,.3);$('missionTag').textContent='PENGUIN SNOW / PENGUIN '+finished+'/9 · ITEM '+foundItems+'/5'}
+
+function setup(){
+ renderer=new THREE.WebGLRenderer({canvas:$('world'),antialias:true,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,touchMode?1.25:1.7));renderer.setSize(innerWidth,innerHeight);renderer.outputEncoding=THREE.sRGBEncoding;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.90;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x8ab4d0);scene.fog=new THREE.FogExp2(0x9ebdce,.0025);
+ camera=new THREE.PerspectiveCamera(73,innerWidth/innerHeight,.07,420);camera.rotation.order='YXZ';
+ scene.add(new THREE.HemisphereLight(0xa2c5e0,0x3c6378,.80));
+ const moon=new THREE.DirectionalLight(0xf6e5c7,1.05);moon.position.set(-55,50,65);moon.castShadow=true;moon.shadow.mapSize.set(2048,2048);moon.shadow.camera.left=-105;moon.shadow.camera.right=105;moon.shadow.camera.top=100;moon.shadow.camera.bottom=-100;moon.shadow.camera.near=1;moon.shadow.camera.far=230;moon.shadow.bias=-.0003;moon.shadow.normalBias=.035;scene.add(moon);const hallLight=new THREE.PointLight(0xa2c5df,.20,100,2);hallLight.position.set(-42,23,28);scene.add(hallLight);const throneLight=new THREE.PointLight(0xa2c5df,.15,100,2);throneLight.position.set(44,24,-28);scene.add(throneLight);
+ tileTex=texture('tile');wallMat=mat(0xabb4a2,{map:texture('wall')});woodMat=mat(0x8b8676,{map:texture('wood')});metalMat=mat(0x455b59);glassMat=mat(0x638c96,{transparent:true,opacity:.28,depthWrite:false,roughness:.6});stairMat=mat(0x92917a);
+ forest();buildAtmosphere();batchRoyalArchitecture();buildSurvival();scene.updateMatrixWorld(true);applyRoyalQuality();ready=true;$('status').textContent='Siap! Mulai berjalan dari Igloo Awal yang aman.';requestAnimationFrame(animate);
+}
+
+
+
+
+function batchRoyalArchitecture(){const groups=new Map();for(const o of [...scene.children]){if(!o.isMesh||o.isInstancedMesh||walkables.includes(o)||Array.isArray(o.material)||!o.geometry.parameters)continue;const key=o.geometry.type+JSON.stringify(o.geometry.parameters)+'-'+(o.geometry.royalShape||'')+'-'+o.material.id;const list=groups.get(key)||[];list.push(o);groups.set(key,list)}for(const list of groups.values()){if(list.length<4)continue;const first=list[0],batch=new THREE.InstancedMesh(first.geometry,first.material,list.length);list.forEach((o,i)=>{o.updateMatrix();batch.setMatrixAt(i,o.matrix);scene.remove(o)});batch.castShadow=list.some(o=>o.castShadow);batch.receiveShadow=true;batch.frustumCulled=false;scene.add(batch)}}
+function applyRoyalQuality(){if(!renderer)return;const mode=$('royalQuality').value||'auto',hd=mode==='hd'||mode==='auto'&&!touchMode;renderer.setPixelRatio(Math.min(devicePixelRatio||1,hd?2:1.1));renderer.shadowMap.enabled=hd;renderer.shadowMap.needsUpdate=true;if(renderer.toneMappingExposure!==undefined)renderer.toneMappingExposure=.90;const sun=scene?.children.find(o=>o.isDirectionalLight);if(sun){sun.castShadow=hd;sun.shadow.mapSize.set(hd?2048:1024,hd?2048:1024);sun.shadow.needsUpdate=true}}
+$('royalQuality').addEventListener('change',applyRoyalQuality);
+
+function animate(now){requestAnimationFrame(animate);const real=Math.max(0,(now-previous)/1000),dt=Math.min(real,.05);previous=now;const live=started&&!won&&!failed&&!document.hidden&&(locked()||active);if(live){elapsed+=Math.min(real,.25);if(locked()&&!active)physics(dt);updatePatrol(dt);if(!failed&&!active&&locked())nearest()}if(started){playerFish.position.set(player.x,player.y+.65,player.z);playerFish.rotation.y=yaw+Math.PI;playerFish.rotation.x=0;playerFish.userData.tail.rotation.y=Math.sin(swimClock*4)*.14;animateWings(playerFish,elapsed,(keys.KeyW||keys.KeyA||keys.KeyS||keys.KeyD||keys.ArrowUp||keys.ArrowDown||keys.ArrowLeft||keys.ArrowRight||Math.hypot(touchMove.forward,touchMove.strafe)>.1)?9:0);updateOceanCamera(dt);hud();minimap();updateSurvivalHUD();animateItems()}else{playerFish.visible=false;camera.position.set(-62,8,74);camera.lookAt(-6,10,-12)}if(!$('forestMap').classList.contains('hidden'))minimap($('bigMap'),true);mood(now);syncTouchUI();renderer.render(scene,camera)}
+
+$('worldMapButton').onclick=openForestMap;$('closeForestMap').onclick=closeForestMap;document.addEventListener('keydown',e=>{if(e.target.matches('textarea,input,select'))return;if(e.code==='KeyM'&&!e.repeat&&started&&!active&&!ended()){e.preventDefault();if($('forestMap').classList.contains('hidden'))openForestMap();else closeForestMap()}});bindSwimmingControls();chooseInputMode();try{setup()}catch(e){console.error(e);$('status').textContent='WebGL gagal diaktifkan. Coba browser dengan dukungan WebGL. '+e.message}
+})();
+</script>
+</body>
+</html>

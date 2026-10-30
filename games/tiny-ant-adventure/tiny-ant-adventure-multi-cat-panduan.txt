@@ -1,0 +1,66 @@
+ENGLISH QUEST: TINY ANT ADVENTURE
+
+Buka tiny-ant-adventure-multi-cat.html lalu klik Mulai Misi. Tidak perlu server lokal.
+Internet diperlukan untuk memuat Three.js r128 dari CDN. Satu HTML ini
+juga dapat diunggah ke hosting web tanpa gambar atau audio terpisah.
+
+Jadilah semut di kamar berantakan seluas 176 x 156 unit ukuran semut.
+Kasur, meja, kursi, lemari, buku, pensil, sepatu, bola, balok huruf,
+kain, dan kertas terlihat raksasa dari sudut pandang pemain.
+
+MISI
+Temui 9 teman semut yang ditempatkan acak dari 30 lokasi potensial.
+Setiap semut memberikan 7 soal bahasa Inggris, total 63 pertanyaan.
+Kumpulkan juga 5 item: kristal gula, remah biskuit, biji emas, kancing,
+dan bintang kertas. Lokasinya diacak pada lima habitat: kotak aman,
+kolong kasur, bawah meja, atas buku, dan sela mainan.
+Semua kuis dan kelima item harus selesai untuk menang.
+
+KUCING PATROLI
+Sembilan kucing raksasa berpatroli bersamaan pada rute masing-masing.
+Milo: kolong kasur; Mochi: barat; Luna: sisi kasur; Leo: lemari;
+Cleo: meja; Oyen: tengah; Momo: mainan timur; Nala: buku; Simba: selatan.
+Kucing mempercepat langkah ketika mendeteksi pemain yang dekat.
+Masuk sepenuhnya ke salah satu dari enam kotak bertanda ANT SAFE
+untuk berlindung. Pemain juga terlindungi selama mengerjakan kuis.
+Sesudah kuis ada waktu aman 3 detik. Tersentuh kucing mengulang progres
+misi, skor, dan waktu. Soal kustom pengajar tetap tersimpan.
+
+KONTROL LAPTOP
+WASD / Panah: berjalan. Mouse: melihat. Shift: lari.
+Space: lompat. E: temui semut / ambil item yang dekat.
+C / Kamera: pandangan mata semut atau kamera mengikuti semut.
+M / Peta Kamar: peta besar, menjeda permainan dan kucing.
+Esc: jeda. Klik tombol Lanjut untuk mengaktifkan mouse kembali.
+Naiki undakan kecil di sisi barat buku untuk mencapai sampulnya.
+Gravitasi dan undakan menggunakan pijakan fisik, tanpa teleport.
+
+KONTROL HP
+Joystick kiri: berjalan. Geser area layar di luar tombol: melihat.
+Gunakan tombol Lompat, Lari, Kamera, dan Interaksi.
+Mode kontrol otomatis dapat diganti manual pada layar awal.
+Game mencoba layar penuh dan landscape setelah sentuhan pengguna.
+Jika browser tidak mengizinkan rotasi, putar HP manual atau pilih
+Tetap main dalam portrait. Dukungan layar penuh berbeda antarbrowser.
+
+TEACHER MODE
+Klik Teacher Mode di layar awal atau tahan judul selama 3 detik.
+Satu soal per baris, tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does ant mean? | Semut | Kucing | Buku | Sepatu
+A cat can ____. | jump | fly | read | write
+Where do you sleep? | Bed | Desk | Shoe | Pencil
+
+Simpan soal, lalu mulai misi baru. Posisi jawaban benar diacak.
+Pertanyaan duplikat, kolom kosong, dan pilihan yang sama ditolak
+dengan nomor baris. Soal kustom diprioritaskan; jika kurang dari 63,
+bank 100 soal bawaan melengkapi. Jika lebih, dipilih 63 secara acak.
+Penyimpanan memakai localStorage browser/perangkat, bukan server.
+
+PENGUJIAN
+Lolos simulasi lokasi semut/item, pijakan lantai, gravitasi/lompat,
+undakan buku, rute kucing, kotak aman, reset, kontrol sentuh, peta,
+impor soal, serta kemenangan. Tampilan WebGL langsung dan pengalaman
+di HP fisik belum diverifikasi.

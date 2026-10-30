@@ -1,0 +1,44 @@
+TOY ROOM ADVENTURE — ENGLISH QUEST
+
+CARA MEMBUKA
+Ekstrak ZIP, lalu klik dua kali toy-room-adventure.html. Pilih kualitas gambar dan klik Mulai Misi. Tidak perlu local server. Internet diperlukan untuk memuat Three.js r128 dari CDN; seluruh model, tekstur, dan audio dibuat di dalam game.
+Untuk dimainkan melalui HP, unggah HTML ke hosting HTTPS dan buka tautannya di browser HP.
+
+MISI
+Jadilah robot mainan mungil dalam kamar besar. Kota balok, lintasan mobil oval, kastel mainan, tempat tidur, meja belajar, buku, dan kotak mainan menjadi wilayah eksplorasi.
+Temukan 9 robot di 9 lokasi berbeda dari 30 kemungkinan lokasi. Setiap robot memberikan 7 pertanyaan, total 63 pertanyaan unik per misi. Kumpulkan juga 5 suku cadang tersembunyi yang diacak di lima wilayah; salah satunya selalu berada dalam kastel. Menang setelah kedua misi selesai.
+Ada 9 dinosaurus mainan dengan rute patroli berbeda, termasuk dua rute melingkar di area sirkuit. Tertangkap mengulang seluruh misi. Soal kustom tetap tersimpan. Mobil kecil di sirkuit adalah dekorasi bergerak.
+TOY SAFE adalah tempat perlindungan. Pemain terlindung selama mengerjakan kuis, saat jeda, serta saat membuka peta. Ada masa persiapan awal dan jeda singkat setelah kuis.
+
+KONTROL LAPTOP
+WASD / panah: berjalan
+Mouse: melihat sekeliling setelah Mulai Misi
+Shift: bergerak cepat
+Space: lompat
+E: bicara dengan robot / mengambil item dekat
+C: ganti kamera orang ketiga / orang pertama
+M: peta besar
+Esc: jeda
+
+KONTROL HP
+Joystick kiri untuk berjalan; geser bagian layar lainnya untuk melihat. Gunakan tombol Interaksi, Lompat, Cepat, Kamera, Peta, Jeda, dan Suara.
+Game mencoba layar penuh serta landscape setelah sentuhan pengguna. Dukungan berbeda menurut browser; jika ditolak, putar HP secara manual dengan rotasi otomatis aktif. Mode portrait tetap tersedia.
+Pilih Ringan jika perangkat terasa lambat; pilihan HD menambah resolusi render dan bayangan. Kemampuan grafis tetap bergantung pada perangkat.
+
+TEACHER MODE
+Klik Teacher Mode di layar awal, atau tahan judul selama 3 detik.
+Masukkan satu pertanyaan per baris, tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does toy mean? | Mainan | Buku | Bola | Kunci
+The car is ____ the desk. (di bawah) | under | on | behind | between
+Two plus three equals ____. | five | four | six | seven
+
+Klik Simpan Semua Soal. Baris tidak valid dan pertanyaan duplikat akan dilaporkan. Empat pilihan harus berbeda. Posisi jawaban benar diacak saat misi disusun.
+Soal kustom diprioritaskan. Jika kurang dari 63, bank bawaan melengkapi; jika lebih banyak, dipilih 63 secara acak. Bank bawaan berisi 100 pertanyaan kosakata mainan, benda kamar, warna, bentuk, jumlah, posisi, dan kalimat sederhana.
+Perubahan berlaku pada misi baru. Penyimpanan memakai localStorage pada browser/perangkat yang sama; memindah alamat web atau menghapus data browser dapat menghilangkan soal tersimpan.
+
+CATATAN PEMERIKSAAN
+Logika diuji dengan simulasi JavaScript/DOM/Three.js: lokasi robot dan item, tangga kastel dua arah, sembilan rute patroli, perlindungan dan tangkapan, kontrol sentuh, jeda peta, kuis hingga kemenangan, penghapusan NPC, penyimpanan soal kustom, dan pilihan HD/Ringan.
+Tampilan WebGL serta performa belum diuji langsung melalui browser nyata atau HP fisik. Model dan bahan merupakan 3D prosedural, bukan aset hasil pemindaian foto.

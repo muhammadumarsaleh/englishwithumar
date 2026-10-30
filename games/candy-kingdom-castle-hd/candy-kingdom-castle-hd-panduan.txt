@@ -1,0 +1,78 @@
+CANDY KINGDOM QUEST: ROYAL CASTLE HD
+
+Buka candy-kingdom-castle-hd.html lalu klik Mulai Misi.
+Tidak perlu server lokal. Internet diperlukan untuk Three.js r128 CDN.
+Seluruh model, tekstur, UI dan suara berada dalam satu HTML.
+
+VERSI ISTANA
+Peta dibangun ulang sebagai kompleks istana, dengan alun-alun patisserie,
+parit cokelat melintang di depan istana, tiga gerbang wafer, tembok royal,
+empat menara es krim, halaman air mancur, Grand Hall, tangga singgasana,
+empat ruang sayap, kebun macaron dan lolipop, paviliun, serta pasar gelato.
+Bangunan utama dan ruang-ruangnya benar-benar bisa dimasuki.
+
+VISUAL
+Model 3D memakai tepi membulat dan permukaan yang diberi pantulan.
+Tekstur prosedural 1024 px untuk wafer, cokelat, icing dan lantai.
+Ada tetesan krim, permen berkilau, tiang bergaris, gapura melengkung,
+lampu gantung, ornamen emas, serta golem ganache dengan lempeng cokelat.
+Pencahayaan arah dengan bayangan lembut, cahaya aula, dan lingkungan
+pantulan digunakan untuk memperjelas bahan dan kedalaman objek.
+Objek statis yang serupa digabung melalui instancing untuk mengurangi
+beban render. Geometri/bahan bersama tetap disimpan ketika NPC selesai.
+
+KUALITAS GAMBAR
+Pada layar awal pilih Kualitas gambar:
+- Otomatis: HD di komputer, mode ringan di perangkat sentuh.
+- HD: bayangan aktif dan resolusi render hingga rasio piksel 2.
+- Ringan: tanpa bayangan dinamis, rasio piksel maksimal 1.1.
+Ketajaman tetap mengikuti ukuran layar dan rasio piksel perangkat.
+Gunakan Ringan bila perangkat terasa lambat. Pilihan tidak mengubah soal.
+
+MISI
+Cari 9 karakter permen dari 30 lokasi. Jawab 7 soal per karakter (63 total).
+Temukan 5 item tersembunyi: Golden Candy, Cupcake Coin, Wafer Key,
+Sugar Crystal, Rainbow Gem. Lokasi diacak pada lima habitat berbeda.
+Menang memerlukan seluruh kuis dan kelima item selesai.
+Bank 120 soal bawaan berisi makanan, bentuk, warna, jumlah, penjumlahan,
+dan kalimat sederhana. Dalam satu percobaan tidak ada soal berulang.
+
+PENJAGA DAN TEMPAT AMAN
+Sembilan golem cokelat memiliki jalur independen: dua alun-alun,
+tiga jembatan gerbang, halaman royal, Grand Hall, dan dua kebun.
+Enam SWEET SAFE berada di Paviliun Kerajaan, Salon Stroberi,
+Ruang Mint, Perpustakaan Wafer, Ruang Blueberry, dan Rumah Macaron.
+Masuk sepenuhnya ke ruang aman agar terlindungi. Selama kuis aman,
+dan setelah kuis ada waktu aman 3 detik. Golem tetap berpatroli bersama.
+Tersentuh golem atau tercebur parit cokelat mengulang progres misi.
+Soal kustom pengajar tetap tersimpan.
+
+KONTROL
+Komputer: WASD/Panah berjalan, mouse melihat, Shift lari, Space lompat,
+E interaksi/ambil, C kamera, M peta, Esc jeda.
+HP: joystick kiri, geser untuk melihat, tombol Lompat, Lari, Kamera,
+dan Interaksi. Mode kontrol dapat dipilih manual pada layar awal.
+Landscape/layar penuh dicoba setelah sentuhan pengguna. Bila ditolak
+browser, putar perangkat manual atau pilih Tetap main dalam portrait.
+
+TEACHER MODE
+Klik Teacher Mode atau tahan judul 3 detik. Satu soal per baris:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does cake mean? | Kue | Susu | Apel | Roti
+How many sides does a triangle have? | Three | Two | Four | Five
+
+Simpan, lalu mulai misi baru. Posisi jawaban benar diacak.
+Duplikat, kolom kosong dan pilihan sama ditolak dengan nomor baris.
+Soal kustom diprioritaskan; bank bawaan melengkapi bila kurang dari 63.
+Data disimpan di localStorage. Kunci penyimpanan sama dengan versi
+Candy Kingdom sebelumnya, sehingga soal yang telah tersimpan pada
+origin browser yang sama dapat dipakai kembali.
+
+VERIFIKASI
+Lolos pengujian simulasi lokasi karakter/item, konektivitas gerbang,
+halaman, aula, empat ruang sayap dan kebun; tangga singgasana; tiga
+jembatan dua arah; sembilan patroli; sungai/reset; kontrol HP; peta;
+impor soal; penghapusan NPC; kemenangan; dan pilihan kualitas.
+Tampilan WebGL langsung serta performa pada perangkat fisik belum diuji.

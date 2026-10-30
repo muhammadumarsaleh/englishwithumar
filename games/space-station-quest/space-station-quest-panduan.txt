@@ -1,0 +1,78 @@
+ENGLISH QUEST: SPACE STATION QUEST
+
+MULAI
+Buka space-station-quest.html lalu klik Mulai Misi. Tidak perlu server lokal.
+Internet diperlukan untuk memuat Three.js r128 melalui script CDN biasa.
+Satu file HTML juga dapat diunggah ke hosting tanpa gambar/audio terpisah.
+
+MISI
+Jadilah astronaut di stasiun seluas 176 x 156 unit. Melayang bebas dalam
+gravitasi nol, termasuk naik/turun dan bergerak mengikuti arah pandang.
+Cari 9 robot pemberi kuis dari 30 lokasi acak, lalu jawab 7 pertanyaan
+masing-masing (63 soal). Temukan juga 5 komponen tersembunyi:
+Power Cell, Data Chip, Oxygen Capsule, Cosmic Crystal, Solar Fragment.
+Kelima lokasi dipilih acak dari lima kelompok habitat. Misi selesai
+hanya jika semua kuis dan kelima komponen sudah dituntaskan.
+
+DELAPAN MODUL
+Science Lab / laboratorium, Command / komando, Engine Room / mesin,
+Greenhouse / rumah kaca, Cargo Bay / kargo, Observatory / observatorium,
+Crew Quarters / ruang kru, Communications / komunikasi.
+Setiap modul memiliki pintu fisik pada empat sisi yang terhubung koridor.
+Jendela luar menampilkan Bumi, Bulan, dan bintang-bintang prosedural.
+
+SEMBILAN DRONE KEAMANAN
+Atlas, Nova, Orion, Flora, Titan, Luna, Comet, Vega, dan Apollo mengikuti
+rute independen, dengan ketinggian yang berubah. Semua berpatroli bersamaan.
+Hindari drone dengan mengubah arah/ketinggian atau masuk sepenuhnya ke
+enam SAFE POD: Aurora, Polaris, Orbit, Nova, Vega, Comet.
+Selama kuis pemain dilindungi, dan setelah kuis ada waktu aman 3 detik.
+Tersentuh drone mengulang progres, skor, dan waktu. Soal kustom tetap ada.
+
+KONTROL LAPTOP
+WASD / Panah: melayang. Mouse: melihat; gerak maju mengikuti arah pandang.
+Space atau R: naik. Q: turun. Shift: dorongan cepat.
+E: temui robot / ambil komponen ketika dekat.
+C / Kamera: pandangan helm astronaut atau kamera mengikuti astronaut.
+M / Peta Stasiun: peta besar yang menjeda gerakan dan semua drone.
+Esc: jeda. Klik Lanjut untuk mengaktifkan mouse kembali.
+
+KONTROL HP
+Joystick kiri: bergerak. Geser area layar di luar tombol: melihat.
+Tahan Naik / Turun: mengubah ketinggian. Cepat: kecepatan tambahan.
+Interaksi: bicara / ambil komponen ketika dekat.
+Mode otomatis dapat diganti manual pada layar awal.
+Layar penuh dan landscape dicoba setelah sentuhan pengguna. Jika browser
+menolak rotasi, putar HP manual atau pilih Tetap main dalam portrait.
+Dukungan layar penuh berbeda antarbrowser.
+
+PETA
+Biru: modul stasiun. Hijau: safe pod. Kuning: robot dekat/ditemukan.
+Jingga: drone dekat. Segitiga putih: astronaut. Peta besar menampilkan
+nama modul serta informasi ketinggian robot yang terdeteksi.
+Komponen tetap harus dicari melalui penjelajahan. Ada batas gerak
+vertikal dan dinding luar fisik agar astronaut tetap di stasiun.
+
+TEACHER MODE / BULK SOAL
+Klik Teacher Mode pada layar awal atau tahan judul selama 3 detik.
+Satu soal per baris, tepat lima kolom:
+pertanyaan | pilihan benar | pilihan salah | pilihan salah | pilihan salah
+
+Contoh:
+What does rocket mean? | Roket | Planet | Bintang | Bulan
+An astronaut can ____. | float | swim | drive | run
+What does moon mean? | Bulan | Bumi | Matahari | Bintang
+
+Klik Simpan Semua Soal, lalu mulai misi baru agar perubahan berlaku.
+Posisi jawaban benar diacak. Duplikat, kolom kosong, dan pilihan sama
+ditolak dengan nomor baris. Soal kustom diprioritaskan; bila kurang
+dari 63, bank 100 soal bawaan melengkapi. Bila lebih, dipilih 63 acak.
+Satu pertanyaan tidak dibagikan ke dua robot dalam satu percobaan.
+Data memakai localStorage browser/perangkat, bukan penyimpanan server.
+
+PENGUJIAN
+Lolos simulasi konektivitas pintu/koridor semua modul dan akses vertikal
+ke 30 situs robot serta 44 lokasi komponen; dinding; sembilan rute
+patroli; gravitasi nol; perlindungan; reset oleh setiap drone; kontrol
+HP; peta; impor soal; penghapusan NPC; serta kemenangan.
+Tampilan WebGL langsung dan pengalaman pada HP fisik belum diverifikasi.
